@@ -1,8 +1,8 @@
-using OpenDBDiff.Abstractions.Schema;
-using OpenDBDiff.Abstractions.Schema.Model;
 using System;
 using System.Globalization;
 using System.Text;
+using OpenDBDiff.Abstractions.Schema;
+using OpenDBDiff.Abstractions.Schema.Model;
 
 namespace OpenDBDiff.SqlServer.Schema.Model
 {
@@ -36,22 +36,24 @@ namespace OpenDBDiff.SqlServer.Schema.Model
         /// </summary>
         public override ISchemaBase Clone(ISchemaBase parent)
         {
-            Constraint col = new Constraint(parent);
-            col.Id = this.Id;
-            col.Name = this.Name;
-            col.NotForReplication = this.NotForReplication;
-            col.RelationalTableFullName = this.RelationalTableFullName;
-            col.Status = this.Status;
-            col.Type = this.Type;
-            col.WithNoCheck = this.WithNoCheck;
-            col.OnDeleteCascade = this.OnDeleteCascade;
-            col.OnUpdateCascade = this.OnUpdateCascade;
-            col.Owner = this.Owner;
-            col.Columns = this.Columns.Clone();
-            col.Index = (Index)this.Index?.Clone(parent);
-            col.IsDisabled = this.IsDisabled;
-            col.Definition = this.Definition;
-            col.Guid = this.Guid;
+            Constraint col = new Constraint(parent)
+            {
+                Id = this.Id,
+                Name = this.Name,
+                NotForReplication = this.NotForReplication,
+                RelationalTableFullName = this.RelationalTableFullName,
+                Status = this.Status,
+                Type = this.Type,
+                WithNoCheck = this.WithNoCheck,
+                OnDeleteCascade = this.OnDeleteCascade,
+                OnUpdateCascade = this.OnUpdateCascade,
+                Owner = this.Owner,
+                Columns = this.Columns.Clone(),
+                Index = (Index)this.Index?.Clone(parent),
+                IsDisabled = this.IsDisabled,
+                Definition = this.Definition,
+                Guid = this.Guid
+            };
             return col;
         }
 
@@ -73,7 +75,7 @@ namespace OpenDBDiff.SqlServer.Schema.Model
             get
             {
                 if (Index != null)
-                    return (Index.Type == Index.IndexTypeEnum.Clustered);
+                    return Index.Type == Index.IndexTypeEnum.Clustered;
                 return false;
             }
         }
@@ -164,7 +166,7 @@ namespace OpenDBDiff.SqlServer.Schema.Model
                 current = current.Parent;
             }
             var isAzure10 = database.Info.Version == DatabaseInfo.SQLServerVersion.SQLServerAzure10;
-            string typeConstraint = "";
+            //string typeConstraint = "";
             StringBuilder sql = new StringBuilder();
             if (Parent.ObjectType != ObjectType.TableType)
                 sql.Append("CONSTRAINT [" + Name + "] ");
@@ -218,7 +220,7 @@ namespace OpenDBDiff.SqlServer.Schema.Model
                 sql.Append(")");
                 if (!isAzure10)
                 {
-                    if (!String.IsNullOrEmpty(Index.FileGroup)) sql.Append(" ON [" + Index.FileGroup + "]");
+                    if (!string.IsNullOrEmpty(Index.FileGroup)) sql.Append(" ON [" + Index.FileGroup + "]");
                 }
             }
 
@@ -264,7 +266,7 @@ namespace OpenDBDiff.SqlServer.Schema.Model
                 if (OnDeleteCascade == 2) sql.Append(" ON DELETE SET NULL");
                 if (OnUpdateCascade == 3) sql.Append(" ON UPDATE SET DEFAULT");
                 if (OnDeleteCascade == 3) sql.Append(" ON DELETE SET DEFAULT");
-                sql.Append((NotForReplication ? " NOT FOR REPLICATION" : ""));
+                sql.Append(NotForReplication ? " NOT FOR REPLICATION" : "");
                 return sql.ToString();
             }
             if (this.Type == ConstraintType.Unique)
@@ -327,19 +329,18 @@ namespace OpenDBDiff.SqlServer.Schema.Model
         public string ToSqlDrop(string FileGroupName)
         {
             string sql = "ALTER TABLE " + ((Table)Parent).FullName + " DROP CONSTRAINT [" + Name + "]";
-            if (!String.IsNullOrEmpty(FileGroupName)) sql += " WITH (MOVE TO [" + FileGroupName + "])";
+            if (!string.IsNullOrEmpty(FileGroupName)) sql += " WITH (MOVE TO [" + FileGroupName + "])";
             sql += "\r\nGO\r\n";
             return sql;
         }
 
         public string ToSQLEnabledDisabled()
         {
-            StringBuilder sql = new StringBuilder();
             if (this.IsDisabled)
-                return "ALTER TABLE " + Parent.FullName + " NOCHECK CONSTRAINT [" + Name + "]\r\nGO\r\n";
+                return $"ALTER TABLE {Parent.FullName} NOCHECK CONSTRAINT [{Name}\r\nGO\r\n";
             else
             {
-                return "ALTER TABLE " + Parent.FullName + " CHECK CONSTRAINT [" + Name + "]\r\nGO\r\n";
+                return $"ALTER TABLE {Parent.FullName} CHECK CONSTRAINT [{Name}]\r\nGO\r\n";
             }
         }
 

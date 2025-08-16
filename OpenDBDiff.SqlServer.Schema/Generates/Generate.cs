@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Microsoft.Data.SqlClient;
 using OpenDBDiff.Abstractions.Schema.Errors;
 using OpenDBDiff.Abstractions.Schema.Events;
@@ -6,8 +7,6 @@ using OpenDBDiff.SqlServer.Schema.Compare;
 using OpenDBDiff.SqlServer.Schema.Generates.Util;
 using OpenDBDiff.SqlServer.Schema.Model;
 using OpenDBDiff.SqlServer.Schema.Options;
-using System;
-using System.Collections.Generic;
 
 namespace OpenDBDiff.SqlServer.Schema.Generates
 {
@@ -50,13 +49,13 @@ namespace OpenDBDiff.SqlServer.Schema.Generates
 
         private void Generate_OnReading(ProgressEventArgs e)
         {
-            if (OnProgress != null) OnProgress(e);
+            OnProgress?.Invoke(e);
         }
 
         public void RaiseOnReading(ProgressEventArgs e)
         {
             this.currentlyReading = e;
-            if (OnReading != null) OnReading(e);
+            OnReading?.Invoke(e);
         }
 
         public void RaiseOnReadingOne(object name)
@@ -64,7 +63,7 @@ namespace OpenDBDiff.SqlServer.Schema.Generates
             if (name != null && this.OnReading != null && this.currentlyReading != null)
             {
                 var eOne = new ProgressEventArgs(this.currentlyReading.Message, this.currentlyReading.Progress);
-                eOne.Message = eOne.Message.Replace("...", String.Format(": [{0}]", name));
+                eOne.Message = eOne.Message.Replace("...", string.Format(": [{0}]", name));
                 this.OnReading(eOne);
             }
         }
@@ -75,28 +74,29 @@ namespace OpenDBDiff.SqlServer.Schema.Generates
         public Database Process()
         {
             string error = "";
-            var databaseSchema = new Database();
-
-            //tables.OnTableProgress += new Progress.ProgressHandler(tables_OnTableProgress);
-            databaseSchema.Options = Options;
-            databaseSchema.Name = Name;
-            databaseSchema.Info = (new GenerateDatabase(ConnectionString, Options)).Get(databaseSchema);
+            var databaseSchema = new Database
+            {
+                //tables.OnTableProgress += new Progress.ProgressHandler(tables_OnTableProgress);
+                Options = Options,
+                Name = Name
+            };
+            databaseSchema.Info = new GenerateDatabase(ConnectionString, Options).Get(databaseSchema);
             /*Thread t1 = new Thread(delegate()
                 {
                     try
                     {*/
-            (new GenerateRules(this)).Fill(databaseSchema, ConnectionString);
-            (new GenerateTables(this)).Fill(databaseSchema, ConnectionString, messages);
-            (new GenerateViews(this)).Fill(databaseSchema, ConnectionString, messages);
+            new GenerateRules(this).Fill(databaseSchema, ConnectionString);
+            new GenerateTables(this).Fill(databaseSchema, ConnectionString, messages);
+            new GenerateViews(this).Fill(databaseSchema, ConnectionString, messages);
 
             if (Options.Ignore.FilterIndex)
             {
-                (new GenerateIndex(this)).Fill(databaseSchema, ConnectionString);
-                (new GenerateFullTextIndex(this)).Fill(databaseSchema, ConnectionString);
+                new GenerateIndex(this).Fill(databaseSchema, ConnectionString);
+                new GenerateFullTextIndex(this).Fill(databaseSchema, ConnectionString);
             }
-            (new GenerateUserDataTypes(this)).Fill(databaseSchema, ConnectionString, messages);
-            (new GenerateXMLSchemas(this)).Fill(databaseSchema, ConnectionString);
-            (new GenerateSchemas(this)).Fill(databaseSchema, ConnectionString);
+            new GenerateUserDataTypes(this).Fill(databaseSchema, ConnectionString, messages);
+            new GenerateXMLSchemas(this).Fill(databaseSchema, ConnectionString);
+            new GenerateSchemas(this).Fill(databaseSchema, ConnectionString);
             /*}
                     catch (Exception ex)
                     {
@@ -111,19 +111,19 @@ namespace OpenDBDiff.SqlServer.Schema.Generates
             //not supported in azure yet
             if (databaseSchema.Info.Version != DatabaseInfo.SQLServerVersion.SQLServerAzure10)
             {
-                (new GeneratePartitionFunctions(this)).Fill(databaseSchema, ConnectionString);
-                (new GeneratePartitionScheme(this)).Fill(databaseSchema, ConnectionString);
-                (new GenerateFileGroups(this)).Fill(databaseSchema, ConnectionString);
+                new GeneratePartitionFunctions(this).Fill(databaseSchema, ConnectionString);
+                new GeneratePartitionScheme(this).Fill(databaseSchema, ConnectionString);
+                new GenerateFileGroups(this).Fill(databaseSchema, ConnectionString);
             }
 
-            (new GenerateDDLTriggers(this)).Fill(databaseSchema, ConnectionString);
-            (new GenerateSynonyms(this)).Fill(databaseSchema, ConnectionString);
+            new GenerateDDLTriggers(this).Fill(databaseSchema, ConnectionString);
+            new GenerateSynonyms(this).Fill(databaseSchema, ConnectionString);
 
             //not supported in azure yet
             if (databaseSchema.Info.Version != DatabaseInfo.SQLServerVersion.SQLServerAzure10)
             {
-                (new GenerateAssemblies(this)).Fill(databaseSchema, ConnectionString);
-                (new GenerateFullText(this)).Fill(databaseSchema, ConnectionString);
+                new GenerateAssemblies(this).Fill(databaseSchema, ConnectionString);
+                new GenerateFullText(this).Fill(databaseSchema, ConnectionString);
             }
             /*}
                     catch (Exception ex)
@@ -135,11 +135,11 @@ namespace OpenDBDiff.SqlServer.Schema.Generates
                 {
                     try
                     {*/
-            (new GenerateStoredProcedures(this)).Fill(databaseSchema, ConnectionString);
-            (new GenerateFunctions(this)).Fill(databaseSchema, ConnectionString);
-            (new GenerateTriggers(this)).Fill(databaseSchema, ConnectionString, messages);
-            (new GenerateTextObjects(this)).Fill(databaseSchema, ConnectionString);
-            (new GenerateUsers(this)).Fill(databaseSchema, ConnectionString);
+            new GenerateStoredProcedures(this).Fill(databaseSchema, ConnectionString);
+            new GenerateFunctions(this).Fill(databaseSchema, ConnectionString);
+            new GenerateTriggers(this).Fill(databaseSchema, ConnectionString, messages);
+            new GenerateTextObjects(this).Fill(databaseSchema, ConnectionString);
+            new GenerateUsers(this).Fill(databaseSchema, ConnectionString);
             /*}
                     catch (Exception ex)
                     {
@@ -152,10 +152,10 @@ namespace OpenDBDiff.SqlServer.Schema.Generates
                 t1.Join();
                 t2.Join();
                 t3.Join();*/
-            if (String.IsNullOrEmpty(error))
+            if (string.IsNullOrEmpty(error))
             {
                 /*Las propiedades extendidas deben ir despues de haber capturado el resto de los objetos de la base*/
-                (new GenerateExtendedProperties(this)).Fill(databaseSchema, ConnectionString, messages);
+                new GenerateExtendedProperties(this).Fill(databaseSchema, ConnectionString, messages);
                 databaseSchema.BuildDependency();
                 return databaseSchema;
             }
@@ -163,7 +163,7 @@ namespace OpenDBDiff.SqlServer.Schema.Generates
                 throw new SchemaException(error);
         }
 
-        private void tables_OnTableProgress(object sender, ProgressEventArgs e)
+        private void Tables_OnTableProgress(object sender, ProgressEventArgs e)
         {
             ProgressEventHandler.RaiseOnChange(e);
         }
@@ -173,7 +173,7 @@ namespace OpenDBDiff.SqlServer.Schema.Generates
 
         internal static void RaiseOnCompareProgress(string formatString, params object[] formatParams)
         {
-            OnCompareProgress?.Invoke(new ProgressEventArgs(String.Format(formatString, formatParams), -1));
+            OnCompareProgress?.Invoke(new ProgressEventArgs(string.Format(formatString, formatParams), -1));
         }
 
         /// <summary>

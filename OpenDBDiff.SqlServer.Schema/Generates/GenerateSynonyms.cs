@@ -5,7 +5,7 @@ namespace OpenDBDiff.SqlServer.Schema.Generates
 {
     public class GenerateSynonyms
     {
-        private Generate root;
+        private readonly Generate root;
 
         public GenerateSynonyms(Generate root)
         {
@@ -31,11 +31,13 @@ namespace OpenDBDiff.SqlServer.Schema.Generates
                         {
                             while (reader.Read())
                             {
-                                Synonym item = new Synonym(database);
-                                item.Id = (int)reader["object_id"];
-                                item.Name = reader["Name"].ToString();
-                                item.Owner = reader["Owner"].ToString();
-                                item.Value = reader["base_object_name"].ToString();
+                                Synonym item = new Synonym(database)
+                                {
+                                    Id = (int)reader["object_id"],
+                                    Name = reader["Name"].ToString(),
+                                    Owner = reader["Owner"].ToString(),
+                                    Value = reader["base_object_name"].ToString()
+                                };
                                 database.Synonyms.Add(item);
                             }
                         }

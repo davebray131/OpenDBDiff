@@ -9,7 +9,7 @@ namespace OpenDBDiff.SqlServer.Schema.Generates
 {
     public class GenerateConstraint
     {
-        private Generate root;
+        private readonly Generate root;
 
         public GenerateConstraint(Generate root)
         {
@@ -45,14 +45,16 @@ namespace OpenDBDiff.SqlServer.Schema.Generates
                             }
                             if (table != null)
                             {
-                                item = new Constraint(table);
-                                item.Id = (int)reader["id"];
-                                item.Name = reader["Name"].ToString();
-                                item.Type = Constraint.ConstraintType.Check;
-                                item.Definition = reader["Definition"].ToString();
-                                item.WithNoCheck = (bool)reader["WithCheck"];
-                                item.IsDisabled = (bool)reader["is_disabled"];
-                                item.Owner = reader["Owner"].ToString();
+                                item = new Constraint(table)
+                                {
+                                    Id = (int)reader["id"],
+                                    Name = reader["Name"].ToString(),
+                                    Type = Constraint.ConstraintType.Check,
+                                    Definition = reader["Definition"].ToString(),
+                                    WithNoCheck = (bool)reader["WithCheck"],
+                                    IsDisabled = (bool)reader["is_disabled"],
+                                    Owner = reader["Owner"].ToString()
+                                };
                                 if (database.Options.Ignore.FilterNotForReplication)
                                     item.NotForReplication = (bool)reader["is_not_for_replication"];
                                 if (reader["ObjectType"].ToString().Trim().Equals("U"))
@@ -102,29 +104,33 @@ namespace OpenDBDiff.SqlServer.Schema.Generates
                             {
                                 if (lastid != (int)reader["object_id"])
                                 {
-                                    con = new Constraint(table);
-                                    con.Id = (int)reader["object_id"];
-                                    con.Name = reader["Name"].ToString();
-                                    con.Type = Constraint.ConstraintType.ForeignKey;
-                                    con.WithNoCheck = (bool)reader["is_not_trusted"];
-                                    con.RelationalTableFullName = "[" + reader["ReferenceOwner"].ToString() + "].[" + reader["TableRelationalName"].ToString() + "]";
-                                    con.RelationalTableId = (int)reader["TableRelationalId"];
-                                    con.Owner = reader["Owner"].ToString();
-                                    con.IsDisabled = (bool)reader["is_disabled"];
-                                    con.OnDeleteCascade = (byte)reader["delete_referential_action"];
-                                    con.OnUpdateCascade = (byte)reader["update_referential_action"];
+                                    con = new Constraint(table)
+                                    {
+                                        Id = (int)reader["object_id"],
+                                        Name = reader["Name"].ToString(),
+                                        Type = Constraint.ConstraintType.ForeignKey,
+                                        WithNoCheck = (bool)reader["is_not_trusted"],
+                                        RelationalTableFullName = "[" + reader["ReferenceOwner"].ToString() + "].[" + reader["TableRelationalName"].ToString() + "]",
+                                        RelationalTableId = (int)reader["TableRelationalId"],
+                                        Owner = reader["Owner"].ToString(),
+                                        IsDisabled = (bool)reader["is_disabled"],
+                                        OnDeleteCascade = (byte)reader["delete_referential_action"],
+                                        OnUpdateCascade = (byte)reader["update_referential_action"]
+                                    };
                                     if (database.Options.Ignore.FilterNotForReplication)
                                         con.NotForReplication = (bool)reader["is_not_for_replication"];
                                     lastid = (int)reader["object_id"];
                                     table.Constraints.Add(con);
                                 }
-                                ConstraintColumn ccon = new ConstraintColumn(con);
-                                ccon.Name = reader["ColumnName"].ToString();
-                                ccon.ColumnRelationalName = reader["ColumnRelationalName"].ToString();
-                                ccon.ColumnRelationalId = (int)reader["ColumnRelationalId"];
-                                ccon.Id = (int)reader["ColumnId"];
-                                ccon.KeyOrder = con.Columns.Count;
-                                ccon.ColumnRelationalDataTypeId = (int)reader["user_type_id"];
+                                ConstraintColumn ccon = new ConstraintColumn(con)
+                                {
+                                    Name = reader["ColumnName"].ToString(),
+                                    ColumnRelationalName = reader["ColumnRelationalName"].ToString(),
+                                    ColumnRelationalId = (int)reader["ColumnRelationalId"],
+                                    Id = (int)reader["ColumnId"],
+                                    KeyOrder = con.Columns.Count,
+                                    ColumnRelationalDataTypeId = (int)reader["user_type_id"]
+                                };
                                 //table.DependenciesCount++;
                                 con.Columns.Add(ccon);
                             }
@@ -140,7 +146,6 @@ namespace OpenDBDiff.SqlServer.Schema.Generates
         {
             int lastId = 0;
             int parentId = 0;
-            bool change = false;
             ISchemaBase table = null;
 
             using (SqlConnection conn = new SqlConnection(connectionString))
@@ -154,6 +159,7 @@ namespace OpenDBDiff.SqlServer.Schema.Generates
                         Constraint con = null;
                         while (reader.Read())
                         {
+                            bool change;
                             if (parentId != (int)reader["ID"])
                             {
                                 parentId = (int)reader["ID"];
@@ -168,13 +174,15 @@ namespace OpenDBDiff.SqlServer.Schema.Generates
 
                             if (table != null)
                             {
-                                if ((lastId != (int)reader["Index_id"]) || (change))
+                                if ((lastId != (int)reader["Index_id"]) || change)
                                 {
-                                    con = new Constraint(table, database.Options.Ignore.FilterIndex);
-                                    con.Name = reader["Name"].ToString();
-                                    con.Owner = (string)reader["Owner"];
-                                    con.Id = (int)reader["Index_id"];
-                                    con.Type = Constraint.ConstraintType.Unique;
+                                    con = new Constraint(table, database.Options.Ignore.FilterIndex)
+                                    {
+                                        Name = reader["Name"].ToString(),
+                                        Owner = (string)reader["Owner"],
+                                        Id = (int)reader["Index_id"],
+                                        Type = Constraint.ConstraintType.Unique
+                                    };
 
                                     if (database.Options.Ignore.FilterIndex)
                                     {
@@ -207,12 +215,14 @@ namespace OpenDBDiff.SqlServer.Schema.Generates
                                     else
                                         ((TableType)table).Constraints.Add(con);
                                 }
-                                ConstraintColumn ccon = new ConstraintColumn(con);
-                                ccon.Name = reader["ColumnName"].ToString();
-                                ccon.IsIncluded = (bool)reader["is_included_column"];
-                                ccon.Order = (bool)reader["is_descending_key"];
-                                ccon.Id = (int)reader["column_id"];
-                                ccon.DataTypeId = (int)reader["user_type_id"];
+                                ConstraintColumn ccon = new ConstraintColumn(con)
+                                {
+                                    Name = reader["ColumnName"].ToString(),
+                                    IsIncluded = (bool)reader["is_included_column"],
+                                    Order = (bool)reader["is_descending_key"],
+                                    Id = (int)reader["column_id"],
+                                    DataTypeId = (int)reader["user_type_id"]
+                                };
                                 con.Columns.Add(ccon);
                             }
                         }
@@ -227,7 +237,6 @@ namespace OpenDBDiff.SqlServer.Schema.Generates
         {
             int lastId = 0;
             int parentId = 0;
-            bool change = false;
             ISchemaBase table = null;
 
             using (SqlConnection conn = new SqlConnection(connectionString))
@@ -241,6 +250,7 @@ namespace OpenDBDiff.SqlServer.Schema.Generates
                         Constraint con = null;
                         while (reader.Read())
                         {
+                            bool change;
                             if (parentId != (int)reader["ID"])
                             {
                                 parentId = (int)reader["ID"];
@@ -255,13 +265,15 @@ namespace OpenDBDiff.SqlServer.Schema.Generates
 
                             if (table != null)
                             {
-                                if ((lastId != (int)reader["Index_id"]) || (change)) 
+                                if ((lastId != (int)reader["Index_id"]) || change)
                                 {
-                                    con = new Constraint(table, database.Options.Ignore.FilterIndex);
-                                    con.Id = (int)reader["Index_id"];
-                                    con.Name = (string)reader["Name"];
-                                    con.Owner = (string)reader["Owner"];
-                                    con.Type = Constraint.ConstraintType.PrimaryKey;
+                                    con = new Constraint(table, database.Options.Ignore.FilterIndex)
+                                    {
+                                        Id = (int)reader["Index_id"],
+                                        Name = (string)reader["Name"],
+                                        Owner = (string)reader["Owner"],
+                                        Type = Constraint.ConstraintType.PrimaryKey
+                                    };
 
                                     if (database.Options.Ignore.FilterIndex)
                                     {
@@ -296,13 +308,15 @@ namespace OpenDBDiff.SqlServer.Schema.Generates
                                     else
                                         ((TableType)table).Constraints.Add(con);
                                 }
-                                ConstraintColumn ccon = new ConstraintColumn(con);
-                                ccon.Name = (string)reader["ColumnName"];
-                                ccon.IsIncluded = (bool)reader["is_included_column"];
-                                ccon.Order = (bool)reader["is_descending_key"];
-                                ccon.KeyOrder = (byte)reader["key_ordinal"];
-                                ccon.Id = (int)reader["column_id"];
-                                ccon.DataTypeId = (int)reader["user_type_id"];
+                                ConstraintColumn ccon = new ConstraintColumn(con)
+                                {
+                                    Name = (string)reader["ColumnName"],
+                                    IsIncluded = (bool)reader["is_included_column"],
+                                    Order = (bool)reader["is_descending_key"],
+                                    KeyOrder = (byte)reader["key_ordinal"],
+                                    Id = (int)reader["column_id"],
+                                    DataTypeId = (int)reader["user_type_id"]
+                                };
                                 con.Columns.Add(ccon);
                             }
                         }

@@ -12,13 +12,13 @@ namespace OpenDBDiff.SqlServer.Ui.Util
             DataTable dt = sqlSource.GetDataSources();
 
             List<string> serverList = new List<string>();
-            string serverName = null;
-            string instanceName = null;
+            string serverName;
+            string instanceName;
 
             foreach (DataRow dr in dt.Rows)
             {
                 serverName = dr["ServerName"].ToString();
-                instanceName = dr["InstanceName"] != null ? dr["InstanceName"].ToString() : null;
+                instanceName = dr["InstanceName"]?.ToString();
 
                 if (string.IsNullOrEmpty(instanceName))
                     serverList.Add(serverName);

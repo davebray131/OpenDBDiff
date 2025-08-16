@@ -1,6 +1,6 @@
-﻿using OpenDBDiff.Abstractions.Schema.Model;
-using System;
+﻿using System;
 using System.Text.RegularExpressions;
+using OpenDBDiff.Abstractions.Schema.Model;
 using TSQL;
 using TSQL.Tokens;
 
@@ -75,7 +75,7 @@ namespace OpenDBDiff.SqlServer.Schema.Model.Util
             };
         }
 
-        public static string FormatAlter(string ObjectType, string body, ISchemaBase item, Boolean quitSchemaBinding)
+        public static string FormatAlter(string objectType, string body, ISchemaBase item, Boolean quitSchemaBinding)
         {
             string prevText = null;
             try
@@ -99,13 +99,13 @@ namespace OpenDBDiff.SqlServer.Schema.Model.Util
             }
         }
 
-        public static string FormatCreate(string ObjectType, string body, ISchemaBase item)
+        public static string FormatCreate(string objectType, string body, ISchemaBase item)
         {
             try
             {
                 string prevText = (string)body.Clone();
                 prevText = FindAndNormalizeCreate(item, prevText).Body;
-                if (String.IsNullOrEmpty(prevText))
+                if (string.IsNullOrEmpty(prevText))
                     prevText = body;
                 prevText = CleanLast(prevText);
                 return SmartGO(prevText);

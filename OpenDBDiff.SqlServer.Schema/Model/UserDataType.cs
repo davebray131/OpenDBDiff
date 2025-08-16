@@ -1,9 +1,9 @@
-using OpenDBDiff.Abstractions.Schema;
-using OpenDBDiff.Abstractions.Schema.Model;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
+using OpenDBDiff.Abstractions.Schema;
+using OpenDBDiff.Abstractions.Schema.Model;
 
 namespace OpenDBDiff.SqlServer.Schema.Model
 {
@@ -144,9 +144,9 @@ namespace OpenDBDiff.SqlServer.Schema.Model
         private string ToSQLAddBinds()
         {
             string sql = "";
-            if (!String.IsNullOrEmpty(Default.Name))
+            if (!string.IsNullOrEmpty(Default.Name))
                 sql += Default.ToSQLAddBind();
-            if (!String.IsNullOrEmpty(Rule.Name))
+            if (!string.IsNullOrEmpty(Rule.Name))
                 sql += Rule.ToSQLAddBind();
             return sql;
         }
@@ -186,7 +186,7 @@ namespace OpenDBDiff.SqlServer.Schema.Model
                         Column column = ((Table)itemDepens).Columns[dependency.ColumnName];
                         if ((column.Parent.Status != ObjectStatus.Drop) &&
                             (column.Parent.Status != ObjectStatus.Create) &&
-                            ((column.Status != ObjectStatus.Create) || (column.IsComputed)))
+                            ((column.Status != ObjectStatus.Create) || column.IsComputed))
                         {
                             if (!fields.ContainsKey(column.FullName))
                             {
@@ -251,7 +251,7 @@ namespace OpenDBDiff.SqlServer.Schema.Model
                     ((Database)Parent).UserTypes.Find(
                         item =>
                         (item.Status == ObjectStatus.Drop) &&
-                        (item.AssemblyName + "." + item.AssemblyClass).Equals((AssemblyName + "." + AssemblyClass)));
+                        (item.AssemblyName + "." + item.AssemblyClass).Equals(AssemblyName + "." + AssemblyClass));
                 if (other != null)
                     return true;
             }
@@ -264,7 +264,7 @@ namespace OpenDBDiff.SqlServer.Schema.Model
                 ((Database)Parent).UserTypes.Find(
                     item =>
                     (item.Status == ObjectStatus.Drop) &&
-                    (item.AssemblyName + "." + item.AssemblyClass).Equals((AssemblyName + "." + AssemblyClass)));
+                    (item.AssemblyName + "." + item.AssemblyClass).Equals(AssemblyName + "." + AssemblyClass));
             return other.ToSqlDrop();
         }
 

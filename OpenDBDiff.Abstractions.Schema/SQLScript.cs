@@ -39,7 +39,7 @@ namespace OpenDBDiff.Abstractions.Schema
         {
             get
             {
-                return ((Status == ScriptAction.DropView) || (Status == ScriptAction.DropFunction) || (Status == ScriptAction.DropStoredProcedure));
+                return (Status == ScriptAction.DropView) || (Status == ScriptAction.DropFunction) || (Status == ScriptAction.DropStoredProcedure);
             }
         }
 
@@ -47,7 +47,7 @@ namespace OpenDBDiff.Abstractions.Schema
         {
             get
             {
-                return ((Status == ScriptAction.AddView) || (Status == ScriptAction.AddFunction) || (Status == ScriptAction.AddStoredProcedure));
+                return (Status == ScriptAction.AddView) || (Status == ScriptAction.AddFunction) || (Status == ScriptAction.AddStoredProcedure);
             }
         }
 

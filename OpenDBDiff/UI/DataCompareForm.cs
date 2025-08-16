@@ -1,8 +1,8 @@
-using OpenDBDiff.Abstractions.Schema.Model;
 using System;
 using System.Data;
 using System.Drawing;
 using System.Windows.Forms;
+using OpenDBDiff.Abstractions.Schema.Model;
 
 namespace OpenDBDiff.UI
 {
@@ -15,13 +15,13 @@ namespace OpenDBDiff.UI
             this.srcConnectionString = SrcConnectionString;
             this.destConnectionString = DestConnectionString;
 
-            doCompare();
+            DoCompare();
         }
 
-        private void doCompare()
+        private void DoCompare()
         {
-            DataTable srcTable = Updater.getData(selected, srcConnectionString);
-            DataTable destTable = Updater.getData(selected, destConnectionString);
+            DataTable srcTable = Updater.GetData(selected, srcConnectionString);
+            DataTable destTable = Updater.GetData(selected, destConnectionString);
 
             srcDgv.MultiSelect = false;
             srcDgv.ReadOnly = true;
@@ -35,10 +35,10 @@ namespace OpenDBDiff.UI
             destDgv.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
             destDgv.RowHeadersVisible = false;
             destDgv.DataSource = destTable;
-            destDgv.CellFormatting += new DataGridViewCellFormattingEventHandler(destDgv_CellFormatting);
+            destDgv.CellFormatting += new DataGridViewCellFormattingEventHandler(DestDgv_CellFormatting);
         }
 
-        private void destDgv_CellFormatting(object sender, DataGridViewCellFormattingEventArgs e)
+        private void DestDgv_CellFormatting(object sender, DataGridViewCellFormattingEventArgs e)
         {
             DataTable table = (DataTable)destDgv.DataSource;
             if (e.RowIndex < table.Rows.Count)
@@ -54,19 +54,19 @@ namespace OpenDBDiff.UI
             }
         }
 
-        private void btnCommitChanges_Click(object sender, EventArgs e)
+        private void BtnCommitChanges_Click(object sender, EventArgs e)
         {
             DataTable destination = (DataTable)destDgv.DataSource;
             DataTable edits = destination.GetChanges();
             if (Updater.CommitTable(edits, selected.FullName, destConnectionString))
             {
                 destination.AcceptChanges();
-                doCompare();
+                DoCompare();
                 btnCommitChanges.Enabled = false;
             }
         }
 
-        private void btnUpdateRow_Click(object sender, EventArgs e)
+        private void BtnUpdateRow_Click(object sender, EventArgs e)
         {
             DataTable source = (DataTable)srcDgv.DataSource;
             DataTable destination = (DataTable)destDgv.DataSource;
@@ -90,7 +90,7 @@ namespace OpenDBDiff.UI
             btnCommitChanges.Enabled = true;
         }
 
-        private void btnMerge_Click(object sender, EventArgs e)
+        private void BtnMerge_Click(object sender, EventArgs e)
         {
             DataTable source = (DataTable)srcDgv.DataSource;
             DataTable destination = (DataTable)destDgv.DataSource;
@@ -106,7 +106,7 @@ namespace OpenDBDiff.UI
             btnCommitChanges.Enabled = true;
         }
 
-        private void btnRowToRow_Click(object sender, EventArgs e)
+        private void BtnRowToRow_Click(object sender, EventArgs e)
         {
             DataTable source = (DataTable)srcDgv.DataSource;
             DataTable destination = (DataTable)destDgv.DataSource;
@@ -123,8 +123,8 @@ namespace OpenDBDiff.UI
             }
             btnCommitChanges.Enabled = true;
         }
-        private ISchemaBase selected;
-        private string srcConnectionString;
-        private string destConnectionString;
+        private readonly ISchemaBase selected;
+        private readonly string srcConnectionString;
+        private readonly string destConnectionString;
     }
 }

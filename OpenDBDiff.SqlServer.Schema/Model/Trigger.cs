@@ -1,6 +1,6 @@
+using System;
 using OpenDBDiff.Abstractions.Schema;
 using OpenDBDiff.Abstractions.Schema.Model;
-using System;
 
 namespace OpenDBDiff.SqlServer.Schema.Model
 {
@@ -17,17 +17,19 @@ namespace OpenDBDiff.SqlServer.Schema.Model
         /// </summary>
         public override ISchemaBase Clone(ISchemaBase parent)
         {
-            Trigger trigger = new Trigger(parent);
-            trigger.Text = this.Text;
-            trigger.Status = this.Status;
-            trigger.Name = this.Name;
-            trigger.IsDisabled = this.IsDisabled;
-            trigger.InsteadOf = this.InsteadOf;
-            trigger.NotForReplication = this.NotForReplication;
-            trigger.Owner = this.Owner;
-            trigger.Id = this.Id;
-            trigger.IsDDLTrigger = this.IsDDLTrigger;
-            trigger.Guid = this.Guid;
+            Trigger trigger = new Trigger(parent)
+            {
+                Text = this.Text,
+                Status = this.Status,
+                Name = this.Name,
+                IsDisabled = this.IsDisabled,
+                InsteadOf = this.InsteadOf,
+                NotForReplication = this.NotForReplication,
+                Owner = this.Owner,
+                Id = this.Id,
+                IsDDLTrigger = this.IsDDLTrigger,
+                Guid = this.Guid
+            };
             return trigger;
         }
 

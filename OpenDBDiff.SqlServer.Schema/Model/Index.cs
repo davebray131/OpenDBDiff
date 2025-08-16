@@ -1,7 +1,7 @@
-using OpenDBDiff.Abstractions.Schema;
-using OpenDBDiff.Abstractions.Schema.Model;
 using System;
 using System.Text;
+using OpenDBDiff.Abstractions.Schema;
+using OpenDBDiff.Abstractions.Schema.Model;
 
 namespace OpenDBDiff.SqlServer.Schema.Model
 {
@@ -153,9 +153,9 @@ namespace OpenDBDiff.SqlServer.Schema.Model
 
             StringBuilder sql = new StringBuilder();
             string includes = "";
-            if ((Type == IndexTypeEnum.Clustered) && (IsUniqueKey)) sql.Append("CREATE UNIQUE CLUSTERED ");
+            if ((Type == IndexTypeEnum.Clustered) && IsUniqueKey) sql.Append("CREATE UNIQUE CLUSTERED ");
             if ((Type == IndexTypeEnum.Clustered) && (!IsUniqueKey)) sql.Append("CREATE CLUSTERED ");
-            if ((Type == IndexTypeEnum.Nonclustered) && (IsUniqueKey)) sql.Append("CREATE UNIQUE NONCLUSTERED ");
+            if ((Type == IndexTypeEnum.Nonclustered) && IsUniqueKey) sql.Append("CREATE UNIQUE NONCLUSTERED ");
             if ((Type == IndexTypeEnum.Nonclustered) && (!IsUniqueKey)) sql.Append("CREATE NONCLUSTERED ");
             if (Type == IndexTypeEnum.XML) sql.Append("CREATE PRIMARY XML ");
             sql.AppendLine("INDEX [" + Name + "] ON " + Parent.FullName + "\r\n(");
@@ -175,18 +175,18 @@ namespace OpenDBDiff.SqlServer.Schema.Model
                 }
                 else
                 {
-                    if (String.IsNullOrEmpty(includes)) includes = ") INCLUDE (";
+                    if (string.IsNullOrEmpty(includes)) includes = ") INCLUDE (";
                     includes += "[" + Columns[j].Name + "],";
                 }
             }
-            if (!String.IsNullOrEmpty(includes)) includes = includes.Substring(0, includes.Length - 1);
+            if (!string.IsNullOrEmpty(includes)) includes = includes.Substring(0, includes.Length - 1);
             sql.Append(includes);
             sql.Append(")");
-            if (!String.IsNullOrEmpty(FilterDefintion)) sql.AppendLine("\r\n WHERE " + FilterDefintion);
+            if (!string.IsNullOrEmpty(FilterDefintion)) sql.AppendLine("\r\n WHERE " + FilterDefintion);
             sql.Append(" WITH (");
             if (Parent.ObjectType == ObjectType.TableType)
             {
-                if ((IgnoreDupKey) && (IsUniqueKey)) sql.Append("IGNORE_DUP_KEY = ON "); else sql.Append("IGNORE_DUP_KEY  = OFF ");
+                if (IgnoreDupKey && IsUniqueKey) sql.Append("IGNORE_DUP_KEY = ON "); else sql.Append("IGNORE_DUP_KEY  = OFF ");
             }
             else
             {
@@ -197,7 +197,7 @@ namespace OpenDBDiff.SqlServer.Schema.Model
 
                 if (IsAutoStatistics) sql.Append("STATISTICS_NORECOMPUTE = ON"); else sql.Append("STATISTICS_NORECOMPUTE  = OFF");
                 if (Type != IndexTypeEnum.XML)
-                    if ((IgnoreDupKey) && (IsUniqueKey)) sql.Append("IGNORE_DUP_KEY = ON, "); else sql.Append(", IGNORE_DUP_KEY  = OFF");
+                    if (IgnoreDupKey && IsUniqueKey) sql.Append("IGNORE_DUP_KEY = ON, "); else sql.Append(", IGNORE_DUP_KEY  = OFF");
 
                 if (!isAzure10)
                 {
@@ -209,7 +209,7 @@ namespace OpenDBDiff.SqlServer.Schema.Model
             sql.Append(")");
             if (!isAzure10)
             {
-                if (!String.IsNullOrEmpty(FileGroup)) sql.Append(" ON [" + FileGroup + "]");
+                if (!string.IsNullOrEmpty(FileGroup)) sql.Append(" ON [" + FileGroup + "]");
             }
             sql.AppendLine("\r\nGO");
             if (IsDisabled)
@@ -232,7 +232,7 @@ namespace OpenDBDiff.SqlServer.Schema.Model
         private string ToSqlDrop(string FileGroupName)
         {
             var sql = new StringBuilder("DROP INDEX [" + Name + "] ON " + Parent.FullName);
-            if (!String.IsNullOrEmpty(FileGroupName)) sql.Append(" WITH (MOVE TO [" + FileGroupName + "])");
+            if (!string.IsNullOrEmpty(FileGroupName)) sql.Append(" WITH (MOVE TO [" + FileGroupName + "])");
             sql.AppendLine("\r\nGO");
             return sql.ToString();
         }
@@ -272,8 +272,7 @@ namespace OpenDBDiff.SqlServer.Schema.Model
             if (Status != ObjectStatus.Original)
             {
                 var actionMessage = RootParent.ActionMessage[Parent.FullName];
-                if (actionMessage != null)
-                    actionMessage.Add(this);
+                actionMessage?.Add(this);
             }
 
             if (HasState(ObjectStatus.Drop))

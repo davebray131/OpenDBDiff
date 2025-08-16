@@ -1,7 +1,6 @@
-using OpenDBDiff.Abstractions.Schema.Model;
-using System;
 using System.Collections.Generic;
 using System.Text;
+using OpenDBDiff.Abstractions.Schema.Model;
 
 namespace OpenDBDiff.Abstractions.Schema
 {
@@ -11,7 +10,7 @@ namespace OpenDBDiff.Abstractions.Schema
 
         public void Sort()
         {
-            if (list != null) list.Sort();
+            list?.Sort();
         }
 
         public void Add(SQLScript item, int deep)
@@ -122,13 +121,13 @@ namespace OpenDBDiff.Abstractions.Schema
 
             for (int i = 0; i < scriptList.Count; ++i)
             {
-                if (!String.IsNullOrEmpty(scriptList[i].SQL))
+                if (!string.IsNullOrEmpty(scriptList[i].SQL))
                 {
                     return scriptList;
                 }
             }
 
-            scriptList.Add(String.Format("\r\n--\r\n-- DIFF-ERROR 0x{0:x8}.{1:d3}: Missing {2} script for {3} '{4}'\r\n--\r\n\r\n", (int)scriptSource.Status, (int)scriptSource.ObjectType, scriptSource.Status, scriptSource.ObjectType, scriptSource.Name), 0, ScriptAction.None);
+            scriptList.Add(string.Format("\r\n--\r\n-- DIFF-ERROR 0x{0:x8}.{1:d3}: Missing {2} script for {3} '{4}'\r\n--\r\n\r\n", (int)scriptSource.Status, (int)scriptSource.ObjectType, scriptSource.Status, scriptSource.ObjectType, scriptSource.Name), 0, ScriptAction.None);
             return scriptList;
         }
     }

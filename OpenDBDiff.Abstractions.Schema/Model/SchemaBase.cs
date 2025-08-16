@@ -10,8 +10,8 @@ namespace OpenDBDiff.Abstractions.Schema.Model
     {
         private ObjectStatus status;
         private ISchemaBase parent;
-        private string nameCharacterOpen;
-        private string nameCharacterClose;
+        private readonly string nameCharacterOpen;
+        private readonly string nameCharacterClose;
         private Hashtable wasInsertInDiffList;
         private IDatabase rootParent = null;
 
@@ -83,9 +83,9 @@ namespace OpenDBDiff.Abstractions.Schema.Model
                     else
                         rootParent = (IDatabase)this.Parent;
                 }
-                else if (this is IDatabase)
+                else if (this is IDatabase database)
                 {
-                    rootParent = (IDatabase)this;
+                    rootParent = database;
                 }
                 return rootParent;
             }
@@ -153,7 +153,7 @@ namespace OpenDBDiff.Abstractions.Schema.Model
         public Boolean GetWasInsertInDiffList(ScriptAction action)
         {
             if (wasInsertInDiffList != null)
-                return (wasInsertInDiffList.ContainsKey(action));
+                return wasInsertInDiffList.ContainsKey(action);
             else
                 return false;
         }
@@ -195,7 +195,7 @@ namespace OpenDBDiff.Abstractions.Schema.Model
         {
             get
             {
-                if (String.IsNullOrEmpty(Owner))
+                if (string.IsNullOrEmpty(Owner))
                     return nameCharacterOpen + Name + nameCharacterClose;
                 else
                     return nameCharacterOpen + Owner + nameCharacterClose + "." + nameCharacterOpen + Name + nameCharacterClose;
@@ -256,7 +256,7 @@ namespace OpenDBDiff.Abstractions.Schema.Model
 
         public Boolean HasState(ObjectStatus statusFind)
         {
-            return ((this.Status & statusFind) == statusFind);
+            return (this.Status & statusFind) == statusFind;
         }
 
         public virtual Boolean IsCodeType

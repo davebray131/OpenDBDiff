@@ -1,8 +1,8 @@
-﻿using OpenDBDiff.Abstractions.Schema;
+﻿using System;
+using OpenDBDiff.Abstractions.Schema;
 using OpenDBDiff.Abstractions.Schema.Attributes;
 using OpenDBDiff.Abstractions.Schema.Model;
 using OpenDBDiff.SqlServer.Schema.Model.Util;
-using System;
 
 namespace OpenDBDiff.SqlServer.Schema.Model
 {
@@ -21,15 +21,17 @@ namespace OpenDBDiff.SqlServer.Schema.Model
         /// </summary>
         public override ISchemaBase Clone(ISchemaBase parent)
         {
-            View item = new View(parent);
-            item.Text = this.Text;
-            item.Status = this.Status;
-            item.Name = this.Name;
-            item.Id = this.Id;
-            item.Owner = this.Owner;
-            item.IsSchemaBinding = this.IsSchemaBinding;
-            item.DependenciesIn = this.DependenciesIn;
-            item.DependenciesOut = this.DependenciesOut;
+            View item = new View(parent)
+            {
+                Text = this.Text,
+                Status = this.Status,
+                Name = this.Name,
+                Id = this.Id,
+                Owner = this.Owner,
+                IsSchemaBinding = this.IsSchemaBinding,
+                DependenciesIn = this.DependenciesIn,
+                DependenciesOut = this.DependenciesOut
+            };
             item.Indexes = this.Indexes.Clone(item);
             item.Triggers = this.Triggers.Clone(item);
             return item;

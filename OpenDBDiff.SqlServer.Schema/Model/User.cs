@@ -1,6 +1,6 @@
-﻿using OpenDBDiff.Abstractions.Schema;
+﻿using System;
+using OpenDBDiff.Abstractions.Schema;
 using OpenDBDiff.Abstractions.Schema.Model;
-using System;
 
 namespace OpenDBDiff.SqlServer.Schema.Model
 {
@@ -23,11 +23,11 @@ namespace OpenDBDiff.SqlServer.Schema.Model
             string sql = "";
             sql += "CREATE USER ";
             sql += FullName + " ";
-            if (!String.IsNullOrEmpty(Login))
+            if (!string.IsNullOrEmpty(Login))
                 sql += "FOR LOGIN [" + Login + "] ";
             else
                 sql += "WITHOUT LOGIN ";
-            if (!String.IsNullOrEmpty(Owner))
+            if (!string.IsNullOrEmpty(Owner))
                 sql += "WITH DEFAULT_SCHEMA=[" + Owner + "]";
             return sql.Trim() + "\r\nGO\r\n";
         }

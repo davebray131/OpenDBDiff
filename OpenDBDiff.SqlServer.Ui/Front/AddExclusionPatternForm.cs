@@ -1,17 +1,17 @@
-﻿using OpenDBDiff.Abstractions.Schema;
-using OpenDBDiff.SqlServer.Schema.Options;
-using System;
+﻿using System;
 using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
 using System.Windows.Forms;
+using OpenDBDiff.Abstractions.Schema;
+using OpenDBDiff.SqlServer.Schema.Options;
 
 namespace OpenDBDiff.SqlServer.Ui
 {
     public partial class AddExclusionPatternForm : Form
     {
-        private SqlOption sqlOption;
-        private int indexFilter;
+        private readonly SqlOption sqlOption;
+        private readonly int indexFilter;
 
         public AddExclusionPatternForm(SqlOption sqlOption)
             : this(sqlOption, -1)

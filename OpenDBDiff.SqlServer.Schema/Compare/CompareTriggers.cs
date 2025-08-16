@@ -21,7 +21,7 @@ namespace OpenDBDiff.SqlServer.Schema.Compare
                 if (!newNode.Text.Equals(originFields[node.FullName].Text))
                     newNode.Status = ObjectStatus.Alter;
                 if (node.IsDisabled != originFields[node.FullName].IsDisabled)
-                    newNode.Status = newNode.Status + (int)ObjectStatus.Disabled;
+                    newNode.Status += (int)ObjectStatus.Disabled;
                 originFields[node.FullName] = newNode;
             }
         }

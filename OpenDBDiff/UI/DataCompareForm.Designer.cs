@@ -125,7 +125,7 @@ namespace OpenDBDiff.UI
             this.btnRowToRow.TabIndex = 4;
             this.btnRowToRow.Text = "Update row --> row";
             this.btnRowToRow.UseVisualStyleBackColor = false;
-            this.btnRowToRow.Click += new System.EventHandler(this.btnRowToRow_Click);
+            this.btnRowToRow.Click += new System.EventHandler(this.BtnRowToRow_Click);
             // 
             // btnMerge
             // 
@@ -137,7 +137,7 @@ namespace OpenDBDiff.UI
             this.btnMerge.TabIndex = 5;
             this.btnMerge.Text = "Merge all -->";
             this.btnMerge.UseVisualStyleBackColor = false;
-            this.btnMerge.Click += new System.EventHandler(this.btnMerge_Click);
+            this.btnMerge.Click += new System.EventHandler(this.BtnMerge_Click);
             // 
             // btnUpdateRow
             // 
@@ -149,7 +149,7 @@ namespace OpenDBDiff.UI
             this.btnUpdateRow.TabIndex = 6;
             this.btnUpdateRow.Text = "Update row -->";
             this.btnUpdateRow.UseVisualStyleBackColor = false;
-            this.btnUpdateRow.Click += new System.EventHandler(this.btnUpdateRow_Click);
+            this.btnUpdateRow.Click += new System.EventHandler(this.BtnUpdateRow_Click);
             // 
             // btnCommitChanges
             // 
@@ -162,7 +162,7 @@ namespace OpenDBDiff.UI
             this.btnCommitChanges.TabIndex = 7;
             this.btnCommitChanges.Text = "Commit";
             this.btnCommitChanges.UseVisualStyleBackColor = false;
-            this.btnCommitChanges.Click += new System.EventHandler(this.btnCommitChanges_Click);
+            this.btnCommitChanges.Click += new System.EventHandler(this.BtnCommitChanges_Click);
             // 
             // splitContainer1
             // 

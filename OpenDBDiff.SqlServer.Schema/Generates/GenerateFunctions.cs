@@ -1,16 +1,15 @@
-﻿using Microsoft.Data.SqlClient;
+﻿using System.Linq;
+using Microsoft.Data.SqlClient;
 using OpenDBDiff.Abstractions.Schema.Events;
 using OpenDBDiff.SqlServer.Schema.Generates.SQLCommands;
 using OpenDBDiff.SqlServer.Schema.Generates.Util;
 using OpenDBDiff.SqlServer.Schema.Model;
-using System;
-using System.Linq;
 
 namespace OpenDBDiff.SqlServer.Schema.Generates
 {
     public class GenerateFunctions
     {
-        private Generate root;
+        private readonly Generate root;
 
         public GenerateFunctions(Generate root)
         {
@@ -38,17 +37,19 @@ namespace OpenDBDiff.SqlServer.Schema.Generates
 
                             if (database.CLRFunctions.Contains(objectName))
                             {
-                                Parameter param = new Parameter();
-                                param.Name = reader["Name"].ToString();
-                                param.Type = reader["TypeName"].ToString();
-                                param.Size = (short)reader["max_length"];
-                                param.Scale = (byte)reader["scale"];
-                                param.Precision = (byte)reader["precision"];
-                                param.Output = (bool)reader["is_output"];
+                                Parameter param = new Parameter
+                                {
+                                    Name = reader["Name"].ToString(),
+                                    Type = reader["TypeName"].ToString(),
+                                    Size = (short)reader["max_length"],
+                                    Scale = (byte)reader["scale"],
+                                    Precision = (byte)reader["precision"],
+                                    Output = (bool)reader["is_output"]
+                                };
                                 if (param.Type.Equals("nchar") || param.Type.Equals("nvarchar"))
                                 {
                                     if (param.Size != -1)
-                                        param.Size = param.Size / 2;
+                                        param.Size /= 2;
                                 }
                                 database.CLRFunctions[objectName].Parameters.Add(param);
                             }
@@ -61,7 +62,7 @@ namespace OpenDBDiff.SqlServer.Schema.Generates
         public void Fill(Database database, string connectionString)
         {
             int lastViewId = 0;
-            if ((database.Options.Ignore.FilterFunction) || (database.Options.Ignore.FilterCLRFunction))
+            if (database.Options.Ignore.FilterFunction || database.Options.Ignore.FilterCLRFunction)
             {
                 root.RaiseOnReading(new ProgressEventArgs("Reading functions...", Constants.READING_FUNCTIONS));
                 using (SqlConnection conn = new SqlConnection(connectionString))
@@ -77,15 +78,17 @@ namespace OpenDBDiff.SqlServer.Schema.Generates
                             while (reader.Read())
                             {
                                 root.RaiseOnReadingOne(reader["name"]);
-                                if ((!reader["type"].ToString().Trim().Equals("FS")) && (database.Options.Ignore.FilterFunction))
+                                if ((!reader["type"].ToString().Trim().Equals("FS")) && database.Options.Ignore.FilterFunction)
                                 {
                                     if (lastViewId != (int)reader["object_id"])
                                     {
-                                        itemF = new Function(database);
-                                        itemF.Id = (int)reader["object_id"];
-                                        itemF.Name = reader["name"].ToString();
-                                        itemF.Owner = reader["owner"].ToString();
-                                        itemF.IsSchemaBinding = reader["IsSchemaBound"].ToString().Equals("1");
+                                        itemF = new Function(database)
+                                        {
+                                            Id = (int)reader["object_id"],
+                                            Name = reader["name"].ToString(),
+                                            Owner = reader["owner"].ToString(),
+                                            IsSchemaBinding = reader["IsSchemaBound"].ToString().Equals("1")
+                                        };
                                         database.Functions.Add(itemF);
                                         lastViewId = itemF.Id;
                                     }
@@ -93,13 +96,13 @@ namespace OpenDBDiff.SqlServer.Schema.Generates
                                     {
                                         if (!reader.IsDBNull(reader.GetOrdinal("referenced_major_id")))
                                             database.Dependencies.Add(database, (int)reader["referenced_major_id"], itemF);
-                                        if (!String.IsNullOrEmpty(reader["TableName"].ToString()))
+                                        if (!string.IsNullOrEmpty(reader["TableName"].ToString()))
                                             itemF.DependenciesIn.Add(reader["TableName"].ToString());
-                                        if (!String.IsNullOrEmpty(reader["DependOut"].ToString()))
+                                        if (!string.IsNullOrEmpty(reader["DependOut"].ToString()))
                                             itemF.DependenciesOut.Add(reader["DependOut"].ToString());
                                     }
                                 }
-                                if ((reader["type"].ToString().Trim().Equals("FS")) && (database.Options.Ignore.FilterCLRFunction))
+                                if (reader["type"].ToString().Trim().Equals("FS") && database.Options.Ignore.FilterCLRFunction)
                                 {
                                     itemC = new CLRFunction(database);
                                     if (lastViewId != (int)reader["object_id"])

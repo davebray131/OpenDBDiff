@@ -1,6 +1,6 @@
+using System;
 using OpenDBDiff.Abstractions.Schema;
 using OpenDBDiff.Abstractions.Schema.Model;
-using System;
 
 namespace OpenDBDiff.SqlServer.Schema.Model
 {
@@ -14,11 +14,13 @@ namespace OpenDBDiff.SqlServer.Schema.Model
 
         public override ISchemaBase Clone(ISchemaBase parent)
         {
-            FileGroup file = new FileGroup(parent);
-            file.IsDefaultFileGroup = this.IsDefaultFileGroup;
-            file.IsReadOnly = this.IsReadOnly;
-            file.Name = this.Name;
-            file.Id = this.Id;
+            FileGroup file = new FileGroup(parent)
+            {
+                IsDefaultFileGroup = this.IsDefaultFileGroup,
+                IsReadOnly = this.IsReadOnly,
+                Name = this.Name,
+                Id = this.Id
+            };
             file.Files = this.Files.Clone(file);
             file.Guid = this.Guid;
             file.IsFileStream = this.IsFileStream;
@@ -85,8 +87,7 @@ namespace OpenDBDiff.SqlServer.Schema.Model
 
         public override string ToSqlDrop()
         {
-            string sql = "";
-            sql = Files.ToSQLDrop();
+            string sql = Files.ToSQLDrop();
             return sql + "ALTER DATABASE [" + Parent.Name + "] REMOVE FILEGROUP [" + Name + "]\r\nGO\r\n\r\n";
         }
 

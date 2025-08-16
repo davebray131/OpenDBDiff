@@ -121,7 +121,7 @@ namespace OpenDBDiff.UI
             this.tabControl1.SelectedIndex = 0;
             this.tabControl1.Size = new System.Drawing.Size(842, 483);
             this.tabControl1.TabIndex = 3;
-            this.tabControl1.SelectedIndexChanged += new System.EventHandler(this.tabControl1_SelectedIndexChanged);
+            this.tabControl1.SelectedIndexChanged += new System.EventHandler(this.TabControl1_SelectedIndexChanged);
             // 
             // tabPage2
             // 
@@ -438,7 +438,7 @@ namespace OpenDBDiff.UI
             "Sybase 12.5"});
             this.toolProjectTypes.Name = "toolProjectTypes";
             this.toolProjectTypes.Size = new System.Drawing.Size(200, 23);
-            this.toolProjectTypes.SelectedIndexChanged += new System.EventHandler(this.toolProjectTypes_SelectedIndexChanged);
+            this.toolProjectTypes.SelectedIndexChanged += new System.EventHandler(this.ToolProjectTypes_SelectedIndexChanged);
             // 
             // PanelActions
             // 
@@ -480,7 +480,7 @@ namespace OpenDBDiff.UI
             this.btnCompare.Text = "Compare";
             this.btnCompare.TextAlign = System.Drawing.ContentAlignment.BottomCenter;
             this.btnCompare.UseVisualStyleBackColor = true;
-            this.btnCompare.Click += new System.EventHandler(this.btnCompare_Click);
+            this.btnCompare.Click += new System.EventHandler(this.BtnCompare_Click);
             // 
             // btnOptions
             // 
@@ -494,7 +494,7 @@ namespace OpenDBDiff.UI
             this.btnOptions.Text = "Options";
             this.btnOptions.TextAlign = System.Drawing.ContentAlignment.BottomCenter;
             this.btnOptions.UseVisualStyleBackColor = true;
-            this.btnOptions.Click += new System.EventHandler(this.btnOptions_Click);
+            this.btnOptions.Click += new System.EventHandler(this.BtnOptions_Click);
             // 
             // btnSaveAs
             // 
@@ -509,7 +509,7 @@ namespace OpenDBDiff.UI
             this.btnSaveAs.Text = "Save as";
             this.btnSaveAs.TextAlign = System.Drawing.ContentAlignment.BottomCenter;
             this.btnSaveAs.UseVisualStyleBackColor = true;
-            this.btnSaveAs.Click += new System.EventHandler(this.btnSaveAs_Click);
+            this.btnSaveAs.Click += new System.EventHandler(this.BtnSaveAs_Click);
             // 
             // btnCopy
             // 
@@ -524,7 +524,7 @@ namespace OpenDBDiff.UI
             this.btnCopy.Text = "Copy script";
             this.btnCopy.TextAlign = System.Drawing.ContentAlignment.BottomCenter;
             this.btnCopy.UseVisualStyleBackColor = true;
-            this.btnCopy.Click += new System.EventHandler(this.btnCopy_Click);
+            this.btnCopy.Click += new System.EventHandler(this.BtnCopy_Click);
             // 
             // btnUpdate
             // 
@@ -539,7 +539,7 @@ namespace OpenDBDiff.UI
             this.btnUpdate.Text = "Update selected";
             this.btnUpdate.TextAlign = System.Drawing.ContentAlignment.BottomCenter;
             this.btnUpdate.UseVisualStyleBackColor = true;
-            this.btnUpdate.Click += new System.EventHandler(this.btnUpdate_Click);
+            this.btnUpdate.Click += new System.EventHandler(this.BtnUpdate_Click);
             // 
             // btnCompareTableData
             // 
@@ -554,7 +554,7 @@ namespace OpenDBDiff.UI
             this.btnCompareTableData.Text = "Compare data";
             this.btnCompareTableData.TextAlign = System.Drawing.ContentAlignment.BottomCenter;
             this.btnCompareTableData.UseVisualStyleBackColor = true;
-            this.btnCompareTableData.Click += new System.EventHandler(this.btnCompareTableData_Click);
+            this.btnCompareTableData.Click += new System.EventHandler(this.BtnCompareTableData_Click);
             // 
             // btnUpdateAll
             // 
@@ -570,7 +570,7 @@ namespace OpenDBDiff.UI
             this.btnUpdateAll.Text = "Update all";
             this.btnUpdateAll.TextAlign = System.Drawing.ContentAlignment.BottomCenter;
             this.btnUpdateAll.UseVisualStyleBackColor = true;
-            this.btnUpdateAll.Click += new System.EventHandler(this.btnUpdateAll_Click);
+            this.btnUpdateAll.Click += new System.EventHandler(this.BtnUpdateAll_Click);
             // 
             // btnNewProject
             // 
@@ -583,7 +583,7 @@ namespace OpenDBDiff.UI
             this.btnNewProject.TabIndex = 15;
             this.btnNewProject.Text = "New project";
             this.btnNewProject.UseVisualStyleBackColor = false;
-            this.btnNewProject.Click += new System.EventHandler(this.btnNewProject_Click);
+            this.btnNewProject.Click += new System.EventHandler(this.BtnNewProject_Click);
             // 
             // btnSaveProject
             // 
@@ -596,7 +596,7 @@ namespace OpenDBDiff.UI
             this.btnSaveProject.TabIndex = 13;
             this.btnSaveProject.Text = "Save project";
             this.btnSaveProject.UseVisualStyleBackColor = false;
-            this.btnSaveProject.Click += new System.EventHandler(this.btnSaveProject_Click);
+            this.btnSaveProject.Click += new System.EventHandler(this.BtnSaveProject_Click);
             // 
             // btnProject
             // 
@@ -609,7 +609,7 @@ namespace OpenDBDiff.UI
             this.btnProject.TabIndex = 12;
             this.btnProject.Text = "Open project";
             this.btnProject.UseVisualStyleBackColor = false;
-            this.btnProject.Click += new System.EventHandler(this.btnProject_Click);
+            this.btnProject.Click += new System.EventHandler(this.BtnProject_Click);
             // 
             // toolOpenProject
             // 

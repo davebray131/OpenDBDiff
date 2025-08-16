@@ -1,6 +1,6 @@
-﻿using OpenDBDiff.Abstractions.Schema;
+﻿using System;
+using OpenDBDiff.Abstractions.Schema;
 using OpenDBDiff.Abstractions.Schema.Model;
-using System;
 
 namespace OpenDBDiff.SqlServer.Schema.Model
 {
@@ -34,7 +34,7 @@ namespace OpenDBDiff.SqlServer.Schema.Model
                 sql += "WITH ACCENT_SENSITIVITY = OFF\r\n";
             else
                 sql += "WITH ACCENT_SENSITIVITY = ON\r\n";
-            if (!String.IsNullOrEmpty(this.Path))
+            if (!string.IsNullOrEmpty(this.Path))
             {
                 if (!database.Options.Ignore.FilterFullTextPath)
                     sql += "--";
@@ -121,10 +121,10 @@ namespace OpenDBDiff.SqlServer.Schema.Model
             if (destination == null) throw new ArgumentNullException("destination");
             if (!this.IsAccentSensity.Equals(destination.IsAccentSensity)) return false;
             if (!this.IsDefault.Equals(destination.IsDefault)) return false;
-            if ((!String.IsNullOrEmpty(this.FileGroupName)) && (!String.IsNullOrEmpty(destination.FileGroupName)))
+            if ((!string.IsNullOrEmpty(this.FileGroupName)) && (!string.IsNullOrEmpty(destination.FileGroupName)))
                 if (!this.FileGroupName.Equals(destination.FileGroupName)) return false;
             if (database.Options.Ignore.FilterFullTextPath)
-                if ((!String.IsNullOrEmpty(this.Path)) && (!String.IsNullOrEmpty(destination.Path)))
+                if ((!string.IsNullOrEmpty(this.Path)) && (!string.IsNullOrEmpty(destination.Path)))
                     return this.Path.Equals(destination.Path, StringComparison.CurrentCultureIgnoreCase);
             return true;
         }

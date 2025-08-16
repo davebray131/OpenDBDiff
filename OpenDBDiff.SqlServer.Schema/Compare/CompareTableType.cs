@@ -11,9 +11,9 @@ namespace OpenDBDiff.SqlServer.Schema.Compare
             if (node.Status != ObjectStatus.Drop)
             {
                 TableType tablaOriginal = originFields[node.FullName];
-                (new CompareColumns()).GenerateDifferences<TableType>(tablaOriginal.Columns, node.Columns);
-                (new CompareConstraints()).GenerateDifferences<TableType>(tablaOriginal.Constraints, node.Constraints);
-                (new CompareIndexes()).GenerateDifferences<TableType>(tablaOriginal.Indexes, node.Indexes);
+                new CompareColumns().GenerateDifferences<TableType>(tablaOriginal.Columns, node.Columns);
+                new CompareConstraints().GenerateDifferences<TableType>(tablaOriginal.Constraints, node.Constraints);
+                new CompareIndexes().GenerateDifferences<TableType>(tablaOriginal.Indexes, node.Indexes);
             }
         }
 

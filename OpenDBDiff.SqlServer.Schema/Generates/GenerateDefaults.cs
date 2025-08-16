@@ -5,7 +5,7 @@ namespace OpenDBDiff.SqlServer.Schema.Generates
 {
     public class GenerateDefaults
     {
-        private Generate root;
+        private readonly Generate root;
 
         public GenerateDefaults(Generate root)
         {
@@ -30,11 +30,13 @@ namespace OpenDBDiff.SqlServer.Schema.Generates
                         {
                             while (reader.Read())
                             {
-                                Default item = new Default(database);
-                                item.Id = (int)reader["object_id"];
-                                item.Name = reader["Name"].ToString();
-                                item.Owner = reader["Owner"].ToString();
-                                item.Value = reader["Definition"].ToString();
+                                Default item = new Default(database)
+                                {
+                                    Id = (int)reader["object_id"],
+                                    Name = reader["Name"].ToString(),
+                                    Owner = reader["Owner"].ToString(),
+                                    Value = reader["Definition"].ToString()
+                                };
                                 database.Defaults.Add(item);
                             }
                         }

@@ -1,13 +1,13 @@
+using System;
 using Microsoft.Data.SqlClient;
 using OpenDBDiff.SqlServer.Schema.Generates.Util;
 using OpenDBDiff.SqlServer.Schema.Model;
-using System;
 
 namespace OpenDBDiff.SqlServer.Schema.Generates
 {
     public class GenerateAssemblies
     {
-        private Generate root;
+        private readonly Generate root;
 
         public GenerateAssemblies(Generate root)
         {
@@ -86,11 +86,11 @@ namespace OpenDBDiff.SqlServer.Schema.Generates
                                     lastViewId = item.Id;
                                     database.Assemblies.Add(item);
                                 }
-                                if (!String.IsNullOrEmpty(reader["Dependency"].ToString()))
+                                if (!string.IsNullOrEmpty(reader["Dependency"].ToString()))
                                     item.DependenciesOut.Add(reader["Dependency"].ToString());
-                                if (!String.IsNullOrEmpty(reader["ObjectDependency"].ToString()))
+                                if (!string.IsNullOrEmpty(reader["ObjectDependency"].ToString()))
                                     item.DependenciesOut.Add(reader["ObjectDependency"].ToString());
-                                if (!String.IsNullOrEmpty(reader["UDTName"].ToString()))
+                                if (!string.IsNullOrEmpty(reader["UDTName"].ToString()))
                                     item.DependenciesOut.Add(reader["UDTName"].ToString());
                             }
                         }

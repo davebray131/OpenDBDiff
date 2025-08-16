@@ -1,11 +1,11 @@
-using Microsoft.Data.SqlClient;
-using OpenDBDiff.Abstractions.Schema;
-using OpenDBDiff.Abstractions.Schema.Model;
 using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Text;
 using System.Windows.Forms;
+using Microsoft.Data.SqlClient;
+using OpenDBDiff.Abstractions.Schema;
+using OpenDBDiff.Abstractions.Schema.Model;
 
 namespace OpenDBDiff
 {
@@ -14,7 +14,7 @@ namespace OpenDBDiff
     /// </summary>
     static class Updater
     {
-        public static string createNew(ISchemaBase target, string connectionString)
+        public static string CreateNew(ISchemaBase target, string connectionString)
         {
             string script = target.ToSql();
             script = script.Replace("GO", "");
@@ -40,7 +40,7 @@ namespace OpenDBDiff
             return result;
         }
 
-        public static string addNew(ISchemaBase target, string connectionString)
+        public static string AddNew(ISchemaBase target, string connectionString)
         {
             string result = string.Empty;
             string script = target.ToSqlAdd();
@@ -67,16 +67,18 @@ namespace OpenDBDiff
             return result;
         }
 
-        public static DataTable getData(ISchemaBase selected, string connectionString)
+        public static DataTable GetData(ISchemaBase selected, string connectionString)
         {
             DataTable data = new DataTable();
             try
             {
                 using (SqlConnection connection = new SqlConnection(connectionString))
                 {
-                    SqlCommand command = new SqlCommand();
-                    command.Connection = connection;
-                    command.CommandText = "SELECT * FROM " + selected.FullName;
+                    SqlCommand command = new SqlCommand
+                    {
+                        Connection = connection,
+                        CommandText = "SELECT * FROM " + selected.FullName
+                    };
 
                     connection.Open();
                     SqlDataReader reader = command.ExecuteReader(CommandBehavior.KeyInfo);
@@ -93,12 +95,12 @@ namespace OpenDBDiff
             return data;
         }
 
-        public static string alter(ISchemaBase target, string connectionString)
+        public static string Alter(ISchemaBase target, string connectionString)
         {
-            var db = target.RootParent as IDatabase;
+            var db = target.RootParent;
             using (SqlConnection connection = new SqlConnection(connectionString))
             {
-                if (db != null && DialogResult.Yes != MessageBox.Show(String.Format("Alter {0} {1} in {2}..{3}?\n(WARNING: No automatic backup is made!)",
+                if (db != null && DialogResult.Yes != MessageBox.Show(string.Format("Alter {0} {1} in {2}..{3}?\n(WARNING: No automatic backup is made!)",
                         target.ObjectType,
                         target.Name,
                         connection.DataSource,
@@ -140,7 +142,7 @@ namespace OpenDBDiff
             }
         }
 
-        public static string rebuild(ISchemaBase target, string connectionString)
+        public static string Rebuild(ISchemaBase target, string connectionString)
         {
             SQLScriptList SqlDiff = target.ToSqlDiff(new List<ISchemaBase>());
             string[] splitOn = { "GO" };

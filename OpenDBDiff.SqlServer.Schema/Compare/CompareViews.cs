@@ -29,8 +29,8 @@ namespace OpenDBDiff.SqlServer.Schema.Compare
                 originFields[node.FullName] = newNode;
                 original = newNode;
             }
-            (new CompareIndexes()).GenerateDifferences<View>(original.Indexes, node.Indexes);
-            (new CompareTriggers()).GenerateDifferences<View>(original.Triggers, node.Triggers);
+            new CompareIndexes().GenerateDifferences<View>(original.Indexes, node.Indexes);
+            new CompareTriggers().GenerateDifferences<View>(original.Triggers, node.Triggers);
         }
 
         protected override void DoNew<Root>(SchemaList<View, Root> originFields, View node)
@@ -40,7 +40,7 @@ namespace OpenDBDiff.SqlServer.Schema.Compare
             originFields.Add(newNode);
             newNode.DependenciesIn.ForEach(dep =>
             {
-                ISchemaBase item = ((Database)((ISchemaBase)originFields.Parent)).Find(dep);
+                ISchemaBase item = ((Database)(ISchemaBase)originFields.Parent).Find(dep);
                 if (item != null)
                 {
                     if (item.IsCodeType)

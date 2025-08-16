@@ -1,9 +1,9 @@
-using OpenDBDiff.Abstractions.Schema;
-using OpenDBDiff.Abstractions.Schema.Model;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Text;
+using OpenDBDiff.Abstractions.Schema;
+using OpenDBDiff.Abstractions.Schema.Model;
 
 namespace OpenDBDiff.SqlServer.Schema.Model
 {
@@ -20,14 +20,16 @@ namespace OpenDBDiff.SqlServer.Schema.Model
         /// </summary>
         public new XMLSchema Clone(ISchemaBase parent)
         {
-            XMLSchema item = new XMLSchema(parent);
-            item.Text = this.Text;
-            item.Status = this.Status;
-            item.Name = this.Name;
-            item.Id = this.Id;
-            item.Owner = this.Owner;
-            item.Guid = this.Guid;
-            item.Dependencies = this.Dependencies;
+            XMLSchema item = new XMLSchema(parent)
+            {
+                Text = this.Text,
+                Status = this.Status,
+                Name = this.Name,
+                Id = this.Id,
+                Owner = this.Owner,
+                Guid = this.Guid,
+                Dependencies = this.Dependencies
+            };
             return item;
         }
 
@@ -71,7 +73,7 @@ namespace OpenDBDiff.SqlServer.Schema.Model
                     if (dependency.Type == ObjectType.Table)
                     {
                         Column column = ((Table)itemDepens).Columns[dependency.ColumnName];
-                        if ((column.Parent.Status != ObjectStatus.Drop) && (column.Parent.Status != ObjectStatus.Create) && ((column.Status != ObjectStatus.Create)))
+                        if ((column.Parent.Status != ObjectStatus.Drop) && (column.Parent.Status != ObjectStatus.Create) && column.Status != ObjectStatus.Create)
                         {
                             if (!fields.ContainsKey(column.FullName))
                             {

@@ -1,17 +1,17 @@
+using System;
+using System.Collections.Generic;
 using Microsoft.Data.SqlClient;
 using OpenDBDiff.Abstractions.Schema.Errors;
 using OpenDBDiff.Abstractions.Schema.Events;
 using OpenDBDiff.SqlServer.Schema.Generates.SQLCommands;
 using OpenDBDiff.SqlServer.Schema.Generates.Util;
 using OpenDBDiff.SqlServer.Schema.Model;
-using System;
-using System.Collections.Generic;
 
 namespace OpenDBDiff.SqlServer.Schema.Generates
 {
     public class GenerateViews
     {
-        private Generate root;
+        private readonly Generate root;
 
         public GenerateViews(Generate root)
         {
@@ -51,11 +51,13 @@ namespace OpenDBDiff.SqlServer.Schema.Generates
                             root.RaiseOnReadingOne(reader["name"]);
                             if (lastViewId != (int)reader["object_id"])
                             {
-                                item = new View(database);
-                                item.Id = (int)reader["object_id"];
-                                item.Name = reader["name"].ToString();
-                                item.Owner = reader["owner"].ToString();
-                                item.IsSchemaBinding = reader["IsSchemaBound"].ToString().Equals("1");
+                                item = new View(database)
+                                {
+                                    Id = (int)reader["object_id"],
+                                    Name = reader["name"].ToString(),
+                                    Owner = reader["owner"].ToString(),
+                                    IsSchemaBinding = reader["IsSchemaBound"].ToString().Equals("1")
+                                };
                                 database.Views.Add(item);
                                 lastViewId = item.Id;
                             }
@@ -63,9 +65,9 @@ namespace OpenDBDiff.SqlServer.Schema.Generates
                             {
                                 if (!reader.IsDBNull(reader.GetOrdinal("referenced_major_id")))
                                     database.Dependencies.Add(database, (int)reader["referenced_major_id"], item);
-                                if (!String.IsNullOrEmpty(reader["TableName"].ToString()))
+                                if (!string.IsNullOrEmpty(reader["TableName"].ToString()))
                                     item.DependenciesIn.Add(reader["TableName"].ToString());
-                                if (!String.IsNullOrEmpty(reader["DependOut"].ToString()))
+                                if (!string.IsNullOrEmpty(reader["DependOut"].ToString()))
                                     item.DependenciesOut.Add(reader["DependOut"].ToString());
                             }
                         }

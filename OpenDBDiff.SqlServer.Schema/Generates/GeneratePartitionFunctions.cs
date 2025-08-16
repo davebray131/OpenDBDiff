@@ -1,13 +1,13 @@
-﻿using Microsoft.Data.SqlClient;
-using OpenDBDiff.SqlServer.Schema.Model;
-using System;
+﻿using System;
 using System.Text;
+using Microsoft.Data.SqlClient;
+using OpenDBDiff.SqlServer.Schema.Model;
 
 namespace OpenDBDiff.SqlServer.Schema.Generates
 {
     public class GeneratePartitionFunctions
     {
-        private Generate root;
+        private readonly Generate root;
 
         public GeneratePartitionFunctions(Generate root)
         {
@@ -46,34 +46,37 @@ namespace OpenDBDiff.SqlServer.Schema.Generates
                                 if (lastObjectId != (int)reader["function_id"])
                                 {
                                     lastObjectId = (int)reader["function_id"];
-                                    item = new PartitionFunction(database);
-                                    item.Id = (int)reader["function_id"];
-                                    item.Name = reader["name"].ToString();
-                                    item.IsBoundaryRight = (bool)reader["IsRight"];
-                                    item.Precision = (byte)reader["precision"];
-                                    item.Scale = (byte)reader["scale"];
-                                    item.Size = (short)reader["max_length"];
-                                    item.Type = reader["TypeName"].ToString();
+                                    item = new PartitionFunction(database)
+                                    {
+                                        Id = (int)reader["function_id"],
+                                        Name = reader["name"].ToString(),
+                                        IsBoundaryRight = (bool)reader["IsRight"],
+                                        Precision = (byte)reader["precision"],
+                                        Scale = (byte)reader["scale"],
+                                        Size = (short)reader["max_length"],
+                                        Type = reader["TypeName"].ToString()
+                                    };
                                     database.PartitionFunctions.Add(item);
                                 }
 
-                                switch (item.Type) {
+                                switch (item.Type)
+                                {
                                     case "binary":
                                     case "varbinary":
                                         item.Values.Add(ToHex((byte[])reader["value"]));
                                         break;
                                     case "date":
-                                        item.Values.Add(String.Format("'{0:yyyy/MM/dd}'", (DateTime)reader["value"]));
+                                        item.Values.Add(string.Format("'{0:yyyy/MM/dd}'", (DateTime)reader["value"]));
                                         break;
                                     case "smalldatetime":
                                     case "datetime":
-                                        item.Values.Add(String.Format("'{0:yyyy/MM/dd HH:mm:ss.fff}'", (DateTime)reader["value"]));
+                                        item.Values.Add(string.Format("'{0:yyyy/MM/dd HH:mm:ss.fff}'", (DateTime)reader["value"]));
                                         break;
                                     default:
                                         item.Values.Add(reader["value"].ToString());
                                         break;
                                 }
-                                    
+
                             }
                         }
                     }

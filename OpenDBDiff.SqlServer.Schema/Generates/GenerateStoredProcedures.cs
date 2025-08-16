@@ -1,8 +1,8 @@
+using System.Linq;
 using Microsoft.Data.SqlClient;
 using OpenDBDiff.Abstractions.Schema.Events;
 using OpenDBDiff.SqlServer.Schema.Generates.Util;
 using OpenDBDiff.SqlServer.Schema.Model;
-using System.Linq;
 
 namespace OpenDBDiff.SqlServer.Schema.Generates
 {
@@ -13,7 +13,7 @@ namespace OpenDBDiff.SqlServer.Schema.Generates
         private static int ownerIndex = -1;
         private static int typeIndex = -1;
 
-        private Generate root;
+        private readonly Generate root;
 
         public GenerateStoredProcedures(Generate root)
         {
@@ -64,17 +64,19 @@ namespace OpenDBDiff.SqlServer.Schema.Generates
 
                             if (database.CLRProcedures.Contains(objectName))
                             {
-                                Parameter param = new Parameter();
-                                param.Name = reader["Name"].ToString();
-                                param.Type = reader["TypeName"].ToString();
-                                param.Size = (short)reader["max_length"];
-                                param.Scale = (byte)reader["scale"];
-                                param.Precision = (byte)reader["precision"];
-                                param.Output = (bool)reader["is_output"];
+                                Parameter param = new Parameter
+                                {
+                                    Name = reader["Name"].ToString(),
+                                    Type = reader["TypeName"].ToString(),
+                                    Size = (short)reader["max_length"],
+                                    Scale = (byte)reader["scale"],
+                                    Precision = (byte)reader["precision"],
+                                    Output = (bool)reader["is_output"]
+                                };
                                 if (param.Type.Equals("nchar") || param.Type.Equals("nvarchar"))
                                 {
                                     if (param.Size != -1)
-                                        param.Size = param.Size / 2;
+                                        param.Size /= 2;
                                 }
                                 database.CLRProcedures[objectName].Parameters.Add(param);
                             }
@@ -86,7 +88,7 @@ namespace OpenDBDiff.SqlServer.Schema.Generates
 
         public void Fill(Database database, string connectionString)
         {
-            if ((database.Options.Ignore.FilterStoredProcedure) || (database.Options.Ignore.FilterCLRStoredProcedure))
+            if (database.Options.Ignore.FilterStoredProcedure || database.Options.Ignore.FilterCLRStoredProcedure)
             {
                 root.RaiseOnReading(new ProgressEventArgs("Reading stored procedures...", Constants.READING_PROCEDURES));
                 using (SqlConnection conn = new SqlConnection(connectionString))
@@ -108,10 +110,12 @@ namespace OpenDBDiff.SqlServer.Schema.Generates
                                     case "P":
                                         if (database.Options.Ignore.FilterStoredProcedure)
                                         {
-                                            StoredProcedure item = new StoredProcedure(database);
-                                            item.Id = (int)reader[object_idIndex];
-                                            item.Name = (string)reader[NameIndex];
-                                            item.Owner = (string)reader[ownerIndex];
+                                            StoredProcedure item = new StoredProcedure(database)
+                                            {
+                                                Id = (int)reader[object_idIndex],
+                                                Name = (string)reader[NameIndex],
+                                                Owner = (string)reader[ownerIndex]
+                                            };
                                             database.Procedures.Add(item);
                                         }
                                         break;
@@ -119,16 +123,18 @@ namespace OpenDBDiff.SqlServer.Schema.Generates
                                     case "PC":
                                         if (database.Options.Ignore.FilterCLRStoredProcedure)
                                         {
-                                            CLRStoredProcedure item = new CLRStoredProcedure(database);
-                                            item.Id = (int)reader[object_idIndex];
-                                            item.Name = reader[NameIndex].ToString();
-                                            item.Owner = reader[ownerIndex].ToString();
-                                            item.IsAssembly = true;
-                                            item.AssemblyId = (int)reader["assembly_id"];
-                                            item.AssemblyName = reader["assembly_name"].ToString();
-                                            item.AssemblyClass = reader["assembly_class"].ToString();
-                                            item.AssemblyExecuteAs = reader["ExecuteAs"].ToString();
-                                            item.AssemblyMethod = reader["assembly_method"].ToString();
+                                            CLRStoredProcedure item = new CLRStoredProcedure(database)
+                                            {
+                                                Id = (int)reader[object_idIndex],
+                                                Name = reader[NameIndex].ToString(),
+                                                Owner = reader[ownerIndex].ToString(),
+                                                IsAssembly = true,
+                                                AssemblyId = (int)reader["assembly_id"],
+                                                AssemblyName = reader["assembly_name"].ToString(),
+                                                AssemblyClass = reader["assembly_class"].ToString(),
+                                                AssemblyExecuteAs = reader["ExecuteAs"].ToString(),
+                                                AssemblyMethod = reader["assembly_method"].ToString()
+                                            };
                                             database.CLRProcedures.Add(item);
                                         }
                                         break;

@@ -1,8 +1,8 @@
-using OpenDBDiff.Abstractions.Schema;
-using OpenDBDiff.Abstractions.Schema.Model;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using OpenDBDiff.Abstractions.Schema;
+using OpenDBDiff.Abstractions.Schema.Model;
 
 namespace OpenDBDiff.SqlServer.Schema.Model
 {
@@ -12,24 +12,28 @@ namespace OpenDBDiff.SqlServer.Schema.Model
 
         public void Add(Database database, int tableId, int columnId, int ownerTableId, int typeId, ISchemaBase constraint)
         {
-            Dependency dependency = new Dependency();
-            dependency.SubObjectId = columnId;
-            dependency.ObjectId = tableId;
-            dependency.OwnerTableId = ownerTableId;
+            Dependency dependency = new Dependency
+            {
+                SubObjectId = columnId,
+                ObjectId = tableId,
+                OwnerTableId = ownerTableId,
 
-            dependency.FullName = constraint.FullName;
-            dependency.Type = constraint.ObjectType;
-            dependency.DataTypeId = typeId;
+                FullName = constraint.FullName,
+                Type = constraint.ObjectType,
+                DataTypeId = typeId
+            };
             this.Database = database;
             base.Add(dependency);
         }
 
         public void Add(Database database, int objectId, ISchemaBase objectSchema)
         {
-            Dependency dependency = new Dependency();
-            dependency.ObjectId = objectId;
-            dependency.FullName = objectSchema.FullName;
-            dependency.Type = objectSchema.ObjectType;
+            Dependency dependency = new Dependency
+            {
+                ObjectId = objectId,
+                FullName = objectSchema.FullName,
+                Type = objectSchema.ObjectType
+            };
             this.Database = database;
             base.Add(dependency);
         }
@@ -46,7 +50,7 @@ namespace OpenDBDiff.SqlServer.Schema.Model
                 {
                     if (dependency.Type == type)
                     {
-                        ISchemaBase item = (ISchemaBase)Database.Find(dependency.FullName);
+                        ISchemaBase item = Database.Find(dependency.FullName);
                         if (dependency.Type == ObjectType.Constraint)
                         {
                             if ((dependency.ObjectId == tableId) && (((Constraint)item).Type == Constraint.ConstraintType.ForeignKey))
@@ -108,7 +112,7 @@ namespace OpenDBDiff.SqlServer.Schema.Model
                     if (type == ObjectType.Constraint)
                     {
                         relationalTableId = ((Constraint)cons).RelationalTableId;
-                        putItem = (relationalTableId == tableId);
+                        putItem = relationalTableId == tableId;
                     }
                 }
                 if (putItem)
@@ -133,7 +137,7 @@ namespace OpenDBDiff.SqlServer.Schema.Model
 
             cons = (from depends in this
                     where (depends.Type == ObjectType.Constraint || depends.Type == ObjectType.Index) &&
-                    ((depends.DataTypeId == dataTypeId || dataTypeId == 0) && (depends.SubObjectId == columnId || columnId == 0) && (depends.ObjectId == tableId))
+                    (depends.DataTypeId == dataTypeId || dataTypeId == 0) && (depends.SubObjectId == columnId || columnId == 0) && (depends.ObjectId == tableId)
                     select depends.FullName)
                         .Concat(from depends in this
                                 where (depends.Type == ObjectType.View || depends.Type == ObjectType.Function) &&

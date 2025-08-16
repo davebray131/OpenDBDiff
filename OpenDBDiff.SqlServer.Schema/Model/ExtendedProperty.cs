@@ -1,6 +1,6 @@
-﻿using OpenDBDiff.Abstractions.Schema;
+﻿using System;
+using OpenDBDiff.Abstractions.Schema;
 using OpenDBDiff.Abstractions.Schema.Model;
-using System;
 
 namespace OpenDBDiff.SqlServer.Schema.Model
 {
@@ -15,8 +15,8 @@ namespace OpenDBDiff.SqlServer.Schema.Model
         {
             get
             {
-                string normal = "[" + Level0name + "]" + (String.IsNullOrEmpty(Level1name) ? "" : ".[" + Level1name + "]") + (String.IsNullOrEmpty(Level2name) ? "" : ".[" + Level2name + "]");
-                if ((String.IsNullOrEmpty(Level1type)) || (String.IsNullOrEmpty(Level2type)))
+                string normal = "[" + Level0name + "]" + (string.IsNullOrEmpty(Level1name) ? "" : ".[" + Level1name + "]") + (string.IsNullOrEmpty(Level2name) ? "" : ".[" + Level2name + "]");
+                if (string.IsNullOrEmpty(Level1type) || string.IsNullOrEmpty(Level2type))
                     return normal;
                 if (!Level2type.Equals("TRIGGER"))
                     return normal;
@@ -57,9 +57,9 @@ namespace OpenDBDiff.SqlServer.Schema.Model
         {
             string sql = "EXEC sys.sp_addextendedproperty @name=N'" + Name + "', @value=N'" + Value + "' ,";
             sql += "@level0type=N'" + Level0type + "',@level0name=N'" + Level0name + "'";
-            if (!String.IsNullOrEmpty(Level1name))
+            if (!string.IsNullOrEmpty(Level1name))
                 sql += ", @level1type=N'" + Level1type + "',@level1name=N'" + Level1name + "'";
-            if (!String.IsNullOrEmpty(Level2name))
+            if (!string.IsNullOrEmpty(Level2name))
                 sql += ", @level2type=N'" + Level2type + "',@level2name=N'" + Level2name + "'";
 
             return sql + "\r\nGO\r\n";
@@ -69,10 +69,10 @@ namespace OpenDBDiff.SqlServer.Schema.Model
         {
             string sql = "EXEC sys.sp_dropextendedproperty @name=N'" + Name + "', @value=N'" + Value + "' ,";
             sql += "@level0type=N'" + Level0type + "',@level0name=N'" + Level0name + "'";
-            if (!String.IsNullOrEmpty(Level1name))
+            if (!string.IsNullOrEmpty(Level1name))
                 sql += ", @level1type=N'" + Level1type + "',@level1name=N'" + Level1name + "'";
 
-            if (!String.IsNullOrEmpty(Level2name))
+            if (!string.IsNullOrEmpty(Level2name))
                 sql += ", @level2type=N'" + Level2type + "',@level2name=N'" + Level2name + "'";
             return sql + "\r\nGO\r\n";
         }

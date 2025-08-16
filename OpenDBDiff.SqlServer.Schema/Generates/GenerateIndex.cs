@@ -9,7 +9,7 @@ namespace OpenDBDiff.SqlServer.Schema.Generates
 {
     public class GenerateIndex
     {
-        private Generate root;
+        private readonly Generate root;
 
         public GenerateIndex(Generate root)
         {
@@ -20,7 +20,6 @@ namespace OpenDBDiff.SqlServer.Schema.Generates
         {
             int indexid = 0;
             int parentId = 0;
-            bool change = false;
             string type;
             ISchemaBase parent = null;
             root.RaiseOnReading(new ProgressEventArgs("Reading Index...", Constants.READING_INDEXES));
@@ -37,6 +36,7 @@ namespace OpenDBDiff.SqlServer.Schema.Generates
                         {
                             root.RaiseOnReadingOne(reader["Name"]);
                             type = reader["ObjectType"].ToString().Trim();
+                            bool change;
                             if (parentId != (int)reader["object_id"])
                             {
                                 parentId = (int)reader["object_id"];
@@ -53,16 +53,18 @@ namespace OpenDBDiff.SqlServer.Schema.Generates
                             {
                                 if (indexid != (int)reader["index_id"] || change)
                                 {
-                                    item = new Index(parent);
-                                    item.Name = reader["Name"].ToString();
-                                    item.Owner = parent.Owner;
-                                    item.Type = (Index.IndexTypeEnum)(byte)reader["type"];
-                                    item.Id = (int)reader["index_id"];
-                                    item.IgnoreDupKey = (bool)reader["ignore_dup_key"];
-                                    item.IsAutoStatistics = (bool)reader["NoAutomaticRecomputation"];
-                                    item.IsDisabled = (bool)reader["is_disabled"];
-                                    item.IsPrimaryKey = (bool)reader["is_primary_key"];
-                                    item.IsUniqueKey = (bool)reader["is_unique"];
+                                    item = new Index(parent)
+                                    {
+                                        Name = reader["Name"].ToString(),
+                                        Owner = parent.Owner,
+                                        Type = (Index.IndexTypeEnum)(byte)reader["type"],
+                                        Id = (int)reader["index_id"],
+                                        IgnoreDupKey = (bool)reader["ignore_dup_key"],
+                                        IsAutoStatistics = (bool)reader["NoAutomaticRecomputation"],
+                                        IsDisabled = (bool)reader["is_disabled"],
+                                        IsPrimaryKey = (bool)reader["is_primary_key"],
+                                        IsUniqueKey = (bool)reader["is_unique"]
+                                    };
                                     if (database.Options.Ignore.FilterIndexRowLock)
                                     {
                                         item.AllowPageLocks = (bool)reader["allow_page_locks"];
@@ -73,10 +75,10 @@ namespace OpenDBDiff.SqlServer.Schema.Generates
                                         item.FillFactor = (byte)reader["fill_factor"];
                                         item.IsPadded = (bool)reader["is_padded"];
                                     }
-                                    if ((database.Options.Ignore.FilterTableFileGroup) && (item.Type != Index.IndexTypeEnum.XML))
+                                    if (database.Options.Ignore.FilterTableFileGroup && (item.Type != Index.IndexTypeEnum.XML))
                                         item.FileGroup = reader["FileGroup"].ToString();
 
-                                    if ((database.Info.Version == DatabaseInfo.SQLServerVersion.SQLServer2008) && (database.Options.Ignore.FilterIndexFilter))
+                                    if ((database.Info.Version == DatabaseInfo.SQLServerVersion.SQLServer2008) && database.Options.Ignore.FilterIndexFilter)
                                     {
                                         item.FilterDefintion = reader["FilterDefinition"].ToString();
                                     }
@@ -86,13 +88,15 @@ namespace OpenDBDiff.SqlServer.Schema.Generates
                                     else
                                         ((Table)parent).Indexes.Add(item);
                                 }
-                                IndexColumn ccon = new IndexColumn(item.Parent);
-                                ccon.Name = reader["ColumnName"].ToString();
-                                ccon.IsIncluded = (bool)reader["is_included_column"];
-                                ccon.Order = (bool)reader["is_descending_key"];
-                                ccon.Id = (int)reader["column_id"];
-                                ccon.KeyOrder = (byte)reader["key_ordinal"];
-                                ccon.DataTypeId = (int)reader["user_type_id"];
+                                IndexColumn ccon = new IndexColumn(item.Parent)
+                                {
+                                    Name = reader["ColumnName"].ToString(),
+                                    IsIncluded = (bool)reader["is_included_column"],
+                                    Order = (bool)reader["is_descending_key"],
+                                    Id = (int)reader["column_id"],
+                                    KeyOrder = (byte)reader["key_ordinal"],
+                                    DataTypeId = (int)reader["user_type_id"]
+                                };
                                 if ((!ccon.IsIncluded) || (ccon.IsIncluded && database.Options.Ignore.FilterIndexIncludeColumns))
                                     item.Columns.Add(ccon);
                             }

@@ -1,7 +1,7 @@
-﻿using OpenDBDiff.Abstractions.Schema;
-using OpenDBDiff.Abstractions.Schema.Model;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using OpenDBDiff.Abstractions.Schema;
+using OpenDBDiff.Abstractions.Schema.Model;
 
 namespace OpenDBDiff.SqlServer.Schema.Model
 {
@@ -23,7 +23,7 @@ namespace OpenDBDiff.SqlServer.Schema.Model
             string sql = "CREATE FUNCTION " + FullName + "";
             string param = "";
             Parameters.ForEach(item => param += item.ToSql() + ",");
-            if (!String.IsNullOrEmpty(param))
+            if (!string.IsNullOrEmpty(param))
             {
                 param = param.Substring(0, param.Length - 1);
                 sql += " (" + param + ")\r\n";

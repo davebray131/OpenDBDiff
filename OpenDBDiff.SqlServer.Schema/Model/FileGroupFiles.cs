@@ -7,7 +7,7 @@ namespace OpenDBDiff.SqlServer.Schema.Model
 {
     public class FileGroupFiles : List<FileGroupFile>
     {
-        private Hashtable hash = new Hashtable();
+        private readonly Hashtable hash = new Hashtable();
 
         /// <summary>
         /// Constructor de la clase.
@@ -67,7 +67,7 @@ namespace OpenDBDiff.SqlServer.Schema.Model
                 hash[name] = value;
                 for (int index = 0; index < base.Count; index++)
                 {
-                    if (((FileGroupFile)base[index]).Name.Equals(name))
+                    if (base[index].Name.Equals(name))
                     {
                         base[index] = value;
                         break;

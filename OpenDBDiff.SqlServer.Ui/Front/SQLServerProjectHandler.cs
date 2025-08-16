@@ -1,9 +1,9 @@
-﻿using OpenDBDiff.Abstractions.Schema.Model;
-using OpenDBDiff.Abstractions.Ui;
-using OpenDBDiff.SqlServer.Schema.Options;
-using System;
+﻿using System;
 using System.Drawing;
 using System.Windows.Forms;
+using OpenDBDiff.Abstractions.Schema.Model;
+using OpenDBDiff.Abstractions.Ui;
+using OpenDBDiff.SqlServer.Schema.Options;
 
 namespace OpenDBDiff.SqlServer.Ui
 {
@@ -24,14 +24,13 @@ namespace OpenDBDiff.SqlServer.Ui
                 UseWindowsAuthentication = true,
                 UserName = "sa",
                 Password = "",
-                DatabaseName = ""
+                DatabaseName = "",
+                Location = new Point(1, 1),
+                Name = "DestinationControl",
+                Anchor = (AnchorStyles)((int)AnchorStyles.Bottom + (int)AnchorStyles.Left + (int)AnchorStyles.Right),
+                TabIndex = 10,
+                Text = "Destination database:"
             };
-
-            this.DestinationControl.Location = new Point(1, 1);
-            this.DestinationControl.Name = "DestinationControl";
-            this.DestinationControl.Anchor = (AnchorStyles)((int)AnchorStyles.Bottom + (int)AnchorStyles.Left + (int)AnchorStyles.Right);
-            this.DestinationControl.TabIndex = 10;
-            this.DestinationControl.Text = "Destination database:";
 
             return this.DestinationControl;
         }

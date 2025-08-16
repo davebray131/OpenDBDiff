@@ -1,13 +1,13 @@
-﻿using OpenDBDiff.Abstractions.Schema;
-using OpenDBDiff.Abstractions.Schema.Attributes;
-using OpenDBDiff.Abstractions.Schema.Model;
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using System.Reflection;
 using System.Windows.Forms;
+using OpenDBDiff.Abstractions.Schema;
+using OpenDBDiff.Abstractions.Schema.Attributes;
+using OpenDBDiff.Abstractions.Schema.Model;
 
 namespace OpenDBDiff.UI
 {
@@ -19,7 +19,7 @@ namespace OpenDBDiff.UI
 
         public event SchemaHandler OnSelectItem;
 
-        private bool busy = false;
+        private bool busy;
 
         public SchemaTreeView()
         {
@@ -109,31 +109,31 @@ namespace OpenDBDiff.UI
             {
                 if (CanNodeAdd(item))
                 {
-                    TreeNode subnode = node.Nodes.Add(item.Id.ToString(), (attr.IsFullName ? item.FullName : item.Name));
+                    TreeNode subnode = node.Nodes.Add(item.Id.ToString(), attr.IsFullName ? item.FullName : item.Name);
                     if (item.Status == ObjectStatus.Drop)
                     {
                         subnode.ForeColor = Color.Red;
-                        NodeColor = (NodeColor == Color.Black || NodeColor == Color.Red ? Color.Red : Color.Plum);
+                        NodeColor = NodeColor == Color.Black || NodeColor == Color.Red ? Color.Red : Color.Plum;
                     }
                     if (item.Status == ObjectStatus.Create)
                     {
                         subnode.ForeColor = Color.Green;
-                        NodeColor = (NodeColor == Color.Black || NodeColor == Color.Green ? Color.Green : Color.Plum);
+                        NodeColor = NodeColor == Color.Black || NodeColor == Color.Green ? Color.Green : Color.Plum;
                     }
-                    if ((item.HasState(ObjectStatus.Alter)) || (item.HasState(ObjectStatus.Disabled)))
+                    if (item.HasState(ObjectStatus.Alter) || item.HasState(ObjectStatus.Disabled))
                     {
                         subnode.ForeColor = Color.Blue;
-                        NodeColor = (NodeColor == Color.Black || NodeColor == Color.Blue ? Color.Blue : Color.Plum);
+                        NodeColor = NodeColor == Color.Black || NodeColor == Color.Blue ? Color.Blue : Color.Plum;
                     }
                     if (item.HasState(ObjectStatus.AlterWhitespace))
                     {
                         subnode.ForeColor = Color.DarkGoldenrod;
-                        NodeColor = (NodeColor == Color.Black || NodeColor == Color.DarkGoldenrod ? Color.DarkGoldenrod : Color.Plum);
+                        NodeColor = NodeColor == Color.Black || NodeColor == Color.DarkGoldenrod ? Color.DarkGoldenrod : Color.Plum;
                     }
                     if (item.HasState(ObjectStatus.Rebuild))
                     {
                         subnode.ForeColor = Color.Purple;
-                        NodeColor = (NodeColor == Color.Black || NodeColor == Color.Purple ? Color.Purple : Color.Plum);
+                        NodeColor = NodeColor == Color.Black || NodeColor == Color.Purple ? Color.Purple : Color.Plum;
                     }
                     subnode.Tag = item;
                     subnode.ImageKey = attr.Image;
@@ -147,8 +147,8 @@ namespace OpenDBDiff.UI
 
         private void RebuildSchemaTree()
         {
-            string currentlySelectedNode = treeView1.SelectedNode != null ? treeView1.SelectedNode.Name : null;
-            string currentTopNode = treeView1.TopNode != null ? treeView1.TopNode.Name : null;
+            string currentlySelectedNode = treeView1.SelectedNode?.Name;
+            string currentTopNode = treeView1.TopNode?.Name;
 
             this.busy = true;
             treeView1.BeginUpdate();
@@ -183,47 +183,47 @@ namespace OpenDBDiff.UI
             if (item.Status == ObjectStatus.Original && ShowUnchangedItems) return true;
 
             if (item.HasState(ObjectStatus.Drop) && ShowMissingItems) return true;
-            checkedStatus = checkedStatus | ObjectStatus.Drop;
+            checkedStatus |= ObjectStatus.Drop;
 
             if (item.HasState(ObjectStatus.Create) && ShowNewItems) return true;
-            checkedStatus = checkedStatus | ObjectStatus.Create;
+            checkedStatus |= ObjectStatus.Create;
 
             if (item.HasState(ObjectStatus.Alter) && ShowChangedItems) return true;
-            checkedStatus = checkedStatus | ObjectStatus.Alter;
+            checkedStatus |= ObjectStatus.Alter;
 
             if (item.HasState(ObjectStatus.AlterWhitespace) && ShowChangedItems) return true;
-            checkedStatus = checkedStatus | ObjectStatus.AlterWhitespace;
+            checkedStatus |= ObjectStatus.AlterWhitespace;
 
             if (item.HasState(ObjectStatus.AlterBody) && ShowChangedItems) return true;
-            checkedStatus = checkedStatus | ObjectStatus.AlterBody;
+            checkedStatus |= ObjectStatus.AlterBody;
 
             if (item.HasState(ObjectStatus.Rebuild) && ShowChangedItems) return true;
-            checkedStatus = checkedStatus | ObjectStatus.Rebuild;
+            checkedStatus |= ObjectStatus.Rebuild;
 
             if (item.HasState(ObjectStatus.RebuildDependencies) && ShowChangedItems) return true;
-            checkedStatus = checkedStatus | ObjectStatus.RebuildDependencies;
+            checkedStatus |= ObjectStatus.RebuildDependencies;
 
             if (item.HasState(ObjectStatus.ChangeOwner) && ShowChangedItems) return true;
-            checkedStatus = checkedStatus | ObjectStatus.ChangeOwner;
+            checkedStatus |= ObjectStatus.ChangeOwner;
 
             if (item.HasState(ObjectStatus.DropOlder) && ShowChangedItems) return true;
-            checkedStatus = checkedStatus | ObjectStatus.DropOlder;
+            checkedStatus |= ObjectStatus.DropOlder;
 
             if (item.HasState(ObjectStatus.Bind) && ShowChangedItems) return true;
-            checkedStatus = checkedStatus | ObjectStatus.Bind;
+            checkedStatus |= ObjectStatus.Bind;
 
             if (item.HasState(ObjectStatus.PermissionSet) && ShowChangedItems) return true;
-            checkedStatus = checkedStatus | ObjectStatus.PermissionSet;
+            checkedStatus |= ObjectStatus.PermissionSet;
 
             if (item.HasState(ObjectStatus.Disabled) && ShowChangedItems) return true;
-            checkedStatus = checkedStatus | ObjectStatus.Disabled;
+            checkedStatus |= ObjectStatus.Disabled;
 
             if (item.HasState(ObjectStatus.Update) && ShowChangedItems) return true;
-            checkedStatus = checkedStatus | ObjectStatus.Update;
+            checkedStatus |= ObjectStatus.Update;
 
             // At the end, we should have check all possible statuses.
             ObjectStatus expectedTotalStatus = ObjectStatus.Original;
-            Enum.GetValues(typeof(ObjectStatus)).Cast<ObjectStatus>().ToList().ForEach((s) => expectedTotalStatus = expectedTotalStatus | s);
+            Enum.GetValues(typeof(ObjectStatus)).Cast<ObjectStatus>().ToList().ForEach((s) => expectedTotalStatus |= s);
 
             if (expectedTotalStatus != checkedStatus)
                 throw new Exception(string.Format("The OjbectStatusType '{0:G}' wasn't implemented in the CanNodeAdd() method. Developer, please ensure that all values in the Enum are checked.", (ObjectStatus)(expectedTotalStatus - checkedStatus)));
@@ -262,21 +262,21 @@ namespace OpenDBDiff.UI
             RebuildSchemaTree();
         }
 
-        private void treeView1_AfterSelect(object sender, TreeViewEventArgs e)
+        private void TreeView1_AfterSelect(object sender, TreeViewEventArgs e)
         {
             if (busy) return;
 
-            ISchemaBase item = ((ISchemaBase)e.Node.Tag);
+            ISchemaBase item = (ISchemaBase)e.Node.Tag;
             if (item != null)
             {
                 if (item.ObjectType == ObjectType.Table
                     || item.ObjectType == ObjectType.View)
                     ReadProperties(item.GetType(), e.Node.Nodes, item);
-                if (OnSelectItem != null) OnSelectItem(item.FullName);
+                OnSelectItem?.Invoke(item.FullName);
             }
         }
 
-        private void treeView1_AfterCheck(object sender, TreeViewEventArgs e)
+        private void TreeView1_AfterCheck(object sender, TreeViewEventArgs e)
         {
             if (e.Node.Tag == null)
             {
@@ -293,8 +293,7 @@ namespace OpenDBDiff.UI
             {
                 if (treeView1.SelectedNode == null) return null;
 
-                var item = treeView1.SelectedNode.Tag as ISchemaBase;
-                if (item == null) return null;
+                if (!(treeView1.SelectedNode.Tag is ISchemaBase item)) return null;
 
                 return item.FullName;
             }

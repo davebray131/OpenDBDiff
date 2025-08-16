@@ -1,11 +1,11 @@
-using OpenDBDiff.Abstractions.Schema;
-using OpenDBDiff.Abstractions.Schema.Attributes;
-using OpenDBDiff.Abstractions.Schema.Model;
-using OpenDBDiff.SqlServer.Schema.Options;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using OpenDBDiff.Abstractions.Schema;
+using OpenDBDiff.Abstractions.Schema.Attributes;
+using OpenDBDiff.Abstractions.Schema.Model;
+using OpenDBDiff.SqlServer.Schema.Options;
 
 namespace OpenDBDiff.SqlServer.Schema.Model
 {
@@ -160,7 +160,7 @@ namespace OpenDBDiff.SqlServer.Schema.Model
             get
             {
                 bool isCS = false;
-                if (!String.IsNullOrEmpty(Info.Collation))
+                if (!string.IsNullOrEmpty(Info.Collation))
                     isCS = Info.Collation.IndexOf("_CS_") != -1;
 
                 if (Options.Comparison.CaseSensityType == SqlOptionComparison.CaseSensityOptions.Automatic)
@@ -205,7 +205,7 @@ namespace OpenDBDiff.SqlServer.Schema.Model
 
             var header = $@"/*
 
-    OpenDBDiff {System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString()}
+    OpenDBDiff {System.Reflection.Assembly.GetExecutingAssembly().GetName().Version}
     https://github.com/OpenDBDiff/OpenDBDiff
 
     Script created by {Environment.UserDomainName}\{Environment.UserName} on {DateTime.Now.ToShortDateString()} at {DateTime.Now.ToLongTimeString()}.

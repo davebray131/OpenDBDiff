@@ -1,3 +1,12 @@
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Drawing;
+using System.IO;
+using System.Linq;
+using System.Reflection;
+using System.Text;
+using System.Windows.Forms;
 using DiffPlex;
 using DiffPlex.DiffBuilder;
 using DiffPlex.DiffBuilder.Model;
@@ -9,15 +18,6 @@ using OpenDBDiff.Abstractions.Ui;
 using OpenDBDiff.Extensions;
 using OpenDBDiff.Settings;
 using ScintillaNET;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Drawing;
-using System.IO;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Windows.Forms;
 
 namespace OpenDBDiff.UI
 {
@@ -29,7 +29,7 @@ namespace OpenDBDiff.UI
         private IOption Options;
         private List<ISchemaBase> _selectedSchemas = new List<ISchemaBase>();
 
-        private List<IProjectHandler> ProjectHandlers = new List<IProjectHandler>();
+        private readonly List<IProjectHandler> ProjectHandlers = new List<IProjectHandler>();
         private IProjectHandler ProjectSelectorHandler;
 
         public MainForm()
@@ -45,8 +45,8 @@ namespace OpenDBDiff.UI
             string errorLocation = null;
             try
             {
-                if ((!String.IsNullOrEmpty(ProjectSelectorHandler.GetSourceDatabaseName()) &&
-                     (!String.IsNullOrEmpty(ProjectSelectorHandler.GetDestinationDatabaseName()))))
+                if (!string.IsNullOrEmpty(ProjectSelectorHandler.GetSourceDatabaseName()) &&
+                     (!string.IsNullOrEmpty(ProjectSelectorHandler.GetDestinationDatabaseName())))
                 {
                     Options = Options ?? this.ProjectSelectorHandler.GetDefaultProjectOptions();
                     var leftGenerator = this.ProjectSelectorHandler.SetSourceGenerator(LeftDatabaseSelector.ConnectionString, Options);
@@ -76,8 +76,8 @@ namespace OpenDBDiff.UI
                     schemaTreeView1.LeftDatabase = progress.Destination;
                     schemaTreeView1.RightDatabase = progress.Origin;
 
-                    schemaTreeView1.OnSelectItem += new SchemaTreeView.SchemaHandler(schemaTreeView1_OnSelectItem);
-                    schemaTreeView1_OnSelectItem(schemaTreeView1.SelectedNode);
+                    schemaTreeView1.OnSelectItem += new SchemaTreeView.SchemaHandler(SchemaTreeView1_OnSelectItem);
+                    SchemaTreeView1_OnSelectItem(schemaTreeView1.SelectedNode);
                     textBox1.Text = progress.Origin.ActionMessage.Message;
 
                     btnCopy.Enabled = true;
@@ -92,14 +92,14 @@ namespace OpenDBDiff.UI
             {
                 if (errorLocation == null && progress != null)
                 {
-                    errorLocation = String.Format("{0} (while {1})", progress.ErrorLocation, progress.ErrorMostRecentProgress ?? "initializing");
+                    errorLocation = string.Format("{0} (while {1})", progress.ErrorLocation, progress.ErrorMostRecentProgress ?? "initializing");
                 }
 
                 throw new SchemaException("Error " + (errorLocation ?? " Comparing Databases"), ex);
             }
         }
 
-        private void schemaTreeView1_OnSelectItem(string nodeFullName)
+        private void SchemaTreeView1_OnSelectItem(string nodeFullName)
         {
             try
             {
@@ -151,7 +151,7 @@ namespace OpenDBDiff.UI
                 txtNewObject.ReadOnly = true;
                 txtOldObject.ReadOnly = true;
 
-                var diff = (new SideBySideDiffBuilder(new Differ())).BuildDiffModel(txtOldObject.Text, txtNewObject.Text);
+                var diff = new SideBySideDiffBuilder(new Differ()).BuildDiffModel(txtOldObject.Text, txtNewObject.Text);
 
                 var sb = new StringBuilder();
                 DiffPiece newLine, oldLine;
@@ -213,7 +213,7 @@ namespace OpenDBDiff.UI
             }
         }
 
-        private void tabControl1_SelectedIndexChanged(object sender, EventArgs e)
+        private void TabControl1_SelectedIndexChanged(object sender, EventArgs e)
         {
             // Refresh script when tab is shown
             if (tabControl1.SelectedIndex != 1)
@@ -221,8 +221,7 @@ namespace OpenDBDiff.UI
                 return;
             }
 
-            var db = schemaTreeView1.LeftDatabase as IDatabase;
-            if (db != null)
+            if (schemaTreeView1.LeftDatabase is IDatabase db)
             {
                 this._selectedSchemas = this.schemaTreeView1.GetCheckedSchemas();
                 this.txtSyncScript.ReadOnly = false;
@@ -232,7 +231,7 @@ namespace OpenDBDiff.UI
             }
         }
 
-        private void btnCompareTableData_Click(object sender, EventArgs e)
+        private void BtnCompareTableData_Click(object sender, EventArgs e)
         {
             TreeView tree = (TreeView)schemaTreeView1.Controls.Find("treeView1", true)[0];
             ISchemaBase selected = (ISchemaBase)tree.SelectedNode.Tag;
@@ -240,7 +239,7 @@ namespace OpenDBDiff.UI
             dataCompare.ShowDialog();
         }
 
-        private void btnCompare_Click(object sender, EventArgs e)
+        private void BtnCompare_Click(object sender, EventArgs e)
         {
             string errorLocation = "Processing Compare";
             try
@@ -296,7 +295,7 @@ namespace OpenDBDiff.UI
             LoadProjectHandler(handler);
         }
 
-        private void optSybase_CheckedChanged(object sender, EventArgs e)
+        private void OptSybase_CheckedChanged(object sender, EventArgs e)
         {
             /*if (optSybase.Checked)
             {
@@ -322,7 +321,7 @@ namespace OpenDBDiff.UI
             }*/
         }
 
-        private void btnSaveAs_Click(object sender, EventArgs e)
+        private void BtnSaveAs_Click(object sender, EventArgs e)
         {
             try
             {
@@ -332,10 +331,9 @@ namespace OpenDBDiff.UI
                     saveFileDialog1.FileName = Path.GetFileName(saveFileDialog1.FileName);
                 }
                 saveFileDialog1.ShowDialog(this);
-                if (!String.IsNullOrEmpty(saveFileDialog1.FileName))
+                if (!string.IsNullOrEmpty(saveFileDialog1.FileName))
                 {
-                    var db = schemaTreeView1.LeftDatabase as IDatabase;
-                    if (db != null)
+                    if (schemaTreeView1.LeftDatabase is IDatabase db)
                     {
                         using (StreamWriter writer = new StreamWriter(saveFileDialog1.FileName, false))
                         {
@@ -352,7 +350,7 @@ namespace OpenDBDiff.UI
             }
         }
 
-        private void btnCopy_Click(object sender, EventArgs e)
+        private void BtnCopy_Click(object sender, EventArgs e)
         {
             try
             {
@@ -365,7 +363,7 @@ namespace OpenDBDiff.UI
             }
         }
 
-        private void btnUpdate_Click(object sender, EventArgs e)
+        private void BtnUpdate_Click(object sender, EventArgs e)
         {
             TreeView tree = (TreeView)schemaTreeView1.Controls.Find("treeView1", true)[0];
             TreeNode dbArm = tree.Nodes[0];
@@ -392,9 +390,9 @@ namespace OpenDBDiff.UI
                                         {
                                             switch (selected.Status)
                                             {
-                                                case ObjectStatus.Create: sb.Append(Updater.createNew(selected, RightDatabaseSelector.ConnectionString)); break;
-                                                case ObjectStatus.Alter: sb.Append(Updater.alter(selected, RightDatabaseSelector.ConnectionString)); break;
-                                                case ObjectStatus.AlterWhitespace: sb.Append(Updater.alter(selected, RightDatabaseSelector.ConnectionString)); break;
+                                                case ObjectStatus.Create: sb.Append(Updater.CreateNew(selected, RightDatabaseSelector.ConnectionString)); break;
+                                                case ObjectStatus.Alter: sb.Append(Updater.Alter(selected, RightDatabaseSelector.ConnectionString)); break;
+                                                case ObjectStatus.AlterWhitespace: sb.Append(Updater.Alter(selected, RightDatabaseSelector.ConnectionString)); break;
                                                 default: sb.AppendLine($"Nothing could be found to do for table '{selected.Name}'"); break;
                                             }
                                         }
@@ -404,9 +402,9 @@ namespace OpenDBDiff.UI
                                         {
                                             switch (selected.Status)
                                             {
-                                                case ObjectStatus.Create: sb.Append(Updater.createNew(selected, RightDatabaseSelector.ConnectionString)); break;
-                                                case ObjectStatus.Alter: sb.Append(Updater.alter(selected, RightDatabaseSelector.ConnectionString)); break;
-                                                case ObjectStatus.AlterWhitespace: sb.Append(Updater.alter(selected, RightDatabaseSelector.ConnectionString)); break;
+                                                case ObjectStatus.Create: sb.Append(Updater.CreateNew(selected, RightDatabaseSelector.ConnectionString)); break;
+                                                case ObjectStatus.Alter: sb.Append(Updater.Alter(selected, RightDatabaseSelector.ConnectionString)); break;
+                                                case ObjectStatus.AlterWhitespace: sb.Append(Updater.Alter(selected, RightDatabaseSelector.ConnectionString)); break;
                                                 default: sb.AppendLine($"Nothing could be found to do for stored procedure '{selected.Name}'"); break;
                                             }
                                         }
@@ -416,10 +414,10 @@ namespace OpenDBDiff.UI
                                         {
                                             switch (selected.Status)
                                             {
-                                                case ObjectStatus.Create: sb.Append(Updater.createNew(selected, RightDatabaseSelector.ConnectionString)); break;
-                                                case ObjectStatus.Alter: sb.Append(Updater.alter(selected, RightDatabaseSelector.ConnectionString)); break;
-                                                case ObjectStatus.AlterWhitespace: sb.Append(Updater.alter(selected, RightDatabaseSelector.ConnectionString)); break;
-                                                case ObjectStatus.Alter | ObjectStatus.AlterBody: sb.Append(Updater.alter(selected, RightDatabaseSelector.ConnectionString)); break;
+                                                case ObjectStatus.Create: sb.Append(Updater.CreateNew(selected, RightDatabaseSelector.ConnectionString)); break;
+                                                case ObjectStatus.Alter: sb.Append(Updater.Alter(selected, RightDatabaseSelector.ConnectionString)); break;
+                                                case ObjectStatus.AlterWhitespace: sb.Append(Updater.Alter(selected, RightDatabaseSelector.ConnectionString)); break;
+                                                case ObjectStatus.Alter | ObjectStatus.AlterBody: sb.Append(Updater.Alter(selected, RightDatabaseSelector.ConnectionString)); break;
                                                 default: sb.AppendLine($"Nothing could be found to do for function '{selected.Name}'"); break;
                                             }
                                         }
@@ -429,10 +427,10 @@ namespace OpenDBDiff.UI
                                         {
                                             switch (selected.Status)
                                             {
-                                                case ObjectStatus.Create: sb.Append(Updater.createNew(selected, RightDatabaseSelector.ConnectionString)); break;
-                                                case ObjectStatus.Alter: sb.Append(Updater.alter(selected, RightDatabaseSelector.ConnectionString)); break;
-                                                case ObjectStatus.AlterWhitespace: sb.Append(Updater.alter(selected, RightDatabaseSelector.ConnectionString)); break;
-                                                case ObjectStatus.Alter | ObjectStatus.AlterBody: sb.Append(Updater.alter(selected, RightDatabaseSelector.ConnectionString)); break;
+                                                case ObjectStatus.Create: sb.Append(Updater.CreateNew(selected, RightDatabaseSelector.ConnectionString)); break;
+                                                case ObjectStatus.Alter: sb.Append(Updater.Alter(selected, RightDatabaseSelector.ConnectionString)); break;
+                                                case ObjectStatus.AlterWhitespace: sb.Append(Updater.Alter(selected, RightDatabaseSelector.ConnectionString)); break;
+                                                case ObjectStatus.Alter | ObjectStatus.AlterBody: sb.Append(Updater.Alter(selected, RightDatabaseSelector.ConnectionString)); break;
                                                 default: sb.AppendLine($"Nothing could be found to do for view '{selected.Name}'"); break;
                                             }
                                         }
@@ -442,7 +440,7 @@ namespace OpenDBDiff.UI
                                         {
                                             switch (selected.Status)
                                             {
-                                                case ObjectStatus.Create: sb.Append(Updater.addNew(selected, RightDatabaseSelector.ConnectionString)); break;
+                                                case ObjectStatus.Create: sb.Append(Updater.AddNew(selected, RightDatabaseSelector.ConnectionString)); break;
                                                 default: sb.AppendLine($"Nothing could be found to do for '{selected.Name}'"); break;
                                             }
                                         }
@@ -467,7 +465,7 @@ namespace OpenDBDiff.UI
             btnUpdate.Enabled = false;
         }
 
-        private void btnUpdateAll_Click(object sender, EventArgs e)
+        private void BtnUpdateAll_Click(object sender, EventArgs e)
         {
             if (MessageBox.Show("Are you sure you want to update all?", "Confirm update", MessageBoxButtons.OKCancel) == DialogResult.OK)
             {
@@ -483,8 +481,8 @@ namespace OpenDBDiff.UI
                             ISchemaBase item = (ISchemaBase)inner.Tag;
                             switch (item.Status)
                             {
-                                case ObjectStatus.Create: sb.Append(Updater.createNew(item, RightDatabaseSelector.ConnectionString)); break;
-                                case ObjectStatus.Alter: sb.Append(Updater.alter(item, RightDatabaseSelector.ConnectionString)); break;
+                                case ObjectStatus.Create: sb.Append(Updater.CreateNew(item, RightDatabaseSelector.ConnectionString)); break;
+                                case ObjectStatus.Alter: sb.Append(Updater.Alter(item, RightDatabaseSelector.ConnectionString)); break;
                             }
                         }
                     }
@@ -499,7 +497,7 @@ namespace OpenDBDiff.UI
             }
         }
 
-        private void btnOptions_Click(object sender, EventArgs e)
+        private void BtnOptions_Click(object sender, EventArgs e)
         {
             Options = Options ?? ProjectSelectorHandler.GetDefaultProjectOptions();
             OptionForm form = new OptionForm(this.ProjectSelectorHandler, Options);
@@ -554,7 +552,7 @@ namespace OpenDBDiff.UI
             txtSyncScript.SetMarginWidth();
         }
 
-        private void btnSaveProject_Click(object sender, EventArgs e)
+        private void BtnSaveProject_Click(object sender, EventArgs e)
         {
             try
             {
@@ -564,7 +562,7 @@ namespace OpenDBDiff.UI
                     {
                         ConnectionStringSource = ProjectSelectorHandler.GetSourceConnectionString(),
                         ConnectionStringDestination = ProjectSelectorHandler.GetDestinationConnectionString(),
-                        ProjectName = String.Format(
+                        ProjectName = string.Format(
                             "[{0}].[{1}] - [{2}].[{3}]",
                             ProjectSelectorHandler.GetSourceServerName(),
                             ProjectSelectorHandler.GetSourceDatabaseName(),
@@ -590,7 +588,7 @@ namespace OpenDBDiff.UI
             }
         }
 
-        private void btnProject_Click(object sender, EventArgs e)
+        private void BtnProject_Click(object sender, EventArgs e)
         {
             try
             {
@@ -598,9 +596,9 @@ namespace OpenDBDiff.UI
                 if (projects.Any())
                 {
                     var form = new ListProjectsForm(projects);
-                    form.OnSelect += new ListProjectHandler(form_OnSelect);
-                    form.OnDelete += new ListProjectHandler(form_OnDelete);
-                    form.OnRename += new ListProjectHandler(form_OnRename);
+                    form.OnSelect += new ListProjectHandler(Form_OnSelect);
+                    form.OnDelete += new ListProjectHandler(Form_OnDelete);
+                    form.OnRename += new ListProjectHandler(Form_OnRename);
                     form.ShowDialog(this);
                 }
                 else
@@ -612,7 +610,7 @@ namespace OpenDBDiff.UI
             }
         }
 
-        private void form_OnRename(Project itemSelected)
+        private void Form_OnRename(Project itemSelected)
         {
             try
             {
@@ -624,7 +622,7 @@ namespace OpenDBDiff.UI
             }
         }
 
-        private void form_OnDelete(Project itemSelected)
+        private void Form_OnDelete(Project itemSelected)
         {
             try
             {
@@ -642,7 +640,7 @@ namespace OpenDBDiff.UI
             }
         }
 
-        private void form_OnSelect(Project itemSelected)
+        private void Form_OnSelect(Project itemSelected)
         {
             try
             {
@@ -659,14 +657,14 @@ namespace OpenDBDiff.UI
             }
         }
 
-        private void btnNewProject_Click(object sender, EventArgs e)
+        private void BtnNewProject_Click(object sender, EventArgs e)
         {
             LeftDatabaseSelector.ConnectionString = "";
             RightDatabaseSelector.ConnectionString = "";
             ActiveProject = null;
         }
 
-        private void toolProjectTypes_SelectedIndexChanged(object sender, EventArgs e)
+        private void ToolProjectTypes_SelectedIndexChanged(object sender, EventArgs e)
         {
             UnloadProjectHandler();
             if (toolProjectTypes.SelectedItem != null)

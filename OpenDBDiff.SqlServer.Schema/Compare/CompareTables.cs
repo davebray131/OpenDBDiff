@@ -12,13 +12,13 @@ namespace OpenDBDiff.SqlServer.Schema.Compare
             {
                 Table tablaOriginal = originFields[node.FullName];
                 tablaOriginal.OriginalTable = (Table)originFields[node.FullName].Clone((Database)tablaOriginal.Parent);
-                (new CompareColumns()).GenerateDifferences<Table>(tablaOriginal.Columns, node.Columns);
-                (new CompareConstraints()).GenerateDifferences<Table>(tablaOriginal.Constraints, node.Constraints);
-                (new CompareIndexes()).GenerateDifferences<Table>(tablaOriginal.Indexes, node.Indexes);
-                (new CompareTablesOptions()).GenerateDifferences<Table>(tablaOriginal.Options, node.Options);
-                (new CompareTriggers()).GenerateDifferences<Table>(tablaOriginal.Triggers, node.Triggers);
-                (new CompareCLRTriggers()).GenerateDifferences<Table>(tablaOriginal.CLRTriggers, node.CLRTriggers);
-                (new CompareFullTextIndex()).GenerateDifferences<Table>(tablaOriginal.FullTextIndex, node.FullTextIndex);
+                new CompareColumns().GenerateDifferences<Table>(tablaOriginal.Columns, node.Columns);
+                new CompareConstraints().GenerateDifferences<Table>(tablaOriginal.Constraints, node.Constraints);
+                new CompareIndexes().GenerateDifferences<Table>(tablaOriginal.Indexes, node.Indexes);
+                new CompareTablesOptions().GenerateDifferences<Table>(tablaOriginal.Options, node.Options);
+                new CompareTriggers().GenerateDifferences<Table>(tablaOriginal.Triggers, node.Triggers);
+                new CompareCLRTriggers().GenerateDifferences<Table>(tablaOriginal.CLRTriggers, node.CLRTriggers);
+                new CompareFullTextIndex().GenerateDifferences<Table>(tablaOriginal.FullTextIndex, node.FullTextIndex);
                 if (!Table.CompareFileGroup(tablaOriginal, node))
                 {
                     tablaOriginal.FileGroup = node.FileGroup;

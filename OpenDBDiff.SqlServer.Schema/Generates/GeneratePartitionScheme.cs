@@ -5,7 +5,7 @@ namespace OpenDBDiff.SqlServer.Schema.Generates
 {
     public class GeneratePartitionScheme
     {
-        private Generate root;
+        private readonly Generate root;
 
         public GeneratePartitionScheme(Generate root)
         {
@@ -36,10 +36,12 @@ namespace OpenDBDiff.SqlServer.Schema.Generates
                                 if (lastObjectId != (int)reader["ID"])
                                 {
                                     lastObjectId = (int)reader["ID"];
-                                    item = new PartitionScheme(database);
-                                    item.Id = (int)reader["ID"];
-                                    item.Name = reader["name"].ToString();
-                                    item.PartitionFunction = reader["FunctionName"].ToString();
+                                    item = new PartitionScheme(database)
+                                    {
+                                        Id = (int)reader["ID"],
+                                        Name = reader["name"].ToString(),
+                                        PartitionFunction = reader["FunctionName"].ToString()
+                                    };
                                     database.PartitionSchemes.Add(item);
                                 }
                                 item.FileGroups.Add(reader["FileGroupName"].ToString());

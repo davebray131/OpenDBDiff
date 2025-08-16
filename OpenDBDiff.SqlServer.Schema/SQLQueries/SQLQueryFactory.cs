@@ -1,13 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace OpenDBDiff.SqlServer.Schema.SQLQueries
 {
     public static class SQLQueryFactory
     {
-        private static Dictionary<string, string> queries = new Dictionary<string, string>();
+        private static readonly Dictionary<string, string> queries = new Dictionary<string, string>();
 
         public static string Get(string queryFullName, Model.DatabaseInfo.SQLServerVersion version)
         {

@@ -1,18 +1,18 @@
-﻿using OpenDBDiff.Front.Extensions;
-using System;
+﻿using System;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
+using OpenDBDiff.Front.Extensions;
 
 namespace OpenDBDiff.UI
 {
     public partial class ErrorForm : Form
     {
-        private static Regex ExtractBuildPathRegex = new Regex($@"\s+at OpenDBDiff.Front.{nameof(ErrorForm)}.{nameof(GetBuildPath)}\(\) in (.*\\)OpenDBDiff\\Front\\ErrorForm.cs", RegexOptions.Compiled);
-        private static Regex SystemExceptionsRegex = new Regex(@"\s+at System\.[^\r\n]+\r\n", RegexOptions.Compiled);
+        private static readonly Regex ExtractBuildPathRegex = new Regex($@"\s+at OpenDBDiff.Front.{nameof(ErrorForm)}.{nameof(GetBuildPath)}\(\) in (.*\\)OpenDBDiff\\Front\\ErrorForm.cs", RegexOptions.Compiled);
+        private static readonly Regex SystemExceptionsRegex = new Regex(@"\s+at System\.[^\r\n]+\r\n", RegexOptions.Compiled);
         private string ErrorInformation;
-        private Exception Exception;
+        private readonly Exception Exception;
         private string SearchTerm;
 
         public ErrorForm()
@@ -121,12 +121,12 @@ namespace OpenDBDiff.UI
             }
         }
 
-        private void btnClose_Click(object sender, EventArgs e)
+        private void BtnClose_Click(object sender, EventArgs e)
         {
             this.Close();
         }
 
-        private void btnCopy_Click(object sender, EventArgs e)
+        private void BtnCopy_Click(object sender, EventArgs e)
         {
             try
             {
@@ -138,7 +138,7 @@ namespace OpenDBDiff.UI
             }
         }
 
-        private void btnFindIssue_Click(object sender, EventArgs e)
+        private void BtnFindIssue_Click(object sender, EventArgs e)
         {
             try
             {

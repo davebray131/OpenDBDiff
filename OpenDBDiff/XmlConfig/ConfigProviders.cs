@@ -18,10 +18,12 @@ namespace OpenDBDiff.XmlConfig
                 providers = new Hashtable();
                 for (int index = 0; index < nodes.Count; index++)
                 {
-                    ConfigProvider provider = new ConfigProvider();
-                    provider.Description = nodes[index].Attributes.GetNamedItem("description").Value;
-                    provider.Key = nodes[index].Attributes.GetNamedItem("key").Value;
-                    provider.Library = nodes[index].Attributes.GetNamedItem("library").Value;
+                    ConfigProvider provider = new ConfigProvider
+                    {
+                        Description = nodes[index].Attributes.GetNamedItem("description").Value,
+                        Key = nodes[index].Attributes.GetNamedItem("key").Value,
+                        Library = nodes[index].Attributes.GetNamedItem("library").Value
+                    };
                     providers.Add(key, provider);
                 }
             }

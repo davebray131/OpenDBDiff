@@ -1,6 +1,6 @@
+using System;
 using OpenDBDiff.Abstractions.Schema;
 using OpenDBDiff.Abstractions.Schema.Model;
-using System;
 
 namespace OpenDBDiff.SqlServer.Schema.Model
 {
@@ -13,14 +13,16 @@ namespace OpenDBDiff.SqlServer.Schema.Model
 
         public new IndexColumn Clone(ISchemaBase parent)
         {
-            IndexColumn column = new IndexColumn(parent);
-            column.Id = this.Id;
-            column.IsIncluded = this.IsIncluded;
-            column.Name = this.Name;
-            column.Order = this.Order;
-            column.Status = this.Status;
-            column.KeyOrder = this.KeyOrder;
-            column.DataTypeId = this.DataTypeId;
+            IndexColumn column = new IndexColumn(parent)
+            {
+                Id = this.Id,
+                IsIncluded = this.IsIncluded,
+                Name = this.Name,
+                Order = this.Order,
+                Status = this.Status,
+                KeyOrder = this.KeyOrder,
+                DataTypeId = this.DataTypeId
+            };
             return column;
         }
 

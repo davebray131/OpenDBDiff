@@ -1,9 +1,9 @@
-using OpenDBDiff.Abstractions.Schema;
-using OpenDBDiff.Abstractions.Schema.Model;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Xml.Serialization;
+using OpenDBDiff.Abstractions.Schema;
+using OpenDBDiff.Abstractions.Schema.Model;
 
 namespace OpenDBDiff.SqlServer.Schema.Model
 {
@@ -174,7 +174,7 @@ namespace OpenDBDiff.SqlServer.Schema.Model
         {
             get
             {
-                return (HasIndexDependencies && !HasComputedDependencies && !IsComputed);
+                return HasIndexDependencies && !HasComputedDependencies && !IsComputed;
             }
         }
         /// <summary>
@@ -189,7 +189,7 @@ namespace OpenDBDiff.SqlServer.Schema.Model
             if (newType.Equals("ntext") && (!this.IsText)) return true;
             if (newType.Equals("image") && (!this.IsBinary)) return true;
             if (isFileStream != this.IsFileStream) return true;
-            return ((Position != newPosition) || HasComputedDependencies || HasIndexDependencies || IsComputed || Type.ToLower().Equals("timestamp"));
+            return (Position != newPosition) || HasComputedDependencies || HasIndexDependencies || IsComputed || Type.ToLower().Equals("timestamp");
         }
 
         /// <summary>
@@ -305,7 +305,7 @@ namespace OpenDBDiff.SqlServer.Schema.Model
         {
             get
             {
-                return (this.HasState(ObjectStatus.Update)) || ((!this.IsNullable) && (this.Status == ObjectStatus.Create));
+                return this.HasState(ObjectStatus.Update) || ((!this.IsNullable) && (this.Status == ObjectStatus.Create));
             }
         }
 
@@ -321,7 +321,7 @@ namespace OpenDBDiff.SqlServer.Schema.Model
                 if (this.IsUserDefinedType)
                     tl = ((Database)this.Parent.Parent).UserTypes[Type].Type.ToLower();
 
-                if ((((Database)Parent.Parent).Options.Defaults.UseDefaultValueIfExists) && (this.DefaultConstraint != null))
+                if (((Database)Parent.Parent).Options.Defaults.UseDefaultValueIfExists && (this.DefaultConstraint != null))
                 {
                     return this.DefaultConstraint.Definition;
                 }
@@ -427,7 +427,7 @@ namespace OpenDBDiff.SqlServer.Schema.Model
                 }
                 if (Type.Equals("xml"))
                 {
-                    if (!String.IsNullOrEmpty(XmlSchema))
+                    if (!string.IsNullOrEmpty(XmlSchema))
                     {
                         if (IsXmlDocument)
                             sql += "(DOCUMENT " + XmlSchema + ")";
@@ -440,7 +440,7 @@ namespace OpenDBDiff.SqlServer.Schema.Model
                 {
                     if (Type.Equals("datetime2") || Type.Equals("datetimeoffset") || Type.Equals("time")) sql += "(" + Scale.ToString(CultureInfo.InvariantCulture) + ")";
                 }
-                if ((!String.IsNullOrEmpty(Collation)) && (!IsUserDefinedType)) sql += " COLLATE " + Collation;
+                if ((!string.IsNullOrEmpty(Collation)) && (!IsUserDefinedType)) sql += " COLLATE " + Collation;
                 if (IsIdentity) sql += " IDENTITY (" + IdentitySeed.ToString(CultureInfo.InvariantCulture) + "," + IdentityIncrement.ToString(CultureInfo.InvariantCulture) + ")";
                 if (IsIdentityForReplication) sql += " NOT FOR REPLICATION";
                 if (IsSparse) sql += " SPARSE";
@@ -456,7 +456,7 @@ namespace OpenDBDiff.SqlServer.Schema.Model
                 sql += "AS " + ComputedFormula;
                 if (IsPersisted) sql += " PERSISTED";
             }
-            if ((sqlConstraint) && (DefaultConstraint != null))
+            if (sqlConstraint && (DefaultConstraint != null))
             {
                 if (DefaultConstraint.Status != ObjectStatus.Drop)
                     sql += " " + DefaultConstraint.ToSql().Replace("\t", "").Trim();
@@ -538,7 +538,7 @@ namespace OpenDBDiff.SqlServer.Schema.Model
             SQLScriptList list = new SQLScriptList();
             if (DefaultConstraint != null)
             {
-                if ((!Check) || (DefaultConstraint.CanCreate)) list.Add(DefaultConstraint.Create());
+                if ((!Check) || DefaultConstraint.CanCreate) list.Add(DefaultConstraint.Create());
                 list.Add(DefaultConstraint.Drop());
             }
             return list;
@@ -622,7 +622,7 @@ namespace OpenDBDiff.SqlServer.Schema.Model
                     if (origin.Precision != destination.Precision) return false;
                     if (origin.Scale != destination.Scale) return false;
                     //Si el tamaño de un campo Text cambia, entonces por la opcion TextInRowLimit.
-                    if ((origin.Size != destination.Size) && (origin.Type.Equals(destination.Type, StringComparison.CurrentCultureIgnoreCase)) && (!origin.Type.Equals("text", StringComparison.CurrentCultureIgnoreCase))) return false;
+                    if ((origin.Size != destination.Size) && origin.Type.Equals(destination.Type, StringComparison.CurrentCultureIgnoreCase) && (!origin.Type.Equals("text", StringComparison.CurrentCultureIgnoreCase))) return false;
                 }
 
             }

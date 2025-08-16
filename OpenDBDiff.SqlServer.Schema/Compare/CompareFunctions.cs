@@ -13,7 +13,7 @@ namespace OpenDBDiff.SqlServer.Schema.Compare
             originFields.Add(newNode);
             newNode.DependenciesIn.ForEach(dep =>
             {
-                ISchemaBase item = ((Database)((ISchemaBase)originFields.Parent)).Find(dep);
+                ISchemaBase item = ((Database)(ISchemaBase)originFields.Parent).Find(dep);
                 if (item != null)
                 {
                     if (item.IsCodeType)

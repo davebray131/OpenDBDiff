@@ -111,21 +111,21 @@ namespace OpenDBDiff.UI
             this.OpenToolStripMenuItem.Name = "OpenToolStripMenuItem";
             this.OpenToolStripMenuItem.Size = new System.Drawing.Size(117, 22);
             this.OpenToolStripMenuItem.Text = "&Open";
-            this.OpenToolStripMenuItem.Click += new System.EventHandler(this.mnuItemOpen_Click);
+            this.OpenToolStripMenuItem.Click += new System.EventHandler(this.MnuItemOpen_Click);
             // 
             // RenameToolStripMenuItem
             // 
             this.RenameToolStripMenuItem.Name = "RenameToolStripMenuItem";
             this.RenameToolStripMenuItem.Size = new System.Drawing.Size(117, 22);
             this.RenameToolStripMenuItem.Text = "&Rename";
-            this.RenameToolStripMenuItem.Click += new System.EventHandler(this.mnuItemRename_Click);
+            this.RenameToolStripMenuItem.Click += new System.EventHandler(this.MnuItemRename_Click);
             // 
             // DeleteToolStripMenuItem
             // 
             this.DeleteToolStripMenuItem.Name = "DeleteToolStripMenuItem";
             this.DeleteToolStripMenuItem.Size = new System.Drawing.Size(117, 22);
             this.DeleteToolStripMenuItem.Text = "&Delete";
-            this.DeleteToolStripMenuItem.Click += new System.EventHandler(this.mnuItemDelete_Click);
+            this.DeleteToolStripMenuItem.Click += new System.EventHandler(this.MnuItemDelete_Click);
             // 
             // statusStrip1
             // 

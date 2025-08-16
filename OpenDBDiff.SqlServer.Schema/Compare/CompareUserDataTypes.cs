@@ -1,7 +1,7 @@
+using System;
 using OpenDBDiff.Abstractions.Schema;
 using OpenDBDiff.Abstractions.Schema.Model;
 using OpenDBDiff.SqlServer.Schema.Model;
-using System;
 
 namespace OpenDBDiff.SqlServer.Schema.Compare
 {
@@ -26,7 +26,7 @@ namespace OpenDBDiff.SqlServer.Schema.Compare
 
                 if (!UserDataType.CompareDefault(node, originFields[node.FullName]))
                 {
-                    if (!String.IsNullOrEmpty(node.Default.Name))
+                    if (!string.IsNullOrEmpty(node.Default.Name))
                         newNode.Default.Status = ObjectStatus.Create;
                     else
                         newNode.Default.Status = ObjectStatus.Drop;
@@ -36,7 +36,7 @@ namespace OpenDBDiff.SqlServer.Schema.Compare
                 {
                     if (!UserDataType.CompareRule(node, originFields[node.FullName]))
                     {
-                        if (!String.IsNullOrEmpty(node.Rule.Name))
+                        if (!string.IsNullOrEmpty(node.Rule.Name))
                             newNode.Rule.Status = ObjectStatus.Create;
                         else
                             newNode.Rule.Status = ObjectStatus.Drop;

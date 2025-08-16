@@ -1,10 +1,10 @@
-using OpenDBDiff.Abstractions.Schema;
-using OpenDBDiff.Abstractions.Schema.Attributes;
-using OpenDBDiff.Abstractions.Schema.Model;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using OpenDBDiff.Abstractions.Schema;
+using OpenDBDiff.Abstractions.Schema.Attributes;
+using OpenDBDiff.Abstractions.Schema.Model;
 
 namespace OpenDBDiff.SqlServer.Schema.Model
 {
@@ -233,21 +233,21 @@ namespace OpenDBDiff.SqlServer.Schema.Model
                 else
                 {
                     sql.AppendLine();
-                    if (!String.IsNullOrEmpty(CompressType))
+                    if (!string.IsNullOrEmpty(CompressType))
                         sql.AppendLine("WITH (DATA_COMPRESSION = " + CompressType + ")");
                 }
                 sql.Append(")");
 
                 if (!isAzure10)
                 {
-                    if (!String.IsNullOrEmpty(FileGroup)) sql.Append(" ON [" + FileGroup + "]");
+                    if (!string.IsNullOrEmpty(FileGroup)) sql.Append(" ON [" + FileGroup + "]");
 
-                    if (!String.IsNullOrEmpty(FileGroupText))
+                    if (!string.IsNullOrEmpty(FileGroupText))
                     {
                         if (HasBlobColumn)
                             sql.Append(" TEXTIMAGE_ON [" + FileGroupText + "]");
                     }
-                    if ((!String.IsNullOrEmpty(FileGroupStream)) && (HasFileStream))
+                    if ((!string.IsNullOrEmpty(FileGroupStream)) && HasFileStream)
                         sql.Append(" FILESTREAM_ON [" + FileGroupStream + "]");
                 }
                 sql.AppendLine();
@@ -460,11 +460,11 @@ namespace OpenDBDiff.SqlServer.Schema.Model
                 var listColumns = columnNamesStringBuilder.ToString(0, columnNamesStringBuilder.Length - 1);
                 var listValues = valuesStringBuilder.ToString(0, valuesStringBuilder.Length - 1);
                 sql.AppendLine(ToSQLTemp(tempTable));
-                if ((HasIdentityColumn) && (!IsIdentityNew))
+                if (HasIdentityColumn && (!IsIdentityNew))
                     sql.AppendLine("SET IDENTITY_INSERT [" + Owner + "].[" + tempTable + "] ON");
                 sql.AppendLine("INSERT INTO [" + Owner + "].[" + tempTable + "] (" + listColumns + ")" + " SELECT " +
-                       listValues + " FROM " + FullName );
-                if ((HasIdentityColumn) && (!IsIdentityNew))
+                       listValues + " FROM " + FullName);
+                if (HasIdentityColumn && (!IsIdentityNew))
                     sql.AppendLine("SET IDENTITY_INSERT [" + Owner + "].[" + tempTable + "] OFF\r\nGO\r\n");
                 sql.AppendLine("DROP TABLE " + FullName + "\r\nGO");
 
@@ -545,17 +545,17 @@ namespace OpenDBDiff.SqlServer.Schema.Model
             else
             {
                 sql.AppendLine();
-                if (!String.IsNullOrEmpty(CompressType))
+                if (!string.IsNullOrEmpty(CompressType))
                     sql.AppendLine("WITH (DATA_COMPRESSION = " + CompressType + ")");
             }
             sql.Append(")");
 
-            if (!String.IsNullOrEmpty(FileGroup)) sql.Append(" ON [" + FileGroup + "]");
+            if (!string.IsNullOrEmpty(FileGroup)) sql.Append(" ON [" + FileGroup + "]");
 
-            if (!String.IsNullOrEmpty(FileGroupText) && HasBlobColumn)
+            if (!string.IsNullOrEmpty(FileGroupText) && HasBlobColumn)
                 sql.Append(" TEXTIMAGE_ON [" + FileGroupText + "]");
-            
-            if (!String.IsNullOrEmpty(FileGroupStream) && HasFileStream)
+
+            if (!string.IsNullOrEmpty(FileGroupStream) && HasFileStream)
                 sql.Append(" FILESTREAM_ON [" + FileGroupStream + "]");
 
             sql.AppendLine();
@@ -645,7 +645,7 @@ namespace OpenDBDiff.SqlServer.Schema.Model
                     if (dependencies[index].ObjectType == ObjectType.Constraint)
                     {
                         if ((((Constraint)dependencies[index]).Type == Constraint.ConstraintType.Unique) &&
-                            ((HasFileStream) || (OriginalTable.HasFileStream)))
+                            (HasFileStream || OriginalTable.HasFileStream))
                             addDependency = false;
                         if ((((Constraint)dependencies[index]).Type != Constraint.ConstraintType.ForeignKey) &&
                             (dependencies[index].Status == ObjectStatus.Drop))
@@ -672,8 +672,9 @@ namespace OpenDBDiff.SqlServer.Schema.Model
 
         private SQLScriptList ToSQLCreateDependencies()
         {
-            bool addDependency = true;
+            bool addDependency;
             var listDiff = new SQLScriptList();
+
             //Las constraints de deben recorrer en el orden inverso.
             for (int index = dependencies.Count - 1; index >= 0; index--)
             {
@@ -684,7 +685,7 @@ namespace OpenDBDiff.SqlServer.Schema.Model
                     if (dependencies[index].ObjectType == ObjectType.Constraint)
                     {
                         if ((((Constraint)dependencies[index]).Type == Constraint.ConstraintType.Unique) &&
-                            (HasFileStream))
+                            HasFileStream)
                             addDependency = false;
                     }
                     if (addDependency)
@@ -696,7 +697,7 @@ namespace OpenDBDiff.SqlServer.Schema.Model
             {
                 if (Columns[index].DefaultConstraint != null)
                 {
-                    if ((Columns[index].DefaultConstraint.CanCreate) &&
+                    if (Columns[index].DefaultConstraint.CanCreate &&
                         (Columns.Parent.Status != ObjectStatus.Rebuild))
                         listDiff.Add(Columns[index].DefaultConstraint.Create());
                 }
@@ -711,7 +712,7 @@ namespace OpenDBDiff.SqlServer.Schema.Model
         {
             if (destination == null) throw new ArgumentNullException("destination");
             if (origin == null) throw new ArgumentNullException("origin");
-            if ((!String.IsNullOrEmpty(destination.FileGroup) && (!String.IsNullOrEmpty(origin.FileGroup))))
+            if (!string.IsNullOrEmpty(destination.FileGroup) && (!string.IsNullOrEmpty(origin.FileGroup)))
                 if (!destination.FileGroup.Equals(origin.FileGroup))
                     return false;
             return true;
@@ -724,7 +725,7 @@ namespace OpenDBDiff.SqlServer.Schema.Model
         {
             if (destination == null) throw new ArgumentNullException("destination");
             if (origin == null) throw new ArgumentNullException("origin");
-            if ((!String.IsNullOrEmpty(destination.FileGroupText) && (!String.IsNullOrEmpty(origin.FileGroupText))))
+            if (!string.IsNullOrEmpty(destination.FileGroupText) && (!string.IsNullOrEmpty(origin.FileGroupText)))
                 if (!destination.FileGroupText.Equals(origin.FileGroupText))
                     return false;
             return true;

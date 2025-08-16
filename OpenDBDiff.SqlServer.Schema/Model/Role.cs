@@ -1,6 +1,6 @@
-﻿using OpenDBDiff.Abstractions.Schema;
+﻿using System;
+using OpenDBDiff.Abstractions.Schema;
 using OpenDBDiff.Abstractions.Schema.Model;
-using System;
 
 namespace OpenDBDiff.SqlServer.Schema.Model
 {
@@ -32,7 +32,7 @@ namespace OpenDBDiff.SqlServer.Schema.Model
             sql += "CREATE " + ((Type == RoleTypeEnum.ApplicationRole) ? "APPLICATION" : "") + " ROLE ";
             sql += FullName + " ";
             sql += "WITH PASSWORD = N'" + Password + "'";
-            if (!String.IsNullOrEmpty(Owner))
+            if (!string.IsNullOrEmpty(Owner))
                 sql += " ,DEFAULT_SCHEMA=[" + Owner + "]";
             return sql.Trim() + "\r\nGO\r\n";
         }

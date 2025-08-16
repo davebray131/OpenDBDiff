@@ -1,19 +1,19 @@
-﻿using CommandLine;
+﻿using System;
+using System.Diagnostics;
+using System.IO;
+using CommandLine;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
 using OpenDBDiff.Abstractions.Schema.Model;
 using OpenDBDiff.SqlServer.Schema.Generates;
 using OpenDBDiff.SqlServer.Schema.Model;
 using OpenDBDiff.SqlServer.Schema.Options;
-using System;
-using System.Diagnostics;
-using System.IO;
 
 namespace OpenDBDiff.CLI
 {
     public class Program
     {
-        private static SqlOption SqlFilter = new SqlOption();
+        private static readonly SqlOption SqlFilter = new SqlOption();
 
         protected Program()
         {
@@ -65,8 +65,10 @@ namespace OpenDBDiff.CLI
                 if (TestConnection(options.Before)
                     && TestConnection(options.After))
                 {
-                    Generate sql = new Generate();
-                    sql.ConnectionString = options.Before;
+                    Generate sql = new Generate
+                    {
+                        ConnectionString = options.Before
+                    };
                     Console.WriteLine("Reading first database...");
                     sql.Options = SqlFilter;
                     origin = sql.Process();
@@ -114,7 +116,7 @@ namespace OpenDBDiff.CLI
             {
                 using (var fs = new FileStream(filenmame, FileMode.Create))
                 using (var writer = new StreamWriter(fs))
-                writer.Write(sql);
+                    writer.Write(sql);
             }
         }
     }

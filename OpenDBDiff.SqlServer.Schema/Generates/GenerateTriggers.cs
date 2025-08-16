@@ -1,3 +1,5 @@
+using System;
+using System.Collections.Generic;
 using Microsoft.Data.SqlClient;
 using OpenDBDiff.Abstractions.Schema.Errors;
 using OpenDBDiff.Abstractions.Schema.Events;
@@ -5,14 +7,12 @@ using OpenDBDiff.Abstractions.Schema.Model;
 using OpenDBDiff.SqlServer.Schema.Generates.Util;
 using OpenDBDiff.SqlServer.Schema.Model;
 using OpenDBDiff.SqlServer.Schema.Options;
-using System;
-using System.Collections.Generic;
 
 namespace OpenDBDiff.SqlServer.Schema.Generates
 {
     public class GenerateTriggers
     {
-        private Generate root;
+        private readonly Generate root;
 
         public GenerateTriggers(Generate root)
         {
@@ -64,13 +64,15 @@ namespace OpenDBDiff.SqlServer.Schema.Generates
                                     if (parent == null) { continue; }
                                     if (reader["type"].Equals("TR"))
                                     {
-                                        Trigger item = new Trigger(parent);
-                                        item.Id = (int)reader["object_id"];
-                                        item.Name = reader["Name"].ToString();
-                                        item.InsteadOf = (bool)reader["is_instead_of_trigger"];
-                                        item.IsDisabled = (bool)reader["is_disabled"];
-                                        item.IsDDLTrigger = false;
-                                        item.Owner = reader["Owner"].ToString();
+                                        Trigger item = new Trigger(parent)
+                                        {
+                                            Id = (int)reader["object_id"],
+                                            Name = reader["Name"].ToString(),
+                                            InsteadOf = (bool)reader["is_instead_of_trigger"],
+                                            IsDisabled = (bool)reader["is_disabled"],
+                                            IsDDLTrigger = false,
+                                            Owner = reader["Owner"].ToString()
+                                        };
                                         if (database.Options.Ignore.FilterNotForReplication)
                                             item.NotForReplication = (bool)reader["is_not_for_replication"];
                                         if (type.Equals("V"))
@@ -80,19 +82,21 @@ namespace OpenDBDiff.SqlServer.Schema.Generates
                                     }
                                     else
                                     {
-                                        CLRTrigger item = new CLRTrigger(parent);
-                                        item.Id = (int)reader["object_id"];
-                                        item.Name = reader["Name"].ToString();
-                                        item.IsDelete = (bool)reader["IsDelete"];
-                                        item.IsUpdate = (bool)reader["IsUpdate"];
-                                        item.IsInsert = (bool)reader["IsInsert"];
-                                        item.Owner = reader["Owner"].ToString();
-                                        item.IsAssembly = true;
-                                        item.AssemblyId = (int)reader["assembly_id"];
-                                        item.AssemblyName = reader["assembly_name"].ToString();
-                                        item.AssemblyClass = reader["assembly_class"].ToString();
-                                        item.AssemblyExecuteAs = reader["ExecuteAs"].ToString();
-                                        item.AssemblyMethod = reader["assembly_method"].ToString();
+                                        CLRTrigger item = new CLRTrigger(parent)
+                                        {
+                                            Id = (int)reader["object_id"],
+                                            Name = reader["Name"].ToString(),
+                                            IsDelete = (bool)reader["IsDelete"],
+                                            IsUpdate = (bool)reader["IsUpdate"],
+                                            IsInsert = (bool)reader["IsInsert"],
+                                            Owner = reader["Owner"].ToString(),
+                                            IsAssembly = true,
+                                            AssemblyId = (int)reader["assembly_id"],
+                                            AssemblyName = reader["assembly_name"].ToString(),
+                                            AssemblyClass = reader["assembly_class"].ToString(),
+                                            AssemblyExecuteAs = reader["ExecuteAs"].ToString(),
+                                            AssemblyMethod = reader["assembly_method"].ToString()
+                                        };
                                         if (type.Equals("V"))
                                             ((View)parent).CLRTriggers.Add(item);
                                         else

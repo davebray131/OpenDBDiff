@@ -1,8 +1,8 @@
-﻿using OpenDBDiff.Settings;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Forms;
+using OpenDBDiff.Settings;
 
 namespace OpenDBDiff.UI
 {
@@ -91,7 +91,7 @@ namespace OpenDBDiff.UI
             }
         }
 
-        private void mnuItemRename_Click(object sender, EventArgs e)
+        private void MnuItemRename_Click(object sender, EventArgs e)
         {
             if (ProjectsListView.SelectedItems.Count != 0)
             {
@@ -114,13 +114,13 @@ namespace OpenDBDiff.UI
             }
         }
 
-        private void mnuItemOpen_Click(object sender, EventArgs e)
+        private void MnuItemOpen_Click(object sender, EventArgs e)
         {
             OpenProject();
             Dispose();
         }
 
-        private void mnuItemDelete_Click(object sender, EventArgs e)
+        private void MnuItemDelete_Click(object sender, EventArgs e)
         {
             DeleteProject();
         }

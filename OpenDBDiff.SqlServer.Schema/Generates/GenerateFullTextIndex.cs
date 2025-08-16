@@ -8,7 +8,7 @@ namespace OpenDBDiff.SqlServer.Schema.Generates
 {
     public class GenerateFullTextIndex
     {
-        private Generate root;
+        private readonly Generate root;
 
         public GenerateFullTextIndex(Generate root)
         {
@@ -21,7 +21,6 @@ namespace OpenDBDiff.SqlServer.Schema.Generates
             if (database.Info.Version == DatabaseInfo.SQLServerVersion.SQLServerAzure10) return;
 
             int parentId = 0;
-            bool change = false;
             Table parent = null;
             root.RaiseOnReading(new ProgressEventArgs("Reading FullText Index...", Constants.READING_INDEXES));
             using (SqlConnection conn = new SqlConnection(connectionString))
@@ -36,6 +35,7 @@ namespace OpenDBDiff.SqlServer.Schema.Generates
                         while (reader.Read())
                         {
                             root.RaiseOnReadingOne(reader["Name"]);
+                            bool change;
                             if (parentId != (int)reader["object_id"])
                             {
                                 parentId = (int)reader["object_id"];
@@ -46,20 +46,24 @@ namespace OpenDBDiff.SqlServer.Schema.Generates
                                 change = false;
                             if (change)
                             {
-                                item = new FullTextIndex(parent);
-                                item.Name = reader["Name"].ToString();
-                                item.Owner = parent.Owner;
-                                item.FullText = reader["FullTextCatalogName"].ToString();
-                                item.Index = reader["IndexName"].ToString();
-                                item.IsDisabled = !(bool)reader["is_enabled"];
-                                item.ChangeTrackingState = reader["ChangeTracking"].ToString();
+                                item = new FullTextIndex(parent)
+                                {
+                                    Name = reader["Name"].ToString(),
+                                    Owner = parent.Owner,
+                                    FullText = reader["FullTextCatalogName"].ToString(),
+                                    Index = reader["IndexName"].ToString(),
+                                    IsDisabled = !(bool)reader["is_enabled"],
+                                    ChangeTrackingState = reader["ChangeTracking"].ToString()
+                                };
                                 if (database.Info.Version == DatabaseInfo.SQLServerVersion.SQLServer2008)
                                     item.FileGroup = reader["FileGroupName"].ToString();
-                                ((Table)parent).FullTextIndex.Add(item);
+                                parent.FullTextIndex.Add(item);
                             }
-                            FullTextIndexColumn ccon = new FullTextIndexColumn();
-                            ccon.ColumnName = reader["ColumnName"].ToString();
-                            ccon.Language = reader["LanguageName"].ToString();
+                            FullTextIndexColumn ccon = new FullTextIndexColumn
+                            {
+                                ColumnName = reader["ColumnName"].ToString(),
+                                Language = reader["LanguageName"].ToString()
+                            };
                             item.Columns.Add(ccon);
                         }
                     }

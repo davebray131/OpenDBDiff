@@ -1,5 +1,5 @@
-﻿using OpenDBDiff.Abstractions.Schema.Model;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using OpenDBDiff.Abstractions.Schema.Model;
 
 namespace OpenDBDiff.Abstractions.Schema
 {
@@ -61,7 +61,7 @@ namespace OpenDBDiff.Abstractions.Schema
         {
             get
             {
-                return ((this.Type != ObjectType.Function) && (this.Type != ObjectType.StoredProcedure) && (this.Type != ObjectType.View) && (this.Type != ObjectType.Table) && (this.Type != ObjectType.Database));
+                return (this.Type != ObjectType.Function) && (this.Type != ObjectType.StoredProcedure) && (this.Type != ObjectType.View) && (this.Type != ObjectType.Table) && (this.Type != ObjectType.Database);
             }
         }
 

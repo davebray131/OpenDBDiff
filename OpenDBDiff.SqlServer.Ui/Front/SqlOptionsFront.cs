@@ -1,8 +1,8 @@
+using System;
+using System.Windows.Forms;
 using OpenDBDiff.Abstractions.Schema;
 using OpenDBDiff.Abstractions.Schema.Model;
 using OpenDBDiff.SqlServer.Schema.Options;
-using System;
-using System.Windows.Forms;
 
 namespace OpenDBDiff.SqlServer.Ui
 {
@@ -29,7 +29,8 @@ namespace OpenDBDiff.SqlServer.Ui
                 var lview = new ListViewItem(item.FilterPattern);
                 lview.SubItems.Add(item.ObjectType.ToString());
                 lstFilters.Items.Add(lview);
-            };
+            }
+            ;
         }
 
         public override void Load(IOption option)
@@ -195,7 +196,7 @@ namespace OpenDBDiff.SqlServer.Ui
             return SQLOption;
         }
 
-        private void chkCompIndices_CheckedChanged(object sender, EventArgs e)
+        private void ChkCompIndices_CheckedChanged(object sender, EventArgs e)
         {
             chkIndexFillFactor.Enabled = chkIndex.Checked;
             chkIndexIncludeColumns.Enabled = chkIndex.Checked;
@@ -203,7 +204,7 @@ namespace OpenDBDiff.SqlServer.Ui
             chkIndexRowLock.Enabled = chkIndex.Checked;
         }
 
-        private void chkCompTablas_CheckedChanged(object sender, EventArgs e)
+        private void ChkCompTablas_CheckedChanged(object sender, EventArgs e)
         {
             chkTablesColumnCollation.Enabled = chkTables.Checked;
             chkTablesColumnIdentity.Enabled = chkTables.Checked;
@@ -213,7 +214,7 @@ namespace OpenDBDiff.SqlServer.Ui
             chkTableOption.Enabled = chkTables.Checked;
         }
 
-        private void btnApply_Click(object sender, EventArgs e)
+        private void BtnApply_Click(object sender, EventArgs e)
         {
             if (lstFilters.SelectedItems.Count > 0)
             {
@@ -222,13 +223,13 @@ namespace OpenDBDiff.SqlServer.Ui
             }
         }
 
-        private void btnAdd_Click(object sender, EventArgs e)
+        private void BtnAdd_Click(object sender, EventArgs e)
         {
             AddExclusionPatternForm itemForm = new AddExclusionPatternForm(SQLOption);
             itemForm.ShowDialog(this);
         }
 
-        private void chkConstraints_CheckedChanged(object sender, EventArgs e)
+        private void ChkConstraints_CheckedChanged(object sender, EventArgs e)
         {
             chkConstraintsFK.Enabled = chkConstraints.Checked;
             chkConstraintsPK.Enabled = chkConstraints.Checked;
@@ -236,7 +237,7 @@ namespace OpenDBDiff.SqlServer.Ui
             chkConstraintsCheck.Enabled = chkConstraints.Checked;
         }
 
-        private void chkFullText_CheckedChanged(object sender, EventArgs e)
+        private void ChkFullText_CheckedChanged(object sender, EventArgs e)
         {
             chkFullTextPath.Enabled = chkFullText.Checked;
         }
@@ -267,7 +268,7 @@ namespace OpenDBDiff.SqlServer.Ui
             }
         }
 
-        private void lstFilters_DoubleClick(object sender, EventArgs e)
+        private void LstFilters_DoubleClick(object sender, EventArgs e)
         {
             if (lstFilters.SelectedItems.Count > 0)
             {

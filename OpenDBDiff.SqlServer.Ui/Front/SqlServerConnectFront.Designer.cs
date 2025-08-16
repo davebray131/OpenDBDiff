@@ -56,7 +56,7 @@ namespace OpenDBDiff.SqlServer.Ui
             this.txtPassword.PasswordChar = '*';
             this.txtPassword.Size = new System.Drawing.Size(180, 20);
             this.txtPassword.TabIndex = 3;
-            this.txtPassword.TextChanged += new System.EventHandler(this.txtPassword_TextChanged);
+            this.txtPassword.TextChanged += new System.EventHandler(this.TxtPassword_TextChanged);
             //
             // label4
             //
@@ -94,9 +94,9 @@ namespace OpenDBDiff.SqlServer.Ui
             this.cboServer.Name = "cboServer";
             this.cboServer.Size = new System.Drawing.Size(180, 21);
             this.cboServer.TabIndex = 0;
-            this.cboServer.SelectedIndexChanged += new System.EventHandler(this.cboServer_SelectedIndexChanged);
-            this.cboServer.DropDown += new System.EventHandler(this.cboServer_DropDown);
-            this.cboServer.TextChanged += new System.EventHandler(this.cboServer_TextChanged);
+            this.cboServer.SelectedIndexChanged += new System.EventHandler(this.CboServer_SelectedIndexChanged);
+            this.cboServer.DropDown += new System.EventHandler(this.CboServer_DropDown);
+            this.cboServer.TextChanged += new System.EventHandler(this.CboServer_TextChanged);
             //
             // cboAuthentication
             //
@@ -109,7 +109,7 @@ namespace OpenDBDiff.SqlServer.Ui
             this.cboAuthentication.Name = "cboAuthentication";
             this.cboAuthentication.Size = new System.Drawing.Size(180, 21);
             this.cboAuthentication.TabIndex = 1;
-            this.cboAuthentication.SelectedIndexChanged += new System.EventHandler(this.cboAuthentication_SelectedIndexChanged);
+            this.cboAuthentication.SelectedIndexChanged += new System.EventHandler(this.CboAuthentication_SelectedIndexChanged);
             //
             // label5
             //
@@ -127,7 +127,7 @@ namespace OpenDBDiff.SqlServer.Ui
             this.cboDatabase.Name = "cboDatabase";
             this.cboDatabase.Size = new System.Drawing.Size(223, 21);
             this.cboDatabase.TabIndex = 4;
-            this.cboDatabase.DropDown += new System.EventHandler(this.cboDatabase_DropDown);
+            this.cboDatabase.DropDown += new System.EventHandler(this.CboDatabase_DropDown);
             //
             // label6
             //
@@ -144,7 +144,7 @@ namespace OpenDBDiff.SqlServer.Ui
             this.txtUsername.Name = "txtUsername";
             this.txtUsername.Size = new System.Drawing.Size(180, 20);
             this.txtUsername.TabIndex = 2;
-            this.txtUsername.TextChanged += new System.EventHandler(this.txtUsername_TextChanged);
+            this.txtUsername.TextChanged += new System.EventHandler(this.TxtUsername_TextChanged);
             //
             // btnTest
             //
@@ -157,7 +157,7 @@ namespace OpenDBDiff.SqlServer.Ui
             this.btnTest.TabIndex = 5;
             this.btnTest.Text = "Test";
             this.btnTest.UseVisualStyleBackColor = true;
-            this.btnTest.Click += new System.EventHandler(this.btnTest_Click);
+            this.btnTest.Click += new System.EventHandler(this.BtnTest_Click);
             //
             // lblName
             //

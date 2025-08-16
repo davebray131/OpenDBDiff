@@ -357,7 +357,7 @@ namespace OpenDBDiff.SqlServer.Ui
             this.chkFullText.TabIndex = 29;
             this.chkFullText.Text = "Full text";
             this.chkFullText.UseVisualStyleBackColor = true;
-            this.chkFullText.CheckedChanged += new System.EventHandler(this.chkFullText_CheckedChanged);
+            this.chkFullText.CheckedChanged += new System.EventHandler(this.ChkFullText_CheckedChanged);
             // 
             // chkCompRules
             // 
@@ -517,7 +517,7 @@ namespace OpenDBDiff.SqlServer.Ui
             this.chkConstraints.TabIndex = 10;
             this.chkConstraints.Text = "Constraints";
             this.chkConstraints.UseVisualStyleBackColor = true;
-            this.chkConstraints.CheckedChanged += new System.EventHandler(this.chkConstraints_CheckedChanged);
+            this.chkConstraints.CheckedChanged += new System.EventHandler(this.ChkConstraints_CheckedChanged);
             // 
             // chkCompSchemas
             // 
@@ -558,7 +558,7 @@ namespace OpenDBDiff.SqlServer.Ui
             this.chkIndex.TabIndex = 5;
             this.chkIndex.Text = "Indexes";
             this.chkIndex.UseVisualStyleBackColor = true;
-            this.chkIndex.CheckedChanged += new System.EventHandler(this.chkCompIndices_CheckedChanged);
+            this.chkIndex.CheckedChanged += new System.EventHandler(this.ChkCompIndices_CheckedChanged);
             // 
             // chkTableOption
             // 
@@ -625,7 +625,7 @@ namespace OpenDBDiff.SqlServer.Ui
             this.chkTables.TabIndex = 0;
             this.chkTables.Text = "Tables";
             this.chkTables.UseVisualStyleBackColor = true;
-            this.chkTables.CheckedChanged += new System.EventHandler(this.chkCompTablas_CheckedChanged);
+            this.chkTables.CheckedChanged += new System.EventHandler(this.ChkCompTablas_CheckedChanged);
             // 
             // chkCompTriggers
             // 
@@ -1042,7 +1042,7 @@ namespace OpenDBDiff.SqlServer.Ui
             this.btnAdd.TabIndex = 3;
             this.btnAdd.Text = "Add";
             this.btnAdd.UseVisualStyleBackColor = true;
-            this.btnAdd.Click += new System.EventHandler(this.btnAdd_Click);
+            this.btnAdd.Click += new System.EventHandler(this.BtnAdd_Click);
             // 
             // gradientPanel10
             // 
@@ -1072,7 +1072,7 @@ namespace OpenDBDiff.SqlServer.Ui
             this.lstFilters.TabIndex = 0;
             this.lstFilters.UseCompatibleStateImageBehavior = false;
             this.lstFilters.View = System.Windows.Forms.View.Details;
-            this.lstFilters.DoubleClick += new System.EventHandler(this.lstFilters_DoubleClick);
+            this.lstFilters.DoubleClick += new System.EventHandler(this.LstFilters_DoubleClick);
             //
             // columnHeader1
             // 
@@ -1102,7 +1102,7 @@ namespace OpenDBDiff.SqlServer.Ui
             this.btnApply.TabIndex = 2;
             this.btnApply.Text = "Edit";
             this.btnApply.UseVisualStyleBackColor = true;
-            this.btnApply.Click += new System.EventHandler(this.btnApply_Click);
+            this.btnApply.Click += new System.EventHandler(this.BtnApply_Click);
             // 
             // gradientPanel9
             // 

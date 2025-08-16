@@ -21,8 +21,7 @@ namespace OpenDBDiff.SqlServer.Ui
             };
             this.Generate.OnProgress += new ProgressEventHandler.ProgressHandler(args =>
             {
-                if (OnProgress != null)
-                    OnProgress.Invoke(args);
+                OnProgress?.Invoke(args);
             });
 
         }

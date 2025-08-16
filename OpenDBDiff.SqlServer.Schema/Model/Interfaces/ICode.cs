@@ -1,6 +1,6 @@
-﻿using OpenDBDiff.Abstractions.Schema;
+﻿using System.Collections.Generic;
+using OpenDBDiff.Abstractions.Schema;
 using OpenDBDiff.Abstractions.Schema.Model;
-using System.Collections.Generic;
 
 namespace OpenDBDiff.SqlServer.Schema.Model
 {

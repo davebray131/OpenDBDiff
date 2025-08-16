@@ -47,7 +47,7 @@ namespace OpenDBDiff.UI
             this.btnCancel.TabIndex = 5;
             this.btnCancel.Text = "Cancel";
             this.btnCancel.UseVisualStyleBackColor = true;
-            this.btnCancel.Click += new System.EventHandler(this.btnCancel_Click);
+            this.btnCancel.Click += new System.EventHandler(this.BtnCancel_Click);
             //
             // btnApply
             //
@@ -58,7 +58,7 @@ namespace OpenDBDiff.UI
             this.btnApply.TabIndex = 4;
             this.btnApply.Text = "Apply";
             this.btnApply.UseVisualStyleBackColor = true;
-            this.btnApply.Click += new System.EventHandler(this.btnApply_Click);
+            this.btnApply.Click += new System.EventHandler(this.BtnApply_Click);
             //
             // OptionForm
             //

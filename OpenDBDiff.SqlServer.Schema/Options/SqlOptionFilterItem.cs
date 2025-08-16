@@ -1,9 +1,9 @@
-﻿using OpenDBDiff.Abstractions.Schema;
-using OpenDBDiff.Abstractions.Schema.Model;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
+using OpenDBDiff.Abstractions.Schema;
+using OpenDBDiff.Abstractions.Schema.Model;
 
 namespace OpenDBDiff.SqlServer.Schema.Options
 {
@@ -37,7 +37,7 @@ namespace OpenDBDiff.SqlServer.Schema.Options
             return this.ObjectType.Equals(ObjectType.Schema) && ValueSatisfiesCriteria(item.Owner, this.FilterPattern);
         }
 
-        private static Lazy<Dictionary<string, Tuple<string, string>>> patternReplacements =
+        private static readonly Lazy<Dictionary<string, Tuple<string, string>>> patternReplacements =
             new Lazy<Dictionary<string, Tuple<string, string>>>(() =>
             {
                 return new Dictionary<string, Tuple<string, string>>

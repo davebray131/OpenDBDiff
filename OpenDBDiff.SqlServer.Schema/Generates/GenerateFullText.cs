@@ -5,7 +5,7 @@ namespace OpenDBDiff.SqlServer.Schema.Generates
 {
     public class GenerateFullText
     {
-        private Generate root;
+        private readonly Generate root;
 
         public GenerateFullText(Generate root)
         {
@@ -30,12 +30,14 @@ namespace OpenDBDiff.SqlServer.Schema.Generates
                         {
                             while (reader.Read())
                             {
-                                FullText item = new FullText(database);
-                                item.Id = (int)reader["fulltext_catalog_id"];
-                                item.Name = reader["Name"].ToString();
-                                item.Owner = reader["Owner"].ToString();
-                                item.IsAccentSensity = (bool)reader["is_accent_sensitivity_on"];
-                                item.IsDefault = (bool)reader["is_default"];
+                                FullText item = new FullText(database)
+                                {
+                                    Id = (int)reader["fulltext_catalog_id"],
+                                    Name = reader["Name"].ToString(),
+                                    Owner = reader["Owner"].ToString(),
+                                    IsAccentSensity = (bool)reader["is_accent_sensitivity_on"],
+                                    IsDefault = (bool)reader["is_default"]
+                                };
                                 if (!reader.IsDBNull(reader.GetOrdinal("path")))
                                     item.Path = reader["path"].ToString().Substring(0, reader["path"].ToString().Length - item.Name.Length);
                                 if (!reader.IsDBNull(reader.GetOrdinal("FileGroupName")))

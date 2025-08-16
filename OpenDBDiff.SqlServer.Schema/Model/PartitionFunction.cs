@@ -1,10 +1,10 @@
-﻿using OpenDBDiff.Abstractions.Schema;
-using OpenDBDiff.Abstractions.Schema.Model;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Text;
+using OpenDBDiff.Abstractions.Schema;
+using OpenDBDiff.Abstractions.Schema.Model;
 
 namespace OpenDBDiff.SqlServer.Schema.Model
 {
@@ -23,14 +23,16 @@ namespace OpenDBDiff.SqlServer.Schema.Model
 
         public new PartitionFunction Clone(ISchemaBase parent)
         {
-            PartitionFunction item = new PartitionFunction(parent);
-            item.Id = this.Id;
-            item.IsBoundaryRight = this.IsBoundaryRight;
-            item.Name = this.Name;
-            item.Precision = this.Precision;
-            item.Scale = this.Scale;
-            item.Size = this.Size;
-            item.Type = this.Type;
+            PartitionFunction item = new PartitionFunction(parent)
+            {
+                Id = this.Id,
+                IsBoundaryRight = this.IsBoundaryRight,
+                Name = this.Name,
+                Precision = this.Precision,
+                Scale = this.Scale,
+                Size = this.Size,
+                Type = this.Type
+            };
             this.Values.ForEach(value => { item.Values.Add(value); });
             return item;
         }
@@ -51,7 +53,7 @@ namespace OpenDBDiff.SqlServer.Schema.Model
 
         private int ValueItem(string typeName)
         {
-            if ((typeName.Equals("nchar") || typeName.Equals("nvarchar") || typeName.Equals("varchar") || typeName.Equals("char")))
+            if (typeName.Equals("nchar") || typeName.Equals("nvarchar") || typeName.Equals("varchar") || typeName.Equals("char"))
                 return IS_STRING;
             if (typeName.Equals("uniqueidentifier"))
                 return IS_UNIQUE;
@@ -122,46 +124,46 @@ namespace OpenDBDiff.SqlServer.Schema.Model
         {
             StringBuilder sqlFinal = new StringBuilder();
             string sql = "ALTER PARTITION FUNCTION [" + Name + "]()\r\n";
-            string sqlmergue = "";
-            string sqsplit = "";
+            string sqlMerge;
+            string sqlSplit;
             IEnumerable<string> items = Old.Values.Except<string>(this.Values);
             int valueType = ValueItem(Type);
             foreach (var item in items)
             {
-                sqlmergue = "MERGE RANGE (";
+                sqlMerge = "MERGE RANGE (";
                 if (valueType == IS_STRING)
-                    sqlmergue += "N'" + item + "'";
+                    sqlMerge += "N'" + item + "'";
                 else
                     if (valueType == IS_DATE)
-                    sqlmergue += "'" + DateTime.Parse(item).ToString("yyyyMMdd HH:mm:ss.fff") + "'";
+                    sqlMerge += "'" + DateTime.Parse(item).ToString("yyyyMMdd HH:mm:ss.fff") + "'";
                 else
                         if (valueType == IS_UNIQUE)
-                    sqlmergue += "'{" + item + "}'";
+                    sqlMerge += "'{" + item + "}'";
                 else
                             if (valueType == IS_NUMERIC)
-                    sqlmergue += item.Replace(",", ".");
+                    sqlMerge += item.Replace(",", ".");
                 else
-                    sqlmergue += item;
-                sqlFinal.Append(sql + sqlmergue + ")\r\nGO\r\n");
+                    sqlMerge += item;
+                sqlFinal.Append(sql + sqlMerge + ")\r\nGO\r\n");
             }
             IEnumerable<string> items2 = this.Values.Except<string>(this.Old.Values);
             foreach (var item in items2)
             {
-                sqsplit = "SPLIT RANGE (";
+                sqlSplit = "SPLIT RANGE (";
                 if (valueType == IS_STRING)
-                    sqsplit += "N'" + item + "'";
+                    sqlSplit += "N'" + item + "'";
                 else
                     if (valueType == IS_DATE)
-                    sqsplit += "'" + DateTime.Parse(item).ToString("yyyyMMdd HH:mm:ss.fff") + "'";
+                    sqlSplit += "'" + DateTime.Parse(item).ToString("yyyyMMdd HH:mm:ss.fff") + "'";
                 else
                         if (valueType == IS_UNIQUE)
-                    sqsplit += "'{" + item + "}'";
+                    sqlSplit += "'{" + item + "}'";
                 else
                             if (valueType == IS_NUMERIC)
-                    sqsplit += item.Replace(",", ".");
+                    sqlSplit += item.Replace(",", ".");
                 else
-                    sqsplit += item;
-                sqlFinal.Append(sql + sqsplit + ")\r\nGO\r\n");
+                    sqlSplit += item;
+                sqlFinal.Append(sql + sqlSplit + ")\r\nGO\r\n");
             }
             return sqlFinal.ToString();
         }

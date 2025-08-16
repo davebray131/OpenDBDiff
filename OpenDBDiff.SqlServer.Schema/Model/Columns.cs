@@ -1,7 +1,7 @@
-using OpenDBDiff.Abstractions.Schema;
-using OpenDBDiff.Abstractions.Schema.Model;
 using System;
 using System.Linq;
+using OpenDBDiff.Abstractions.Schema;
+using OpenDBDiff.Abstractions.Schema.Model;
 
 namespace OpenDBDiff.SqlServer.Schema.Model
 {
@@ -71,9 +71,9 @@ namespace OpenDBDiff.SqlServer.Schema.Model
                         }
                         if (item.HasState(ObjectStatus.Create))
                             sqlAdd += "\r\n" + item.ToSql(true) + ",";
-                        if ((item.HasState(ObjectStatus.Alter) || (item.HasState(ObjectStatus.RebuildDependencies))))
+                        if (item.HasState(ObjectStatus.Alter) || item.HasState(ObjectStatus.RebuildDependencies))
                         {
-                            if ((!item.Parent.HasState(ObjectStatus.RebuildDependencies) || (!item.Parent.HasState(ObjectStatus.Rebuild))))
+                            if (!item.Parent.HasState(ObjectStatus.RebuildDependencies) || (!item.Parent.HasState(ObjectStatus.Rebuild)))
                                 list.AddRange(item.RebuildSchemaBindingDependencies());
                             list.AddRange(item.RebuildConstraint(false));
                             list.AddRange(item.RebuildDependencies());
@@ -92,12 +92,12 @@ namespace OpenDBDiff.SqlServer.Schema.Model
                             list.AddRange(item.DefaultConstraint.ToSqlDiff(schemas));
                     }
                 });
-                if (!String.IsNullOrEmpty(sqlDrop))
+                if (!string.IsNullOrEmpty(sqlDrop))
                     sqlDrop = "ALTER TABLE " + Parent.FullName + " DROP COLUMN " + sqlDrop.Substring(0, sqlDrop.Length - 1) + "\r\nGO\r\n";
-                if (!String.IsNullOrEmpty(sqlAdd))
+                if (!string.IsNullOrEmpty(sqlAdd))
                     sqlAdd = "ALTER TABLE " + Parent.FullName + " ADD " + sqlAdd.Substring(0, sqlAdd.Length - 1) + "\r\nGO\r\n";
 
-                if (!String.IsNullOrEmpty(sqlDrop + sqlAdd + sqlCons + sqlBinds))
+                if (!string.IsNullOrEmpty(sqlDrop + sqlAdd + sqlCons + sqlBinds))
                     list.Add(sqlDrop + sqlAdd + sqlBinds, 0, ScriptAction.AlterTable);
             }
             else

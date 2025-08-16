@@ -8,7 +8,7 @@ namespace OpenDBDiff.Abstractions.Schema.Events
 
         public static void RaiseOnChange(ProgressEventArgs e)
         {
-            if (OnProgress != null) OnProgress(e);
+            OnProgress?.Invoke(e);
         }
     }
 }

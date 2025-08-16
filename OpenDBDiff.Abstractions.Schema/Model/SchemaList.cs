@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 namespace OpenDBDiff.Abstractions.Schema.Model
 {
@@ -9,8 +8,8 @@ namespace OpenDBDiff.Abstractions.Schema.Model
         where T : ISchemaBase
         where P : ISchemaBase
     {
-        private Dictionary<string, int> nameMap = new Dictionary<string, int>();
-        private SearchSchemaBase allObjects = null;
+        private readonly Dictionary<string, int> nameMap = new Dictionary<string, int>();
+        private readonly SearchSchemaBase allObjects = null;
         private bool IsCaseSensitive = false;
 
         public SchemaList(P parent, SearchSchemaBase allObjects)
@@ -49,8 +48,7 @@ namespace OpenDBDiff.Abstractions.Schema.Model
                 return;
 
             base.Add(item);
-            if (allObjects != null)
-                allObjects.Add(item);
+            allObjects?.Add(item);
 
             string name = item.FullName;
             IsCaseSensitive = item.RootParent.IsCaseSensitive;
@@ -122,7 +120,7 @@ namespace OpenDBDiff.Abstractions.Schema.Model
         public virtual SQLScriptList ToSqlDiff(ICollection<ISchemaBase> schemas)
         {
             SQLScriptList listDiff = new SQLScriptList();
-            foreach (var item in this.Where(item => (schemas.Count() == 0 || schemas.FirstOrDefault(sch => sch.Id == item.Id || (sch.Parent != null && sch.Parent.Id == item.Id)) != default(ISchemaBase))))
+            foreach (var item in this.Where(item => schemas.Count() == 0 || schemas.FirstOrDefault(sch => sch.Id == item.Id || (sch.Parent != null && sch.Parent.Id == item.Id)) != default(ISchemaBase)))
             {
                 item.ResetWasInsertInDiffList();
                 var childrenSchemas = schemas.Where(s => s.Parent != null && s.Parent.Id == item.Id).ToList();

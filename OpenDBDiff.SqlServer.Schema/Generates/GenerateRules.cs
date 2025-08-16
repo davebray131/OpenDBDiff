@@ -5,7 +5,7 @@ namespace OpenDBDiff.SqlServer.Schema.Generates
 {
     public class GenerateRules
     {
-        private Generate root;
+        private readonly Generate root;
 
         public GenerateRules(Generate root)
         {
@@ -30,11 +30,13 @@ namespace OpenDBDiff.SqlServer.Schema.Generates
                         {
                             while (reader.Read())
                             {
-                                Rule item = new Rule(database);
-                                item.Id = (int)reader["object_id"];
-                                item.Name = reader["Name"].ToString();
-                                item.Owner = reader["Owner"].ToString();
-                                item.Text = reader["Definition"].ToString();
+                                Rule item = new Rule(database)
+                                {
+                                    Id = (int)reader["object_id"],
+                                    Name = reader["Name"].ToString(),
+                                    Owner = reader["Owner"].ToString(),
+                                    Text = reader["Definition"].ToString()
+                                };
                                 database.Rules.Add(item);
                             }
                         }

@@ -1,3 +1,8 @@
+using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Globalization;
+using System.Linq;
 using Microsoft.Data.SqlClient;
 using OpenDBDiff.Abstractions.Schema.Errors;
 using OpenDBDiff.Abstractions.Schema.Events;
@@ -5,11 +10,6 @@ using OpenDBDiff.Abstractions.Schema.Model;
 using OpenDBDiff.SqlServer.Schema.Generates.SQLCommands;
 using OpenDBDiff.SqlServer.Schema.Generates.Util;
 using OpenDBDiff.SqlServer.Schema.Model;
-using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Globalization;
-using System.Linq;
 using Constraint = OpenDBDiff.SqlServer.Schema.Model.Constraint;
 
 namespace OpenDBDiff.SqlServer.Schema.Generates
@@ -59,7 +59,7 @@ namespace OpenDBDiff.SqlServer.Schema.Generates
         private int FileGroupTextIndex = -1;
         private int FileGroupStreamIndex = -1;
 
-        private Generate root;
+        private readonly Generate root;
 
         public GenerateTables(Generate root)
         {
@@ -135,8 +135,10 @@ namespace OpenDBDiff.SqlServer.Schema.Generates
             Database database = (Database)table.Parent;
 
             InitColIndex(database, reader);
-            Column col = new Column((ISchemaBase)table);
-            col.Id = (int)reader[colIDIndex];
+            Column col = new Column((ISchemaBase)table)
+            {
+                Id = (int)reader[colIDIndex]
+            };
             if (database.Options.Ignore.FilterColumnOrder)
                 col.Position = table.Columns.Count + 1;
 
@@ -146,7 +148,7 @@ namespace OpenDBDiff.SqlServer.Schema.Generates
             if (database.Options.Ignore.FilterColumnIdentity)
             {
                 col.IsIdentity = (bool)reader[colIsIdentityIndex];
-                if ((col.IsIdentity) || (col.IsIdentityForReplication))
+                if (col.IsIdentity || col.IsIdentityForReplication)
                 {
                     if (!reader.IsDBNull(colIdentSeedIndex))
                         col.IdentitySeed = (long)(decimal)reader[colIdentSeedIndex];
@@ -159,7 +161,7 @@ namespace OpenDBDiff.SqlServer.Schema.Generates
                         col.IdentityIncrement = 1;
                 }
                 if (database.Options.Ignore.FilterNotForReplication)
-                    col.IsIdentityForReplication = ((int)reader[colIsIdentityReplIndex] == 1);
+                    col.IsIdentityForReplication = (int)reader[colIsIdentityReplIndex] == 1;
             }
             col.Name = (string)reader[colNameIndex];
             col.Owner = table.Owner;
@@ -173,10 +175,10 @@ namespace OpenDBDiff.SqlServer.Schema.Generates
             col.Scale = (byte)reader[colScaleIndex];
             col.DataUserTypeId = (int)reader[colDataUserTypeIdIndex];
             col.IsUserDefinedType = (bool)reader[colIsUserDefinedTypeIndex];
-            if (!String.IsNullOrEmpty(reader[colSizeIndex].ToString()))
+            if (!string.IsNullOrEmpty(reader[colSizeIndex].ToString()))
                 col.Size = (short)reader[colSizeIndex];
-            col.HasIndexDependencies = ((int)reader[colHasIndexIndex] == 1);
-            col.HasComputedDependencies = ((int)reader[colHasComputedFormulaIndex] == 1);
+            col.HasIndexDependencies = (int)reader[colHasIndexIndex] == 1;
+            col.HasComputedDependencies = (int)reader[colHasComputedFormulaIndex] == 1;
             col.IsRowGuid = (bool)reader[colIsRowGuidIndex];
             if (col.IsUserDefinedType)
                 col.Type = "[" + (string)reader[colOwnerType] + "].[" + (string)reader[colTypeIndex] + "]";
@@ -212,7 +214,7 @@ namespace OpenDBDiff.SqlServer.Schema.Generates
                 if (database.Tables.Any() || database.TablesTypes.Any())
                 {
                     if (database.Options.Ignore.FilterConstraint)
-                        (new GenerateConstraint(root)).Fill(database, connectionString);
+                        new GenerateConstraint(root).Fill(database, connectionString);
                 }
             }
             catch (Exception ex)
@@ -248,10 +250,12 @@ namespace OpenDBDiff.SqlServer.Schema.Generates
                                 isTable = reader["ObjectType"].ToString().Trim().Equals("U");
                                 if (isTable)
                                 {
-                                    item = new Table(database);
-                                    item.Id = (int)reader[TableIdIndex];
-                                    item.Name = (string)reader[TableNameIndex];
-                                    item.Owner = (string)reader[TableOwnerIndex];
+                                    item = new Table(database)
+                                    {
+                                        Id = (int)reader[TableIdIndex],
+                                        Name = (string)reader[TableNameIndex],
+                                        Owner = (string)reader[TableOwnerIndex]
+                                    };
                                     ((Table)item).HasClusteredIndex = (int)reader[HasClusteredIndexIndex] == 1;
                                     textInRow = (int)reader[Text_In_Row_limitIndex];
                                     largeValues = (Boolean)reader[large_value_types_out_of_rowIndex];
@@ -276,7 +280,7 @@ namespace OpenDBDiff.SqlServer.Schema.Generates
                                         if (largeValues) ((Table)item).Options.Add(new TableOption("LargeValues", "1", item));
                                         if (varDecimal) ((Table)item).Options.Add(new TableOption("VarDecimal", "1", item));
                                     }
-                                    if ((database.Options.Ignore.FilterTableLockEscalation) && (database.Info.Version == DatabaseInfo.SQLServerVersion.SQLServer2008))
+                                    if (database.Options.Ignore.FilterTableLockEscalation && (database.Info.Version == DatabaseInfo.SQLServerVersion.SQLServer2008))
                                         ((Table)item).Options.Add(new TableOption("LockEscalation", (string)reader[TableLockEscalation], item));
                                     else
                                         ((Table)item).Options.Add(new TableOption("LockEscalation", "TABLE", item));

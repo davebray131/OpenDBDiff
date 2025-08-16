@@ -1,7 +1,7 @@
-﻿using OpenDBDiff.Abstractions.Schema;
+﻿using System;
+using OpenDBDiff.Abstractions.Schema;
 using OpenDBDiff.Abstractions.Schema.Model;
 using OpenDBDiff.SqlServer.Schema.Model.Util;
-using System;
 
 namespace OpenDBDiff.SqlServer.Schema.Model
 {
@@ -18,14 +18,16 @@ namespace OpenDBDiff.SqlServer.Schema.Model
         /// </summary>
         public override ISchemaBase Clone(ISchemaBase parent)
         {
-            Function item = new Function(parent);
-            item.Text = this.Text;
-            item.Status = this.Status;
-            item.Name = this.Name;
-            item.Id = this.Id;
-            item.Owner = this.Owner;
-            item.Guid = this.Guid;
-            item.IsSchemaBinding = this.IsSchemaBinding;
+            Function item = new Function(parent)
+            {
+                Text = this.Text,
+                Status = this.Status,
+                Name = this.Name,
+                Id = this.Id,
+                Owner = this.Owner,
+                Guid = this.Guid,
+                IsSchemaBinding = this.IsSchemaBinding
+            };
             this.DependenciesIn.ForEach(dep => item.DependenciesIn.Add(dep));
             this.DependenciesOut.ForEach(dep => item.DependenciesOut.Add(dep));
             return item;

@@ -1,10 +1,10 @@
+using System;
+using System.Globalization;
 using Microsoft.Data.SqlClient;
 using OpenDBDiff.Abstractions.Schema.Misc;
 using OpenDBDiff.SqlServer.Schema.Generates.SQLCommands;
 using OpenDBDiff.SqlServer.Schema.Model;
 using OpenDBDiff.SqlServer.Schema.Options;
-using System;
-using System.Globalization;
 #if DEBUG
 #endif
 
@@ -12,8 +12,8 @@ namespace OpenDBDiff.SqlServer.Schema.Generates
 {
     public class GenerateDatabase
     {
-        private string connectioString;
-        private SqlOption objectFilter;
+        private readonly string connectioString;
+        private readonly SqlOption objectFilter;
 
         public bool UseDefaultVersionOnVersionParseError { get; private set; }
 
@@ -48,12 +48,11 @@ namespace OpenDBDiff.SqlServer.Schema.Generates
                             {
                                 // used to use the decimal as well when Azure was 10.25
                                 var version = new Version(versionValue);
-                                item.VersionNumber = float.Parse(String.Format("{0}.{1}", version.Major, version.Minor), CultureInfo.InvariantCulture);
+                                item.VersionNumber = float.Parse(string.Format("{0}.{1}", version.Major, version.Minor), CultureInfo.InvariantCulture);
 
                                 if (reader.FieldCount > 1 && !reader.IsDBNull(1))
                                 {
-                                    int edition;
-                                    if (int.TryParse(reader[1].ToString(), out edition)
+                                    if (int.TryParse(reader[1].ToString(), out var edition)
                                         && Enum.IsDefined(typeof(DatabaseInfo.SQLServerEdition), edition))
                                     {
                                         item.SetEdition((DatabaseInfo.SQLServerEdition)edition);
@@ -64,7 +63,7 @@ namespace OpenDBDiff.SqlServer.Schema.Generates
                             catch (Exception notAGoodIdeaToCatchAllErrors)
                             {
                                 var exception = new SchemaException(
-                                    String.Format("Error parsing ProductVersion. ({0})", versionValue ?? "[null]")
+                                    string.Format("Error parsing ProductVersion. ({0})", versionValue ?? "[null]")
                                     , notAGoodIdeaToCatchAllErrors);
 
                                 if (!UseDefaultVersionOnVersionParseError)

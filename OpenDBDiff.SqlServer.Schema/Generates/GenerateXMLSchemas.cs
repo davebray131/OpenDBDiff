@@ -8,7 +8,7 @@ namespace OpenDBDiff.SqlServer.Schema.Generates
 {
     public class GenerateXMLSchemas
     {
-        private Generate root;
+        private readonly Generate root;
 
         public GenerateXMLSchemas(Generate root)
         {
@@ -65,11 +65,13 @@ namespace OpenDBDiff.SqlServer.Schema.Generates
                             while (reader.Read())
                             {
                                 root.RaiseOnReadingOne(reader["name"]);
-                                XMLSchema item = new XMLSchema(database);
-                                item.Id = (int)reader["ID"];
-                                item.Name = reader["name"].ToString();
-                                item.Owner = reader["owner"].ToString();
-                                item.Text = reader["Text"].ToString();
+                                XMLSchema item = new XMLSchema(database)
+                                {
+                                    Id = (int)reader["ID"],
+                                    Name = reader["name"].ToString(),
+                                    Owner = reader["owner"].ToString(),
+                                    Text = reader["Text"].ToString()
+                                };
                                 database.XmlSchemas.Add(item);
 
                             }

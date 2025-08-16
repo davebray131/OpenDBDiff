@@ -1,16 +1,16 @@
-﻿using OpenDBDiff.Abstractions.Schema.Events;
-using OpenDBDiff.Abstractions.Schema.Model;
-using OpenDBDiff.Abstractions.Ui;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Windows.Forms;
+using OpenDBDiff.Abstractions.Schema.Events;
+using OpenDBDiff.Abstractions.Schema.Model;
+using OpenDBDiff.Abstractions.Ui;
 
 namespace OpenDBDiff.UI
 {
     public partial class ProgressForm : Form
     {
-        private IGenerator OriginGenerator;
-        private IGenerator DestinationGenerator;
+        private readonly IGenerator OriginGenerator;
+        private readonly IGenerator DestinationGenerator;
         private bool IsProcessing = false;
         private IDatabase originClone = null;
         private readonly IDatabaseComparer Comparer;
@@ -44,7 +44,7 @@ namespace OpenDBDiff.UI
 
         public Exception Error { get; private set; }
 
-        private void btnOK_Click(object sender, EventArgs e)
+        private void BtnOK_Click(object sender, EventArgs e)
         {
             this.Cursor = Cursors.WaitCursor;
             this.Close();
@@ -53,14 +53,14 @@ namespace OpenDBDiff.UI
 
         private void ProgressForm_Activated(object sender, EventArgs e)
         {
-            var handler = new ProgressEventHandler.ProgressHandler(genData2_OnProgress);
+            var handler = new ProgressEventHandler.ProgressHandler(GenData2_OnProgress);
             try
             {
                 if (!IsProcessing)
                 {
                     this.Refresh();
                     IsProcessing = false;
-                    OriginGenerator.OnProgress += new ProgressEventHandler.ProgressHandler(genData1_OnProgress);
+                    OriginGenerator.OnProgress += new ProgressEventHandler.ProgressHandler(GenData1_OnProgress);
                     DestinationGenerator.OnProgress += handler;
 
                     this.ErrorLocation = "Loading " + destinationProgressControl.DatabaseName;
@@ -93,7 +93,7 @@ namespace OpenDBDiff.UI
             }
         }
 
-        private void genData2_OnProgress(ProgressEventArgs e)
+        private void GenData2_OnProgress(ProgressEventArgs e)
         {
             if (e.Progress > -1 && destinationProgressControl.Value != e.Progress)
             {
@@ -108,7 +108,7 @@ namespace OpenDBDiff.UI
             this.ErrorMostRecentProgress = e.Message;
         }
 
-        private void genData1_OnProgress(ProgressEventArgs e)
+        private void GenData1_OnProgress(ProgressEventArgs e)
         {
             if (e.Progress > -1 && originProgressControl.Value != e.Progress)
             {

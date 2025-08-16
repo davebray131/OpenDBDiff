@@ -5,7 +5,7 @@ namespace OpenDBDiff.SqlServer.Schema.Generates
 {
     public class GenerateSchemas
     {
-        private Generate root;
+        private readonly Generate root;
 
         public GenerateSchemas(Generate root)
         {
@@ -31,10 +31,12 @@ namespace OpenDBDiff.SqlServer.Schema.Generates
                         {
                             while (reader.Read())
                             {
-                                Model.Schema item = new Model.Schema(database);
-                                item.Id = (int)reader["schema_id"];
-                                item.Name = reader["name"].ToString();
-                                item.Owner = reader["owner"].ToString();
+                                Model.Schema item = new Model.Schema(database)
+                                {
+                                    Id = (int)reader["schema_id"],
+                                    Name = reader["name"].ToString(),
+                                    Owner = reader["owner"].ToString()
+                                };
                                 database.Schemas.Add(item);
                             }
                         }

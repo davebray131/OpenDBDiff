@@ -1,10 +1,10 @@
-﻿using LiteDB;
-using OpenDBDiff.Abstractions.Schema.Model;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Windows.Forms;
+using LiteDB;
+using OpenDBDiff.Abstractions.Schema.Model;
 
 namespace OpenDBDiff.Settings
 {
@@ -101,7 +101,7 @@ namespace OpenDBDiff.Settings
             catch (Exception ex)
             {
                 if (showErrors)
-                    showErrors = MessageBox.Show($"{ex.Message}\n\nDo you want to see further errors?\n\n{ex.ToString()}", "Project error", MessageBoxButtons.YesNo, MessageBoxIcon.Error) == DialogResult.Yes;
+                    showErrors = MessageBox.Show($"{ex.Message}\n\nDo you want to see further errors?\n\n{ex}", "Project error", MessageBoxButtons.YesNo, MessageBoxIcon.Error) == DialogResult.Yes;
 
                 return false;
             }
@@ -119,7 +119,7 @@ namespace OpenDBDiff.Settings
     internal class ProjectDb : IDisposable
     {
         LiteDatabase db;
-        string file;
+        readonly string file;
 
         internal ProjectDb(string file)
         {

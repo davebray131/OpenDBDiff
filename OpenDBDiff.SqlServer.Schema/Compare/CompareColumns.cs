@@ -1,7 +1,7 @@
+using System;
 using OpenDBDiff.Abstractions.Schema;
 using OpenDBDiff.Abstractions.Schema.Model;
 using OpenDBDiff.SqlServer.Schema.Model;
-using System;
 
 namespace OpenDBDiff.SqlServer.Schema.Compare
 {
@@ -52,7 +52,7 @@ namespace OpenDBDiff.SqlServer.Schema.Compare
                             if (node.HasToRebuildOnlyConstraint)
                             {
                                 node.Status = ObjectStatus.Alter;
-                                if ((originField.IsNullable) && (!node.IsNullable))
+                                if (originField.IsNullable && (!node.IsNullable))
                                     node.Status += (int)ObjectStatus.Update;
                             }
                             else
@@ -64,7 +64,7 @@ namespace OpenDBDiff.SqlServer.Schema.Compare
                                     if (!IsColumnEqual)
                                     {
                                         node.Status = ObjectStatus.Alter;
-                                        if ((originField.IsNullable) && (!node.IsNullable))
+                                        if (originField.IsNullable && (!node.IsNullable))
                                             node.Status += (int)ObjectStatus.Update;
                                     }
                                 }

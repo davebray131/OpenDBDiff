@@ -1,15 +1,15 @@
-﻿using Microsoft.Data.SqlClient;
+﻿using System;
+using System.Collections.Generic;
+using Microsoft.Data.SqlClient;
 using OpenDBDiff.Abstractions.Schema.Errors;
 using OpenDBDiff.Abstractions.Schema.Model;
 using OpenDBDiff.SqlServer.Schema.Model;
-using System;
-using System.Collections.Generic;
 
 namespace OpenDBDiff.SqlServer.Schema.Generates
 {
     public class GenerateExtendedProperties
     {
-        private Generate root;
+        private readonly Generate root;
 
         public GenerateExtendedProperties(Generate root)
         {
@@ -95,7 +95,7 @@ namespace OpenDBDiff.SqlServer.Schema.Generates
                                     }
                                     item.Value = reader["Value"].ToString();
                                     item.Name = reader["Name"].ToString();
-                                    parent = ((ISQLServerSchemaBase)database.Find(item.FullName));
+                                    parent = (ISQLServerSchemaBase)database.Find(item.FullName);
                                     if (parent != null)
                                     {
                                         item.Parent = (ISchemaBase)parent;

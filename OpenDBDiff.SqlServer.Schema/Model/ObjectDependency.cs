@@ -25,7 +25,7 @@ namespace OpenDBDiff.SqlServer.Schema.Model
 
         public bool IsCodeType
         {
-            get { return ((Type == ObjectType.StoredProcedure) || (Type == ObjectType.Trigger) || (Type == ObjectType.View) || (Type == ObjectType.Function)); }
+            get { return (Type == ObjectType.StoredProcedure) || (Type == ObjectType.Trigger) || (Type == ObjectType.View) || (Type == ObjectType.Function); }
 
         }
     }

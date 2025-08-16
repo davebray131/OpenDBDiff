@@ -1,6 +1,6 @@
+using System;
 using OpenDBDiff.Abstractions.Schema;
 using OpenDBDiff.Abstractions.Schema.Model;
-using System;
 
 namespace OpenDBDiff.SqlServer.Schema.Model
 {
@@ -13,12 +13,14 @@ namespace OpenDBDiff.SqlServer.Schema.Model
 
         public override ISchemaBase Clone(ISchemaBase parent)
         {
-            Synonym item = new Synonym(parent);
-            item.Id = this.Id;
-            item.Name = this.Name;
-            item.Owner = this.Owner;
-            item.Value = this.Value;
-            item.Guid = this.Guid;
+            Synonym item = new Synonym(parent)
+            {
+                Id = this.Id,
+                Name = this.Name,
+                Owner = this.Owner,
+                Value = this.Value,
+                Guid = this.Guid
+            };
             return item;
         }
 

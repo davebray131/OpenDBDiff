@@ -12,11 +12,13 @@ namespace OpenDBDiff.SqlServer.Schema.Model
 
         public new Default Clone(ISchemaBase parent)
         {
-            Default item = new Default(parent);
-            item.Id = this.Id;
-            item.Name = this.Name;
-            item.Owner = this.Owner;
-            item.Value = this.Value;
+            Default item = new Default(parent)
+            {
+                Id = this.Id,
+                Name = this.Name,
+                Owner = this.Owner,
+                Value = this.Value
+            };
             return item;
         }
 

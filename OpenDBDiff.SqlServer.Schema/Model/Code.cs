@@ -1,11 +1,11 @@
-﻿using OpenDBDiff.Abstractions.Schema;
-using OpenDBDiff.Abstractions.Schema.Model;
-using OpenDBDiff.SqlServer.Schema.Model.Util;
-using OpenDBDiff.SqlServer.Schema.Options;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
+using OpenDBDiff.Abstractions.Schema;
+using OpenDBDiff.Abstractions.Schema.Model;
+using OpenDBDiff.SqlServer.Schema.Model.Util;
+using OpenDBDiff.SqlServer.Schema.Options;
 
 namespace OpenDBDiff.SqlServer.Schema.Model
 {
@@ -13,10 +13,10 @@ namespace OpenDBDiff.SqlServer.Schema.Model
     {
         protected string sql = null;
         protected string typeName = "";
-        private int deepMax = 0;
-        private int deepMin = 0;
-        private ScriptAction addAction;
-        private ScriptAction dropAction;
+        private readonly int deepMax = 0;
+        private readonly int deepMin = 0;
+        private readonly ScriptAction addAction;
+        private readonly ScriptAction dropAction;
 
         public Code(ISchemaBase parent, ObjectType type, ScriptAction addAction, ScriptAction dropAction)
             : base(parent, type)
@@ -37,7 +37,7 @@ namespace OpenDBDiff.SqlServer.Schema.Model
         public override SQLScript Create()
         {
             int iCount = DependenciesCount;
-            if (iCount > 0) iCount = iCount * -1;
+            if (iCount > 0) iCount *= -1;
             if (!GetWasInsertInDiffList(addAction))
             {
                 SetWasInsertInDiffList(addAction);
@@ -143,7 +143,8 @@ namespace OpenDBDiff.SqlServer.Schema.Model
                         if ((item.Status == ObjectStatus.Rebuild) || (item.Status == ObjectStatus.RebuildDependencies))
                             return true;
                     }
-                };
+                }
+                ;
                 return IsSchemaBinding;
             }
         }
@@ -167,7 +168,7 @@ namespace OpenDBDiff.SqlServer.Schema.Model
                         }
                         if (item.Status != ObjectStatus.Drop)
                         {
-                            if (!((item.Parent.HasState(ObjectStatus.Rebuild)) && (item.ObjectType == ObjectType.Trigger)))
+                            if (!(item.Parent.HasState(ObjectStatus.Rebuild) && (item.ObjectType == ObjectType.Trigger)))
                                 list.Add(item.Drop(), newDeepMin);
                         }
                         if ((this.Status != ObjectStatus.Drop) && (item.Status != ObjectStatus.Create))
@@ -176,7 +177,8 @@ namespace OpenDBDiff.SqlServer.Schema.Model
                             list.AddRange(RebuildDependencies(((ICode)item).DependenciesOut, newDeepMin, newDeepMax));
                     }
                 }
-            };
+            }
+            ;
             return list;
         }
 
@@ -204,7 +206,7 @@ namespace OpenDBDiff.SqlServer.Schema.Model
 
         public override string ToSql()
         {
-            if (String.IsNullOrEmpty(sql))
+            if (string.IsNullOrEmpty(sql))
                 sql = FormatCode.FormatCreate(typeName, Text, this);
             return sql;
         }
@@ -218,23 +220,23 @@ namespace OpenDBDiff.SqlServer.Schema.Model
 
         public override string ToSqlDrop()
         {
-            return String.Format("DROP {0} {1}\r\nGO\r\n", typeName, FullName);
+            return string.Format("DROP {0} {1}\r\nGO\r\n", typeName, FullName);
         }
 
         public virtual bool CompareExceptWhitespace(ICode obj)
         {
             if (obj == null) throw new ArgumentNullException("obj");
-            string sql1 = this.ToSql();
-            string sql2 = obj.ToSql();
+            string sql1;
+            string sql2;
 
             Regex whitespace = new Regex(@"\s");
             sql1 = whitespace.Replace(this.ToSql(), "");
             sql2 = whitespace.Replace(obj.ToSql(), "");
 
             if (((Database)RootParent).Options.Comparison.CaseSensityInCode == Options.SqlOptionComparison.CaseSensityOptions.CaseInsensity)
-                return (sql1.Equals(sql2, StringComparison.InvariantCultureIgnoreCase));
+                return sql1.Equals(sql2, StringComparison.InvariantCultureIgnoreCase);
 
-            return (sql1.Equals(sql2, StringComparison.InvariantCulture));
+            return sql1.Equals(sql2, StringComparison.InvariantCulture);
         }
 
         public virtual bool Compare(ICode obj)
@@ -249,9 +251,9 @@ namespace OpenDBDiff.SqlServer.Schema.Model
                 sql2 = whitespace.Replace(obj.ToSql(), "");
             }
             if (((Database)RootParent).Options.Comparison.CaseSensityInCode == SqlOptionComparison.CaseSensityOptions.CaseInsensity)
-                return (sql1.Equals(sql2, StringComparison.InvariantCultureIgnoreCase));
+                return sql1.Equals(sql2, StringComparison.InvariantCultureIgnoreCase);
 
-            return (sql1.Equals(sql2, StringComparison.InvariantCulture));
+            return sql1.Equals(sql2, StringComparison.InvariantCulture);
         }
     }
 }

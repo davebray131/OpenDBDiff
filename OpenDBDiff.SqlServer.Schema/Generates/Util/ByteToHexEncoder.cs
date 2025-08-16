@@ -13,14 +13,14 @@
             for (int i = 0; i < 256; i++)
             {
                 var s = i.ToString("X2");
-                result[i] = ((uint)s[0]) + ((uint)s[1] << 16);
+                result[i] = s[0] + ((uint)s[1] << 16);
             }
             return result;
         }
 
         public static string ByteArrayToHex(byte[] bytes)
         {
-            var result = new char[2 + bytes.Length * 2];
+            var result = new char[2 + (bytes.Length * 2)];
 
             result[0] = '0';
             result[1] = 'x';
@@ -28,8 +28,8 @@
             for (int i = 0; i < bytes.Length; i++)
             {
                 var val = _lookup32[bytes[i]];
-                result[2 * i + 2] = (char)val;
-                result[2 * i + 3] = (char)(val >> 16);
+                result[(2 * i) + 2] = (char)val;
+                result[(2 * i) + 3] = (char)(val >> 16);
             }
 
             return new string(result);

@@ -1,6 +1,6 @@
-﻿using OpenDBDiff.Abstractions.Schema;
+﻿using System.Linq;
+using OpenDBDiff.Abstractions.Schema;
 using OpenDBDiff.Abstractions.Schema.Model;
-using System.Linq;
 
 namespace OpenDBDiff.SqlServer.Schema.Model
 {
@@ -27,7 +27,7 @@ namespace OpenDBDiff.SqlServer.Schema.Model
                 Constraints = null,
                 Indexes = null
             };
-             
+
             tableType.Columns = this.Columns.Clone(tableType);
             tableType.Constraints = this.Constraints.Clone(tableType);
             tableType.Indexes = this.Indexes.Clone(tableType);

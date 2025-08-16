@@ -1,7 +1,7 @@
-﻿using OpenDBDiff.Abstractions.Schema;
-using OpenDBDiff.Abstractions.Schema.Model;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using OpenDBDiff.Abstractions.Schema;
+using OpenDBDiff.Abstractions.Schema.Model;
 
 namespace OpenDBDiff.SqlServer.Schema.Model
 {
@@ -15,17 +15,19 @@ namespace OpenDBDiff.SqlServer.Schema.Model
 
         public override ISchemaBase Clone(ISchemaBase parent)
         {
-            FullTextIndex index = new FullTextIndex(parent);
-            index.ChangeTrackingState = this.ChangeTrackingState;
-            index.FullText = this.FullText;
-            index.Name = this.Name;
-            index.FileGroup = this.FileGroup;
-            index.Id = this.Id;
-            index.Index = this.Index;
-            index.IsDisabled = this.IsDisabled;
-            index.Status = this.Status;
-            index.Owner = this.Owner;
-            index.Columns = this.Columns;
+            FullTextIndex index = new FullTextIndex(parent)
+            {
+                ChangeTrackingState = this.ChangeTrackingState,
+                FullText = this.FullText,
+                Name = this.Name,
+                FileGroup = this.FileGroup,
+                Id = this.Id,
+                Index = this.Index,
+                IsDisabled = this.IsDisabled,
+                Status = this.Status,
+                Owner = this.Owner,
+                Columns = this.Columns
+            };
             this.ExtendedProperties.ForEach(item => index.ExtendedProperties.Add(item));
             return index;
         }

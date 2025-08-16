@@ -1,5 +1,5 @@
-﻿using OpenDBDiff.SqlServer.Schema.Model;
-using System.Text;
+﻿using System.Text;
+using OpenDBDiff.SqlServer.Schema.Model;
 
 namespace OpenDBDiff.SqlServer.Schema.Generates.SQLCommands
 {

@@ -1,3 +1,5 @@
+using System;
+using System.Collections.Generic;
 using Microsoft.Data.SqlClient;
 using OpenDBDiff.Abstractions.Schema.Errors;
 using OpenDBDiff.Abstractions.Schema.Events;
@@ -5,8 +7,6 @@ using OpenDBDiff.Abstractions.Schema.Model;
 using OpenDBDiff.SqlServer.Schema.Generates.SQLCommands;
 using OpenDBDiff.SqlServer.Schema.Generates.Util;
 using OpenDBDiff.SqlServer.Schema.Model;
-using System;
-using System.Collections.Generic;
 
 namespace OpenDBDiff.SqlServer.Schema.Generates
 {
@@ -65,20 +65,22 @@ namespace OpenDBDiff.SqlServer.Schema.Generates
                                 while (reader.Read())
                                 {
                                     root.RaiseOnReadingOne(reader["Name"]);
-                                    UserDataType item = new UserDataType(database);
-                                    item.Id = (int)reader["tid"];
-                                    item.AllowNull = (bool)reader["is_nullable"];
-                                    item.Size = (short)reader["max_length"];
-                                    item.Name = reader["Name"].ToString();
-                                    item.Owner = reader["owner"].ToString();
-                                    item.Precision = int.Parse(reader["precision"].ToString());
-                                    item.Scale = int.Parse(reader["scale"].ToString());
-                                    if (!String.IsNullOrEmpty(reader["defaultname"].ToString()))
+                                    UserDataType item = new UserDataType(database)
+                                    {
+                                        Id = (int)reader["tid"],
+                                        AllowNull = (bool)reader["is_nullable"],
+                                        Size = (short)reader["max_length"],
+                                        Name = reader["Name"].ToString(),
+                                        Owner = reader["owner"].ToString(),
+                                        Precision = int.Parse(reader["precision"].ToString()),
+                                        Scale = int.Parse(reader["scale"].ToString())
+                                    };
+                                    if (!string.IsNullOrEmpty(reader["defaultname"].ToString()))
                                     {
                                         item.Default.Name = reader["defaultname"].ToString();
                                         item.Default.Owner = reader["defaultowner"].ToString();
                                     }
-                                    if (!String.IsNullOrEmpty(reader["rulename"].ToString()))
+                                    if (!string.IsNullOrEmpty(reader["rulename"].ToString()))
                                     {
                                         item.Rule.Name = reader["rulename"].ToString();
                                         item.Rule.Owner = reader["ruleowner"].ToString();

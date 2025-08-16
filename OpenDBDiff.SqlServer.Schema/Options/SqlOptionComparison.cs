@@ -1,6 +1,6 @@
-﻿using OpenDBDiff.Abstractions.Schema.Model;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using OpenDBDiff.Abstractions.Schema.Model;
 
 namespace OpenDBDiff.SqlServer.Schema.Options
 {
@@ -39,11 +39,13 @@ namespace OpenDBDiff.SqlServer.Schema.Options
 
         public IDictionary<string, string> GetOptions()
         {
-            Dictionary<string, string> options = new Dictionary<string, string>();
-            options.Add("IgnoreWhiteSpacesInCode", IgnoreWhiteSpacesInCode.ToString());
-            options.Add("ReloadComparisonOnUpdate", ReloadComparisonOnUpdate.ToString());
-            options.Add("CaseSensityInCode", CaseSensityInCode.ToString());
-            options.Add("CaseSensityType", CaseSensityType.ToString());
+            Dictionary<string, string> options = new Dictionary<string, string>
+            {
+                { "IgnoreWhiteSpacesInCode", IgnoreWhiteSpacesInCode.ToString() },
+                { "ReloadComparisonOnUpdate", ReloadComparisonOnUpdate.ToString() },
+                { "CaseSensityInCode", CaseSensityInCode.ToString() },
+                { "CaseSensityType", CaseSensityType.ToString() }
+            };
             return options;
         }
     }

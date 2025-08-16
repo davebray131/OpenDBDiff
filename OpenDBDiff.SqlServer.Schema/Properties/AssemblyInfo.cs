@@ -24,4 +24,4 @@ using System.Runtime.InteropServices;
 
 [assembly: System.CLSCompliant(true)]
 
-[assembly:InternalsVisibleTo("OpenDBDiff.Tests")]
+[assembly: InternalsVisibleTo("OpenDBDiff.Tests")]

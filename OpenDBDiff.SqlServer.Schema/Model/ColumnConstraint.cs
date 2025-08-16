@@ -1,6 +1,6 @@
+using System;
 using OpenDBDiff.Abstractions.Schema;
 using OpenDBDiff.Abstractions.Schema.Model;
-using System;
 
 namespace OpenDBDiff.SqlServer.Schema.Model
 {
@@ -19,13 +19,15 @@ namespace OpenDBDiff.SqlServer.Schema.Model
         /// </summary>
         public ColumnConstraint Clone(Column parent)
         {
-            ColumnConstraint ccons = new ColumnConstraint(parent);
-            ccons.Name = this.Name;
-            ccons.Type = this.Type;
-            ccons.Definition = this.Definition;
-            ccons.Status = this.Status;
-            ccons.Disabled = this.Disabled;
-            ccons.Owner = this.Owner;
+            ColumnConstraint ccons = new ColumnConstraint(parent)
+            {
+                Name = this.Name,
+                Type = this.Type,
+                Definition = this.Definition,
+                Status = this.Status,
+                Disabled = this.Disabled,
+                Owner = this.Owner
+            };
             return ccons;
         }
 
@@ -117,7 +119,7 @@ namespace OpenDBDiff.SqlServer.Schema.Model
             {
                 ObjectStatus tableStatus = this.Parent.Parent.Status;
                 ObjectStatus columnStatus = this.Parent.Status;
-                return ((columnStatus != ObjectStatus.Drop) && (((tableStatus == ObjectStatus.Alter) || (tableStatus == ObjectStatus.Original) || (tableStatus == ObjectStatus.RebuildDependencies)) && (this.Status == ObjectStatus.Original)));
+                return (columnStatus != ObjectStatus.Drop) && ((tableStatus == ObjectStatus.Alter) || (tableStatus == ObjectStatus.Original) || (tableStatus == ObjectStatus.RebuildDependencies)) && (this.Status == ObjectStatus.Original);
             }
         }
 

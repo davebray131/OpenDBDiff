@@ -1,7 +1,7 @@
-﻿using OpenDBDiff.Abstractions.Schema;
-using OpenDBDiff.Abstractions.Schema.Model;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using OpenDBDiff.Abstractions.Schema;
+using OpenDBDiff.Abstractions.Schema.Model;
 
 namespace OpenDBDiff.SqlServer.Schema.Model
 {
@@ -20,7 +20,7 @@ namespace OpenDBDiff.SqlServer.Schema.Model
             string sql = "CREATE PROCEDURE " + FullName + "\r\n";
             string param = "";
             Parameters.ForEach(item => param += "\t" + item.ToSql() + ",\r\n");
-            if (!String.IsNullOrEmpty(param)) param = param.Substring(0, param.Length - 3) + "\r\n";
+            if (!string.IsNullOrEmpty(param)) param = param.Substring(0, param.Length - 3) + "\r\n";
             sql += param;
             sql += "WITH EXECUTE AS " + AssemblyExecuteAs + "\r\n";
             sql += "AS\r\n";

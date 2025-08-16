@@ -1,6 +1,6 @@
+using System;
 using OpenDBDiff.Abstractions.Schema;
 using OpenDBDiff.Abstractions.Schema.Model;
-using System;
 
 namespace OpenDBDiff.SqlServer.Schema.Model
 {
@@ -13,16 +13,18 @@ namespace OpenDBDiff.SqlServer.Schema.Model
 
         public override ISchemaBase Clone(ISchemaBase parent)
         {
-            FileGroupFile file = new FileGroupFile(parent);
-            file.Growth = this.Growth;
-            file.Id = this.Id;
-            file.IsPercentGrowth = this.IsPercentGrowth;
-            file.IsSparse = this.IsSparse;
-            file.MaxSize = this.MaxSize;
-            file.Name = this.Name;
-            file.PhysicalName = this.PhysicalName;
-            file.Size = this.Size;
-            file.Type = this.Type;
+            FileGroupFile file = new FileGroupFile(parent)
+            {
+                Growth = this.Growth,
+                Id = this.Id,
+                IsPercentGrowth = this.IsPercentGrowth,
+                IsSparse = this.IsSparse,
+                MaxSize = this.MaxSize,
+                Name = this.Name,
+                PhysicalName = this.PhysicalName,
+                Size = this.Size,
+                Type = this.Type
+            };
             return file;
         }
 
@@ -59,7 +61,7 @@ namespace OpenDBDiff.SqlServer.Schema.Model
             string result = "";
             string[] flies = path.Split('\\');
             for (int index = 0; index < flies.Length - 1; index++)
-                if (!String.IsNullOrEmpty(flies[index]))
+                if (!string.IsNullOrEmpty(flies[index]))
                     result += flies[index] + "\\";
             result += Parent.Parent.Name + "_" + Name + "_DB.ndf";
             return result;
@@ -83,7 +85,7 @@ namespace OpenDBDiff.SqlServer.Schema.Model
         public override string ToSql()
         {
             if (Type != 2)
-                return "ALTER DATABASE " + Parent.Parent.FullName + "\r\nADD" + ((Type != 1) ? "" : " LOG") + " FILE ( NAME = N'" + Name + "', FILENAME = N'" + PhysicalName + "' , SIZE = " + Size * 1000 + "KB , FILEGROWTH = " + Growth * 1000 + TypeGrowth + ") TO FILEGROUP " + Parent.FullName + "\r\nGO\r\n";
+                return "ALTER DATABASE " + Parent.Parent.FullName + "\r\nADD" + ((Type != 1) ? "" : " LOG") + " FILE ( NAME = N'" + Name + "', FILENAME = N'" + PhysicalName + "' , SIZE = " + (Size * 1000) + "KB , FILEGROWTH = " + (Growth * 1000) + TypeGrowth + ") TO FILEGROUP " + Parent.FullName + "\r\nGO\r\n";
             else
                 return "ALTER DATABASE " + Parent.Parent.FullName + "\r\nADD" + ((Type != 1) ? "" : " LOG") + " FILE ( NAME = N'" + Name + "', FILENAME = N'" + PhysicalName + "') TO FILEGROUP " + Parent.FullName + "\r\nGO\r\n";
         }
@@ -91,7 +93,7 @@ namespace OpenDBDiff.SqlServer.Schema.Model
         public override string ToSqlAdd()
         {
             if (Type != 2)
-                return "ALTER DATABASE " + Parent.Parent.FullName + "\r\nADD" + ((Type != 1) ? "" : " LOG") + " FILE ( NAME = N'" + Name + "', FILENAME = N'" + GetNameNewFileGroup(PhysicalName) + "' , SIZE = " + Size * 1000 + "KB , FILEGROWTH = " + Growth * 1000 + TypeGrowth + ") TO FILEGROUP " + Parent.FullName + "\r\nGO\r\n";
+                return "ALTER DATABASE " + Parent.Parent.FullName + "\r\nADD" + ((Type != 1) ? "" : " LOG") + " FILE ( NAME = N'" + Name + "', FILENAME = N'" + GetNameNewFileGroup(PhysicalName) + "' , SIZE = " + (Size * 1000) + "KB , FILEGROWTH = " + (Growth * 1000) + TypeGrowth + ") TO FILEGROUP " + Parent.FullName + "\r\nGO\r\n";
             else
                 return "ALTER DATABASE " + Parent.Parent.FullName + "\r\nADD" + ((Type != 1) ? "" : " LOG") + " FILE ( NAME = N'" + Name + "', FILENAME = N'" + GetNameNewFileGroup(PhysicalName) + "') TO FILEGROUP " + Parent.FullName + "\r\nGO\r\n";
         }
@@ -99,7 +101,7 @@ namespace OpenDBDiff.SqlServer.Schema.Model
         public string ToSQLAlter()
         {
             if (Type != 2)
-                return "ALTER DATABASE " + Parent.Parent.FullName + " MODIFY FILE ( NAME = N'" + Name + "', FILENAME = N'" + PhysicalName + "' , SIZE = " + Size * 1000 + "KB , FILEGROWTH = " + Growth * 1000 + TypeGrowth + ")";
+                return "ALTER DATABASE " + Parent.Parent.FullName + " MODIFY FILE ( NAME = N'" + Name + "', FILENAME = N'" + PhysicalName + "' , SIZE = " + (Size * 1000) + "KB , FILEGROWTH = " + (Growth * 1000) + TypeGrowth + ")";
             else
                 return "ALTER DATABASE " + Parent.Parent.FullName + " MODIFY FILE ( NAME = N'" + Name + "', FILENAME = N'" + PhysicalName + "')";
         }

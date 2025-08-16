@@ -1,6 +1,6 @@
-using OpenDBDiff.Abstractions.Schema.Model;
 using System;
 using System.Collections.Generic;
+using OpenDBDiff.Abstractions.Schema.Model;
 
 namespace OpenDBDiff.SqlServer.Schema.Options
 {
@@ -52,18 +52,20 @@ namespace OpenDBDiff.SqlServer.Schema.Options
 
         public IDictionary<string, string> GetOptions()
         {
-            Dictionary<string, string> options = new Dictionary<string, string>();
-            options.Add("defaultIntegerValue", defaultIntegerValue);
-            options.Add("defaultRealValue", defaultRealValue);
-            options.Add("defaultTextValue", defaultTextValue);
-            options.Add("defaultDateValue", defaultDateValue); 
-            options.Add("defaultVariantValue", defaultVariantValue);
-            options.Add("defaultNTextValue", defaultNTextValue);
-            options.Add("defaultBlobValue", defaultBlobValue);
-            options.Add("defaultUniqueValue", defaultUniqueValue);
-            options.Add("useDefaultValueIfExists", useDefaultValueIfExists.ToString());
-            options.Add("defaultTime", defaultTime);
-            options.Add("defaultXml", defaultXml);
+            Dictionary<string, string> options = new Dictionary<string, string>
+            {
+                { "defaultIntegerValue", defaultIntegerValue },
+                { "defaultRealValue", defaultRealValue },
+                { "defaultTextValue", defaultTextValue },
+                { "defaultDateValue", defaultDateValue },
+                { "defaultVariantValue", defaultVariantValue },
+                { "defaultNTextValue", defaultNTextValue },
+                { "defaultBlobValue", defaultBlobValue },
+                { "defaultUniqueValue", defaultUniqueValue },
+                { "useDefaultValueIfExists", useDefaultValueIfExists.ToString() },
+                { "defaultTime", defaultTime },
+                { "defaultXml", defaultXml }
+            };
             return options;
         }
         /// <summary>

@@ -1,9 +1,9 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using System;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using OpenDBDiff.Abstractions.Schema.Model;
 using OpenDBDiff.SqlServer.Schema.Model.Util;
 using OpenDBDiff.Tests.Utils;
-using System;
 
 namespace OpenDBDiff.Tests.Model.Tests
 {

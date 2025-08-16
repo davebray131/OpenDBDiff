@@ -5,7 +5,7 @@ namespace OpenDBDiff.SqlServer.Schema.Generates
 {
     public class GenerateDDLTriggers
     {
-        private Generate root;
+        private readonly Generate root;
 
         public GenerateDDLTriggers(Generate root)
         {
@@ -31,14 +31,16 @@ namespace OpenDBDiff.SqlServer.Schema.Generates
                         {
                             while (reader.Read())
                             {
-                                Trigger trigger = new Trigger(database);
-                                trigger.Text = reader["Text"].ToString();
-                                trigger.Name = reader["Name"].ToString();
-                                trigger.InsteadOf = (bool)reader["is_instead_of_trigger"];
-                                trigger.IsDisabled = (bool)reader["is_disabled"];
-                                trigger.IsDDLTrigger = true;
-                                trigger.NotForReplication = (bool)reader["is_not_for_replication"];
-                                trigger.Owner = "";
+                                Trigger trigger = new Trigger(database)
+                                {
+                                    Text = reader["Text"].ToString(),
+                                    Name = reader["Name"].ToString(),
+                                    InsteadOf = (bool)reader["is_instead_of_trigger"],
+                                    IsDisabled = (bool)reader["is_disabled"],
+                                    IsDDLTrigger = true,
+                                    NotForReplication = (bool)reader["is_not_for_replication"],
+                                    Owner = ""
+                                };
                                 database.DDLTriggers.Add(trigger);
                             }
                         }

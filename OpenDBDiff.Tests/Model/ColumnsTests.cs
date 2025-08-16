@@ -1,11 +1,11 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using System;
+using System.Collections.Generic;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using OpenDBDiff.Abstractions.Schema;
 using OpenDBDiff.Abstractions.Schema.Model;
 using OpenDBDiff.SqlServer.Schema.Compare;
 using OpenDBDiff.SqlServer.Schema.Model;
 using OpenDBDiff.SqlServer.Schema.Options;
-using System;
-using System.Collections.Generic;
 
 namespace OpenDBDiff.Tests.Model.Tests
 {
@@ -16,24 +16,28 @@ namespace OpenDBDiff.Tests.Model.Tests
         public void OriginHasExtraColumn_NothingSelected_ShouldDropExtraColumn()
         {
             int idStorage = 1;
-            System.Func<int> getId = new Func<int>(()=>++idStorage);
-            
-            Database originDatabase = new Database();
-            originDatabase.Info = new DatabaseInfo()
+            System.Func<int> getId = new Func<int>(() => ++idStorage);
+
+            Database originDatabase = new Database
             {
-                Collation = "SQL_Latin1_General_CP1_CI_AS",
+                Info = new DatabaseInfo()
+                {
+                    Collation = "SQL_Latin1_General_CP1_CI_AS",
+                },
+                Options = new SqlOption(),
+                Id = getId()
             };
-            originDatabase.Options = new SqlOption();
-            originDatabase.Id = getId();
-            Table originTable = new Table(originDatabase);
-            originTable.Name = "Example";
-            originTable.Id = getId();
+            Table originTable = new Table(originDatabase)
+            {
+                Name = "Example",
+                Id = getId()
+            };
             var originColumn1 = new Column(originTable)
             {
                 Name = "Test",
                 Type = "int",
                 Id = getId()
-        };
+            };
             var originColumn2 = new Column(originTable)
             {
                 Name = "Test2",
@@ -52,16 +56,20 @@ namespace OpenDBDiff.Tests.Model.Tests
             originDatabase.Tables.Add(originTable);
 
 
-            Database destinationDatabase = new Database();
-            destinationDatabase.Info = new DatabaseInfo()
+            Database destinationDatabase = new Database
             {
-                Collation = "SQL_Latin1_General_CP1_CI_AS"
+                Info = new DatabaseInfo()
+                {
+                    Collation = "SQL_Latin1_General_CP1_CI_AS"
+                },
+                Id = getId(),
+                Options = new SqlOption()
             };
-            destinationDatabase.Id = getId();
-            destinationDatabase.Options = new SqlOption();
-            Table destinationTable = new Table(destinationDatabase);
-            destinationTable.Name = "Example";
-            destinationTable.Id = getId();
+            Table destinationTable = new Table(destinationDatabase)
+            {
+                Name = "Example",
+                Id = getId()
+            };
             var destinationColumn1 = new Column(destinationTable)
             {
                 Name = "Test",
@@ -91,16 +99,20 @@ namespace OpenDBDiff.Tests.Model.Tests
         {
             int idStorage = 1;
             System.Func<int> getId = new Func<int>(() => ++idStorage);
-            Database originDatabase = new Database();
-            originDatabase.Info = new DatabaseInfo()
+            Database originDatabase = new Database
             {
-                Collation = "SQL_Latin1_General_CP1_CI_AS"
+                Info = new DatabaseInfo()
+                {
+                    Collation = "SQL_Latin1_General_CP1_CI_AS"
+                },
+                Id = getId(),
+                Options = new SqlOption()
             };
-            originDatabase.Id = getId();
-            originDatabase.Options = new SqlOption();
-            Table originTable = new Table(originDatabase);
-            originTable.Name = "Example";
-            originTable.Id = getId();
+            Table originTable = new Table(originDatabase)
+            {
+                Name = "Example",
+                Id = getId()
+            };
             var originColumn1 = new Column(originTable)
             {
                 Name = "Test",
@@ -125,16 +137,20 @@ namespace OpenDBDiff.Tests.Model.Tests
             originDatabase.Tables.Add(originTable);
 
 
-            Database destinationDatabase = new Database();
-            destinationDatabase.Info = new DatabaseInfo()
+            Database destinationDatabase = new Database
             {
-                Collation = "SQL_Latin1_General_CP1_CI_AS"
+                Info = new DatabaseInfo()
+                {
+                    Collation = "SQL_Latin1_General_CP1_CI_AS"
+                },
+                Id = getId(),
+                Options = new SqlOption()
             };
-            destinationDatabase.Id = getId();
-            destinationDatabase.Options = new SqlOption();
-            Table destinationTable = new Table(destinationDatabase);
-            destinationTable.Name = "Example";
-            destinationTable.Id = getId();
+            Table destinationTable = new Table(destinationDatabase)
+            {
+                Name = "Example",
+                Id = getId()
+            };
             var destinationColumn1 = new Column(destinationTable)
             {
                 Name = "Test",
@@ -164,16 +180,20 @@ namespace OpenDBDiff.Tests.Model.Tests
         {
             int idStorage = 1;
             System.Func<int> getId = new Func<int>(() => ++idStorage);
-            Database originDatabase = new Database();
-            originDatabase.Info = new DatabaseInfo()
+            Database originDatabase = new Database
             {
-                Collation = "SQL_Latin1_General_CP1_CI_AS"
+                Info = new DatabaseInfo()
+                {
+                    Collation = "SQL_Latin1_General_CP1_CI_AS"
+                },
+                Id = getId(),
+                Options = new SqlOption()
             };
-            originDatabase.Id = getId();
-            originDatabase.Options = new SqlOption();
-            Table originTable = new Table(originDatabase);
-            originTable.Name = "Example";
-            originTable.Id = getId();
+            Table originTable = new Table(originDatabase)
+            {
+                Name = "Example",
+                Id = getId()
+            };
             var originColumn1 = new Column(originTable)
             {
                 Name = "Test",
@@ -198,16 +218,20 @@ namespace OpenDBDiff.Tests.Model.Tests
             originDatabase.Tables.Add(originTable);
 
 
-            Database destinationDatabase = new Database();
-            destinationDatabase.Info = new DatabaseInfo()
+            Database destinationDatabase = new Database
             {
-                Collation = "SQL_Latin1_General_CP1_CI_AS"
+                Info = new DatabaseInfo()
+                {
+                    Collation = "SQL_Latin1_General_CP1_CI_AS"
+                },
+                Id = getId(),
+                Options = new SqlOption()
             };
-            destinationDatabase.Id = getId();
-            destinationDatabase.Options = new SqlOption();
-            Table destinationTable = new Table(destinationDatabase);
-            destinationTable.Name = "Example";
-            destinationTable.Id = getId();
+            Table destinationTable = new Table(destinationDatabase)
+            {
+                Name = "Example",
+                Id = getId()
+            };
             var destinationColumn1 = new Column(destinationTable)
             {
                 Name = "Test",

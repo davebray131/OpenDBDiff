@@ -1,14 +1,14 @@
-﻿using OpenDBDiff.Abstractions.Schema.Model;
-using OpenDBDiff.Abstractions.Ui;
-using System;
+﻿using System;
 using System.Windows.Forms;
+using OpenDBDiff.Abstractions.Schema.Model;
+using OpenDBDiff.Abstractions.Ui;
 
 namespace OpenDBDiff.UI
 {
     public partial class OptionForm : Form
     {
-        private IProjectHandler projectSelectorHandler;
-        private IOption SqlFilter;
+        private readonly IProjectHandler projectSelectorHandler;
+        private readonly IOption SqlFilter;
 
         public event OptionControl.OptionEventHandler OptionSaved;
 
@@ -24,9 +24,9 @@ namespace OpenDBDiff.UI
 
             this.SuspendLayout();
 
-            this.sqlOptionsFront1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
-            | System.Windows.Forms.AnchorStyles.Left)
-            | System.Windows.Forms.AnchorStyles.Right)));
+            this.sqlOptionsFront1.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom
+            | System.Windows.Forms.AnchorStyles.Left
+            | System.Windows.Forms.AnchorStyles.Right;
             this.sqlOptionsFront1.Location = new System.Drawing.Point(3, 3);
             this.sqlOptionsFront1.Name = "sqlOptionsFront1";
             this.sqlOptionsFront1.Size = new System.Drawing.Size(586, 440);
@@ -41,13 +41,13 @@ namespace OpenDBDiff.UI
             OptionSaved?.Invoke(option);
         }
 
-        private void btnApply_Click(object sender, EventArgs e)
+        private void BtnApply_Click(object sender, EventArgs e)
         {
             sqlOptionsFront1.Save();
             this.Close();
         }
 
-        private void btnCancel_Click(object sender, EventArgs e)
+        private void BtnCancel_Click(object sender, EventArgs e)
         {
             this.Close();
         }

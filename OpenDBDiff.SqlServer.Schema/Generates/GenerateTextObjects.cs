@@ -1,16 +1,16 @@
-﻿using Microsoft.Data.SqlClient;
+﻿using System;
+using System.Text.RegularExpressions;
+using Microsoft.Data.SqlClient;
 using OpenDBDiff.Abstractions.Schema.Events;
 using OpenDBDiff.SqlServer.Schema.Generates.Util;
 using OpenDBDiff.SqlServer.Schema.Model;
 using OpenDBDiff.SqlServer.Schema.Options;
-using System;
-using System.Text.RegularExpressions;
 
 namespace OpenDBDiff.SqlServer.Schema.Generates
 {
     public class GenerateTextObjects
     {
-        private Generate root;
+        private readonly Generate root;
 
         public GenerateTextObjects(Generate root)
         {
@@ -19,7 +19,7 @@ namespace OpenDBDiff.SqlServer.Schema.Generates
 
         private static string GetSQL(SqlOption options)
         {
-            var filterQuery =  SQLQueries.SQLQueryFactory.Get("GetTextObjectsQuery");
+            var filterQuery = SQLQueries.SQLQueryFactory.Get("GetTextObjectsQuery");
             string filter = "";
             if (options.Ignore.FilterStoredProcedure)
                 filter += "O.type = 'P' OR ";
@@ -35,10 +35,10 @@ namespace OpenDBDiff.SqlServer.Schema.Generates
 
         public void Fill(Database database, string connectionString)
         {
-            ICode code = null;
+            ICode code;
             try
             {
-                if ((database.Options.Ignore.FilterStoredProcedure) || (database.Options.Ignore.FilterView) || (database.Options.Ignore.FilterFunction) || (database.Options.Ignore.FilterTrigger))
+                if (database.Options.Ignore.FilterStoredProcedure || database.Options.Ignore.FilterView || database.Options.Ignore.FilterFunction || database.Options.Ignore.FilterTrigger)
                 {
                     root.RaiseOnReading(new ProgressEventArgs("Reading Text Objects...", Constants.READING_TEXTOBJECTS));
                     using (SqlConnection conn = new SqlConnection(connectionString))
@@ -58,7 +58,7 @@ namespace OpenDBDiff.SqlServer.Schema.Generates
                                     string definition = reader["Text"].ToString();
                                     int id = (int)reader["object_id"];
                                     if (type.Equals("V"))
-                                        code = (ICode)database.Views.Find(id);
+                                        code = database.Views.Find(id);
 
                                     if (type.Equals("TR"))
                                         code = (ICode)database.Find(id);
@@ -71,7 +71,7 @@ namespace OpenDBDiff.SqlServer.Schema.Generates
                                     }
 
                                     if (type.Equals("IF") || type.Equals("FN") || type.Equals("TF"))
-                                        code = (ICode)database.Functions.Find(id);
+                                        code = database.Functions.Find(id);
 
                                     if (code != null)
                                         code.Text = reader["Text"].ToString();
@@ -102,7 +102,7 @@ namespace OpenDBDiff.SqlServer.Schema.Generates
                     {
                         // Try to replace the name saved in the definition when the object was created by the one used for the object in sys.object
                         string oldName = match.Groups["spname"].Value;
-                        //if (String.IsNullOrEmpty(oldName)) System.Diagnostics.Debugger.Break();
+                        //if (string.IsNullOrEmpty(oldName)) System.Diagnostics.Debugger.Break();
                         if (String.Compare(oldName, name) != 0)
                         {
                             rv = rv.Replace(oldName, name);

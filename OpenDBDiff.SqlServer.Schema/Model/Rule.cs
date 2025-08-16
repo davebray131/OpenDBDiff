@@ -1,8 +1,8 @@
-using OpenDBDiff.Abstractions.Schema;
-using OpenDBDiff.Abstractions.Schema.Model;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using OpenDBDiff.Abstractions.Schema;
+using OpenDBDiff.Abstractions.Schema.Model;
 
 namespace OpenDBDiff.SqlServer.Schema.Model
 {
@@ -15,12 +15,14 @@ namespace OpenDBDiff.SqlServer.Schema.Model
 
         public new Rule Clone(ISchemaBase parent)
         {
-            Rule item = new Rule(parent);
-            item.Id = this.Id;
-            item.Name = this.Name;
-            item.Owner = this.Owner;
-            item.Text = this.Text;
-            item.Guid = this.Guid;
+            Rule item = new Rule(parent)
+            {
+                Id = this.Id,
+                Name = this.Name,
+                Owner = this.Owner,
+                Text = this.Text,
+                Guid = this.Guid
+            };
             return item;
         }
 
@@ -28,9 +30,9 @@ namespace OpenDBDiff.SqlServer.Schema.Model
         {
             string sql;
             if (this.Parent.ObjectType == ObjectType.Column)
-                sql = String.Format("EXEC sp_bindrule N'{0}', N'[{1}].[{2}]','futureonly'\r\nGO\r\n", Name, this.Parent.Parent.Name, this.Parent.Name);
+                sql = string.Format("EXEC sp_bindrule N'{0}', N'[{1}].[{2}]','futureonly'\r\nGO\r\n", Name, this.Parent.Parent.Name, this.Parent.Name);
             else
-                sql = String.Format("EXEC sp_bindrule N'{0}', N'{1}','futureonly'\r\nGO\r\n", Name, this.Parent.Name);
+                sql = string.Format("EXEC sp_bindrule N'{0}', N'{1}','futureonly'\r\nGO\r\n", Name, this.Parent.Name);
             return sql;
         }
 
@@ -38,9 +40,9 @@ namespace OpenDBDiff.SqlServer.Schema.Model
         {
             string sql;
             if (this.Parent.ObjectType == ObjectType.Column)
-                sql = String.Format("EXEC sp_unbindrule @objname=N'[{0}].[{1}]'\r\nGO\r\n", this.Parent.Parent.Name, this.Parent.Name);
+                sql = string.Format("EXEC sp_unbindrule @objname=N'[{0}].[{1}]'\r\nGO\r\n", this.Parent.Parent.Name, this.Parent.Name);
             else
-                sql = String.Format("EXEC sp_unbindrule @objname=N'{0}'\r\nGO\r\n", this.Parent.Name);
+                sql = string.Format("EXEC sp_unbindrule @objname=N'{0}'\r\nGO\r\n", this.Parent.Name);
             return sql;
         }
 

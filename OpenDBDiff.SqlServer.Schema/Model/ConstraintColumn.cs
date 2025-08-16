@@ -1,5 +1,5 @@
-using OpenDBDiff.Abstractions.Schema;
 using System;
+using OpenDBDiff.Abstractions.Schema;
 
 namespace OpenDBDiff.SqlServer.Schema.Model
 {
@@ -12,16 +12,18 @@ namespace OpenDBDiff.SqlServer.Schema.Model
 
         public ConstraintColumn Clone()
         {
-            ConstraintColumn ccol = new ConstraintColumn((Constraint)this.Parent);
-            ccol.ColumnRelationalName = this.ColumnRelationalName;
-            ccol.ColumnRelationalId = this.ColumnRelationalId;
-            ccol.Name = this.Name;
-            ccol.IsIncluded = this.IsIncluded;
-            ccol.Order = this.Order;
-            ccol.KeyOrder = this.KeyOrder;
-            ccol.Id = this.Id;
-            ccol.DataTypeId = this.DataTypeId;
-            ccol.ColumnRelationalDataTypeId = this.ColumnRelationalDataTypeId;
+            ConstraintColumn ccol = new ConstraintColumn((Constraint)this.Parent)
+            {
+                ColumnRelationalName = this.ColumnRelationalName,
+                ColumnRelationalId = this.ColumnRelationalId,
+                Name = this.Name,
+                IsIncluded = this.IsIncluded,
+                Order = this.Order,
+                KeyOrder = this.KeyOrder,
+                Id = this.Id,
+                DataTypeId = this.DataTypeId,
+                ColumnRelationalDataTypeId = this.ColumnRelationalDataTypeId
+            };
             return ccol;
         }
 

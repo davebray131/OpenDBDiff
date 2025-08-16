@@ -1,6 +1,6 @@
+using System;
 using OpenDBDiff.Abstractions.Schema;
 using OpenDBDiff.Abstractions.Schema.Model;
-using System;
 
 namespace OpenDBDiff.SqlServer.Schema.Model
 {
@@ -23,10 +23,12 @@ namespace OpenDBDiff.SqlServer.Schema.Model
         /// </summary>
         public override ISchemaBase Clone(ISchemaBase parent)
         {
-            TableOption option = new TableOption(parent);
-            option.Name = this.Name;
-            option.Status = this.Status;
-            option.Value = this.Value;
+            TableOption option = new TableOption(parent)
+            {
+                Name = this.Name,
+                Status = this.Status,
+                Value = this.Value
+            };
             return option;
         }
 

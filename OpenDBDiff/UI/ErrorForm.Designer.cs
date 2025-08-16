@@ -60,7 +60,7 @@
             this.FindIssueButton.TabIndex = 2;
             this.FindIssueButton.Text = "Search for error on web";
             this.FindIssueButton.UseVisualStyleBackColor = true;
-            this.FindIssueButton.Click += new System.EventHandler(this.btnFindIssue_Click);
+            this.FindIssueButton.Click += new System.EventHandler(this.BtnFindIssue_Click);
             //
             // CloseButton
             //
@@ -72,7 +72,7 @@
             this.CloseButton.TabIndex = 1;
             this.CloseButton.Text = "Close";
             this.CloseButton.UseVisualStyleBackColor = true;
-            this.CloseButton.Click += new System.EventHandler(this.btnClose_Click);
+            this.CloseButton.Click += new System.EventHandler(this.BtnClose_Click);
             //
             // CopyButton
             //
@@ -83,7 +83,7 @@
             this.CopyButton.TabIndex = 0;
             this.CopyButton.Text = "Copy error";
             this.CopyButton.UseVisualStyleBackColor = true;
-            this.CopyButton.Click += new System.EventHandler(this.btnCopy_Click);
+            this.CopyButton.Click += new System.EventHandler(this.BtnCopy_Click);
             //
             // ErrorLabel
             //

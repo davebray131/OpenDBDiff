@@ -5,7 +5,7 @@ namespace OpenDBDiff.SqlServer.Schema.Generates
 {
     public class GenerateFileGroups
     {
-        private Generate root;
+        private readonly Generate root;
 
         public GenerateFileGroups(Generate root)
         {
@@ -35,17 +35,19 @@ namespace OpenDBDiff.SqlServer.Schema.Generates
                     {
                         while (reader.Read())
                         {
-                            FileGroupFile item = new FileGroupFile(filegroup);
-                            item.Id = (int)reader["file_id"];
-                            item.Name = reader["name"].ToString();
-                            item.Owner = "";
-                            item.Growth = (int)reader["growth"];
-                            item.IsPercentGrowth = (bool)reader["is_percent_growth"];
-                            item.IsSparse = (bool)reader["is_sparse"];
-                            item.MaxSize = (int)reader["max_size"];
-                            item.PhysicalName = reader["physical_name"].ToString();
-                            item.Size = (int)reader["size"];
-                            item.Type = (byte)reader["type"];
+                            FileGroupFile item = new FileGroupFile(filegroup)
+                            {
+                                Id = (int)reader["file_id"],
+                                Name = reader["name"].ToString(),
+                                Owner = "",
+                                Growth = (int)reader["growth"],
+                                IsPercentGrowth = (bool)reader["is_percent_growth"],
+                                IsSparse = (bool)reader["is_sparse"],
+                                MaxSize = (int)reader["max_size"],
+                                PhysicalName = reader["physical_name"].ToString(),
+                                Size = (int)reader["size"],
+                                Type = (byte)reader["type"]
+                            };
                             filegroup.Files.Add(item);
                         }
                     }
@@ -68,13 +70,15 @@ namespace OpenDBDiff.SqlServer.Schema.Generates
                             {
                                 while (reader.Read())
                                 {
-                                    FileGroup item = new FileGroup(database);
-                                    item.Id = (int)reader["ID"];
-                                    item.Name = reader["name"].ToString();
-                                    item.Owner = "";
-                                    item.IsDefaultFileGroup = (bool)reader["is_default"];
-                                    item.IsReadOnly = (bool)reader["is_read_only"];
-                                    item.IsFileStream = reader["type"].Equals("FD");
+                                    FileGroup item = new FileGroup(database)
+                                    {
+                                        Id = (int)reader["ID"],
+                                        Name = reader["name"].ToString(),
+                                        Owner = "",
+                                        IsDefaultFileGroup = (bool)reader["is_default"],
+                                        IsReadOnly = (bool)reader["is_read_only"],
+                                        IsFileStream = reader["type"].Equals("FD")
+                                    };
                                     FillFiles(item, connectionString);
                                     database.FileGroups.Add(item);
                                 }
