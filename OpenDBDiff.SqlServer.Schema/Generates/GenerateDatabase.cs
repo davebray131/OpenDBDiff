@@ -16,7 +16,6 @@ namespace OpenDBDiff.SqlServer.Schema.Generates;
 /// <param name="connectionString">Connection string de la base</param>
 public class GenerateDatabase(string connectionString, SqlOption filter)
 {
-    private readonly string connectioString = connectionString;
     private readonly SqlOption objectFilter = filter;
 
     public bool UseDefaultVersionOnVersionParseError { get; private set; }
@@ -24,7 +23,7 @@ public class GenerateDatabase(string connectionString, SqlOption filter)
     public DatabaseInfo Get(Database database)
     {
         var item = new DatabaseInfo();
-        using (var conn = new SqlConnection(connectioString))
+        using (var conn = new SqlConnection(connectionString))
         {
             using (var command = new SqlCommand(DatabaseSQLCommand.GetVersion(database), conn))
             {

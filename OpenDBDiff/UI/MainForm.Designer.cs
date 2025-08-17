@@ -52,7 +52,6 @@ namespace OpenDBDiff.UI
             this.panel4 = new System.Windows.Forms.Panel();
             this.panel3 = new System.Windows.Forms.Panel();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
-            this.schemaTreeView1 = new OpenDBDiff.UI.SchemaTreeView();
             this.tabPage1 = new System.Windows.Forms.TabPage();
             this.panel1 = new System.Windows.Forms.Panel();
             this.txtSyncScript = new ScintillaNET.Scintilla();
@@ -84,6 +83,7 @@ namespace OpenDBDiff.UI
             this.tableLayoutPanel3 = new System.Windows.Forms.TableLayoutPanel();
             this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
             this.tableLayoutPanel4 = new System.Windows.Forms.TableLayoutPanel();
+            this.schemaTreeView1 = new OpenDBDiff.UI.SchemaTreeView();
             this.tabControl1.SuspendLayout();
             this.tabPage2.SuspendLayout();
             this.tabControl2.SuspendLayout();
@@ -130,6 +130,7 @@ namespace OpenDBDiff.UI
             this.tabPage2.Controls.Add(this.tabControl2);
             this.tabPage2.Controls.Add(this.groupBox2);
             this.tabPage2.Controls.Add(this.groupBox1);
+            this.tabPage2.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.tabPage2.Location = new System.Drawing.Point(4, 22);
             this.tabPage2.Name = "tabPage2";
             this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
@@ -291,21 +292,6 @@ namespace OpenDBDiff.UI
             this.groupBox1.TabIndex = 1;
             this.groupBox1.TabStop = false;
             // 
-            // schemaTreeView1
-            // 
-            this.schemaTreeView1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left)));
-            this.schemaTreeView1.LeftDatabase = null;
-            this.schemaTreeView1.Location = new System.Drawing.Point(7, 10);
-            this.schemaTreeView1.Name = "schemaTreeView1";
-            this.schemaTreeView1.RightDatabase = null;
-            this.schemaTreeView1.ShowChangedItems = true;
-            this.schemaTreeView1.ShowMissingItems = true;
-            this.schemaTreeView1.ShowNewItems = true;
-            this.schemaTreeView1.ShowUnchangedItems = true;
-            this.schemaTreeView1.Size = new System.Drawing.Size(322, 501);
-            this.schemaTreeView1.TabIndex = 0;
-            // 
             // tabPage1
             // 
             this.tabPage1.Controls.Add(this.panel1);
@@ -389,7 +375,7 @@ namespace OpenDBDiff.UI
             // SwapButton
             // 
             this.SwapButton.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.SwapButton.Image = global::OpenDBDiff.Properties.Resources.arrow_ew;
+            this.SwapButton.Image = ((System.Drawing.Image)(resources.GetObject("SwapButton.Image")));
             this.SwapButton.Location = new System.Drawing.Point(543, 3);
             this.SwapButton.Name = "SwapButton";
             this.SwapButton.Size = new System.Drawing.Size(34, 169);
@@ -402,7 +388,7 @@ namespace OpenDBDiff.UI
             // 
             this.btnNewProject.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
             this.btnNewProject.BackColor = System.Drawing.SystemColors.ButtonFace;
-            this.btnNewProject.Image = global::OpenDBDiff.Properties.Resources.new_window;
+            this.btnNewProject.Image = ((System.Drawing.Image)(resources.GetObject("btnNewProject.Image")));
             this.btnNewProject.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.btnNewProject.Location = new System.Drawing.Point(3, 42);
             this.btnNewProject.Name = "btnNewProject";
@@ -417,7 +403,7 @@ namespace OpenDBDiff.UI
             // 
             this.btnSaveProject.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
             this.btnSaveProject.BackColor = System.Drawing.SystemColors.ButtonFace;
-            this.btnSaveProject.Image = global::OpenDBDiff.Properties.Resources.diskette;
+            this.btnSaveProject.Image = ((System.Drawing.Image)(resources.GetObject("btnSaveProject.Image")));
             this.btnSaveProject.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.btnSaveProject.Location = new System.Drawing.Point(3, 81);
             this.btnSaveProject.Name = "btnSaveProject";
@@ -432,7 +418,7 @@ namespace OpenDBDiff.UI
             // 
             this.btnProject.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
             this.btnProject.BackColor = System.Drawing.SystemColors.ButtonFace;
-            this.btnProject.Image = global::OpenDBDiff.Properties.Resources.folder;
+            this.btnProject.Image = ((System.Drawing.Image)(resources.GetObject("btnProject.Image")));
             this.btnProject.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.btnProject.Location = new System.Drawing.Point(3, 3);
             this.btnProject.Name = "btnProject";
@@ -460,7 +446,7 @@ namespace OpenDBDiff.UI
             // 
             // toolOpenProject
             // 
-            this.toolOpenProject.Image = global::OpenDBDiff.Properties.Resources.folder;
+            this.toolOpenProject.Image = ((System.Drawing.Image)(resources.GetObject("toolOpenProject.Image")));
             this.toolOpenProject.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.toolOpenProject.Name = "toolOpenProject";
             this.toolOpenProject.Size = new System.Drawing.Size(96, 22);
@@ -468,7 +454,7 @@ namespace OpenDBDiff.UI
             // 
             // toolNewProject
             // 
-            this.toolNewProject.Image = global::OpenDBDiff.Properties.Resources.new_window;
+            this.toolNewProject.Image = ((System.Drawing.Image)(resources.GetObject("toolNewProject.Image")));
             this.toolNewProject.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.toolNewProject.Name = "toolNewProject";
             this.toolNewProject.Size = new System.Drawing.Size(91, 22);
@@ -476,7 +462,7 @@ namespace OpenDBDiff.UI
             // 
             // toolSaveProject
             // 
-            this.toolSaveProject.Image = global::OpenDBDiff.Properties.Resources.diskette;
+            this.toolSaveProject.Image = ((System.Drawing.Image)(resources.GetObject("toolSaveProject.Image")));
             this.toolSaveProject.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.toolSaveProject.Name = "toolSaveProject";
             this.toolSaveProject.Size = new System.Drawing.Size(91, 22);
@@ -509,7 +495,7 @@ namespace OpenDBDiff.UI
             // btnCompare
             // 
             this.btnCompare.Anchor = System.Windows.Forms.AnchorStyles.None;
-            this.btnCompare.Image = global::OpenDBDiff.Properties.Resources.compare;
+            this.btnCompare.Image = ((System.Drawing.Image)(resources.GetObject("btnCompare.Image")));
             this.btnCompare.ImageAlign = System.Drawing.ContentAlignment.TopCenter;
             this.btnCompare.Location = new System.Drawing.Point(5, 22);
             this.btnCompare.Margin = new System.Windows.Forms.Padding(0, 22, 0, 4);
@@ -525,7 +511,7 @@ namespace OpenDBDiff.UI
             // btnOptions
             // 
             this.btnOptions.Anchor = System.Windows.Forms.AnchorStyles.None;
-            this.btnOptions.Image = global::OpenDBDiff.Properties.Resources.setting_tools;
+            this.btnOptions.Image = ((System.Drawing.Image)(resources.GetObject("btnOptions.Image")));
             this.btnOptions.ImageAlign = System.Drawing.ContentAlignment.TopCenter;
             this.btnOptions.Location = new System.Drawing.Point(5, 95);
             this.btnOptions.Margin = new System.Windows.Forms.Padding(0, 4, 0, 4);
@@ -542,7 +528,7 @@ namespace OpenDBDiff.UI
             // 
             this.btnSaveAs.Anchor = System.Windows.Forms.AnchorStyles.None;
             this.btnSaveAs.Enabled = false;
-            this.btnSaveAs.Image = global::OpenDBDiff.Properties.Resources.save_as;
+            this.btnSaveAs.Image = ((System.Drawing.Image)(resources.GetObject("btnSaveAs.Image")));
             this.btnSaveAs.ImageAlign = System.Drawing.ContentAlignment.TopCenter;
             this.btnSaveAs.Location = new System.Drawing.Point(5, 168);
             this.btnSaveAs.Margin = new System.Windows.Forms.Padding(0, 4, 0, 4);
@@ -559,7 +545,7 @@ namespace OpenDBDiff.UI
             // 
             this.btnCopy.Anchor = System.Windows.Forms.AnchorStyles.None;
             this.btnCopy.Enabled = false;
-            this.btnCopy.Image = global::OpenDBDiff.Properties.Resources.clipboard_invoice;
+            this.btnCopy.Image = ((System.Drawing.Image)(resources.GetObject("btnCopy.Image")));
             this.btnCopy.ImageAlign = System.Drawing.ContentAlignment.TopCenter;
             this.btnCopy.Location = new System.Drawing.Point(5, 241);
             this.btnCopy.Margin = new System.Windows.Forms.Padding(0, 4, 0, 4);
@@ -576,7 +562,7 @@ namespace OpenDBDiff.UI
             // 
             this.btnUpdate.Anchor = System.Windows.Forms.AnchorStyles.None;
             this.btnUpdate.Enabled = false;
-            this.btnUpdate.Image = global::OpenDBDiff.Properties.Resources.refresh_all;
+            this.btnUpdate.Image = ((System.Drawing.Image)(resources.GetObject("btnUpdate.Image")));
             this.btnUpdate.ImageAlign = System.Drawing.ContentAlignment.TopCenter;
             this.btnUpdate.Location = new System.Drawing.Point(5, 314);
             this.btnUpdate.Margin = new System.Windows.Forms.Padding(0, 4, 0, 4);
@@ -584,7 +570,7 @@ namespace OpenDBDiff.UI
             this.btnUpdate.Padding = new System.Windows.Forms.Padding(4);
             this.btnUpdate.Size = new System.Drawing.Size(95, 65);
             this.btnUpdate.TabIndex = 8;
-            this.btnUpdate.Text = "Update selected";
+            this.btnUpdate.Text = "Update";
             this.btnUpdate.TextAlign = System.Drawing.ContentAlignment.BottomCenter;
             this.btnUpdate.UseVisualStyleBackColor = true;
             this.btnUpdate.Click += new System.EventHandler(this.BtnUpdate_Click);
@@ -593,7 +579,7 @@ namespace OpenDBDiff.UI
             // 
             this.btnCompareTableData.Anchor = System.Windows.Forms.AnchorStyles.None;
             this.btnCompareTableData.Enabled = false;
-            this.btnCompareTableData.Image = global::OpenDBDiff.Properties.Resources.table_analysis;
+            this.btnCompareTableData.Image = ((System.Drawing.Image)(resources.GetObject("btnCompareTableData.Image")));
             this.btnCompareTableData.ImageAlign = System.Drawing.ContentAlignment.TopCenter;
             this.btnCompareTableData.Location = new System.Drawing.Point(5, 387);
             this.btnCompareTableData.Margin = new System.Windows.Forms.Padding(0, 4, 0, 4);
@@ -601,7 +587,7 @@ namespace OpenDBDiff.UI
             this.btnCompareTableData.Padding = new System.Windows.Forms.Padding(4);
             this.btnCompareTableData.Size = new System.Drawing.Size(95, 65);
             this.btnCompareTableData.TabIndex = 9;
-            this.btnCompareTableData.Text = "Compare data";
+            this.btnCompareTableData.Text = "Compare";
             this.btnCompareTableData.TextAlign = System.Drawing.ContentAlignment.BottomCenter;
             this.btnCompareTableData.UseVisualStyleBackColor = true;
             this.btnCompareTableData.Click += new System.EventHandler(this.BtnCompareTableData_Click);
@@ -610,7 +596,7 @@ namespace OpenDBDiff.UI
             // 
             this.btnUpdateAll.Anchor = System.Windows.Forms.AnchorStyles.None;
             this.btnUpdateAll.Enabled = false;
-            this.btnUpdateAll.Image = global::OpenDBDiff.Properties.Resources.database_refresh;
+            this.btnUpdateAll.Image = ((System.Drawing.Image)(resources.GetObject("btnUpdateAll.Image")));
             this.btnUpdateAll.ImageAlign = System.Drawing.ContentAlignment.TopCenter;
             this.btnUpdateAll.Location = new System.Drawing.Point(5, 460);
             this.btnUpdateAll.Margin = new System.Windows.Forms.Padding(0, 4, 0, 4);
@@ -704,6 +690,21 @@ namespace OpenDBDiff.UI
             this.tableLayoutPanel4.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
             this.tableLayoutPanel4.Size = new System.Drawing.Size(105, 561);
             this.tableLayoutPanel4.TabIndex = 4;
+            // 
+            // schemaTreeView1
+            // 
+            this.schemaTreeView1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left)));
+            this.schemaTreeView1.LeftDatabase = null;
+            this.schemaTreeView1.Location = new System.Drawing.Point(7, 10);
+            this.schemaTreeView1.Name = "schemaTreeView1";
+            this.schemaTreeView1.RightDatabase = null;
+            this.schemaTreeView1.ShowChangedItems = true;
+            this.schemaTreeView1.ShowMissingItems = true;
+            this.schemaTreeView1.ShowNewItems = true;
+            this.schemaTreeView1.ShowUnchangedItems = true;
+            this.schemaTreeView1.Size = new System.Drawing.Size(322, 501);
+            this.schemaTreeView1.TabIndex = 0;
             // 
             // MainForm
             // 

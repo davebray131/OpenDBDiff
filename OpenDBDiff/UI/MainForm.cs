@@ -17,6 +17,7 @@ using OpenDBDiff.Abstractions.Schema.Model;
 using OpenDBDiff.Abstractions.Ui;
 using OpenDBDiff.Extensions;
 using OpenDBDiff.Settings;
+using OpenDBDiff.SqlServer.Ui.Front;
 using ScintillaNET;
 
 namespace OpenDBDiff.UI;
@@ -41,6 +42,21 @@ public partial class MainForm : Form
         Text = string.Concat(nameof(OpenDBDiff), " v", Assembly.GetExecutingAssembly().GetName().Version.ToString());
     }
 
+    private bool TestDatabase(string connectionString, string title)
+    {
+        var testForm = new ConnectionTestForm(connectionString, title);
+        var testResult = testForm.ShowDialog();
+        if (testResult != DialogResult.Yes)
+        {
+            if (testResult == DialogResult.No)
+            {
+                MessageBox.Show($"There was a problem connecting to the {title.ToLower()}.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            return false;
+        }
+        return true;
+    }
+
     private void StartComparison()
     {
         ProgressForm progress = null;
@@ -50,6 +66,12 @@ public partial class MainForm : Form
             if (!string.IsNullOrEmpty(ProjectSelectorHandler.GetSourceDatabaseName()) &&
                  (!string.IsNullOrEmpty(ProjectSelectorHandler.GetDestinationDatabaseName())))
             {
+                // Test connectivity to the databases first to prevent the nasty exception
+                if (!TestDatabase(RightDatabaseSelector.ConnectionString, "Destination Database") || !TestDatabase(LeftDatabaseSelector.ConnectionString, "Source Database"))
+                {
+                    return;
+                }
+
                 Options ??= ProjectSelectorHandler.GetDefaultProjectOptions();
                 var leftGenerator = ProjectSelectorHandler.SetSourceGenerator(LeftDatabaseSelector.ConnectionString, Options);
                 var rightGenerator = ProjectSelectorHandler.SetDestinationGenerator(RightDatabaseSelector.ConnectionString, Options);
@@ -88,8 +110,7 @@ public partial class MainForm : Form
             }
             else
             {
-                MessageBox.Show(Owner, "Please select a valid connection string", "ERROR", MessageBoxButtons.OK,
-                                MessageBoxIcon.Information);
+                MessageBox.Show(Owner, "Please select a valid connection string", "ERROR", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
         }
         catch (Exception ex)

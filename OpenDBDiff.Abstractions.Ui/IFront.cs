@@ -12,7 +12,6 @@ public interface IFront : ICloneable
     int TabIndex { get; set; }
     bool Visible { get; set; }
     DockStyle Dock { get; set; }
-    bool TestConnection();
     string ConnectionString { get; set; }
     string ErrorConnection { get; }
     string DatabaseName { get; }

@@ -2,6 +2,7 @@ using System;
 using System.Windows.Forms;
 using Microsoft.Data.SqlClient;
 using OpenDBDiff.Abstractions.Ui;
+using OpenDBDiff.SqlServer.Ui.Front;
 using OpenDBDiff.SqlServer.Ui.Util;
 
 namespace OpenDBDiff.SqlServer.Ui;
@@ -59,23 +60,6 @@ public partial class SqlServerConnectFront : UserControl, IFront
     public string ServerName
     {
         get => cboServer.Text; set => cboServer.Text = value;
-    }
-
-    public bool TestConnection()
-    {
-        try
-        {
-            using var connection = new SqlConnection();
-            connection.ConnectionString = ConnectionString;
-            connection.Open();
-            connection.Close();
-            return true;
-        }
-        catch (Exception ex)
-        {
-            ErrorConnection = ex.Message;
-            return false;
-        }
     }
 
     private string BuildConnectionString(string server, string database)
@@ -153,20 +137,37 @@ public partial class SqlServerConnectFront : UserControl, IFront
 
     public Control Control => this;
 
-    private void BtnTest_Click(object sender, EventArgs e) => _ = TestConnection()
-            ? MessageBox.Show(this, "Test successful!", "Test", MessageBoxButtons.OK, MessageBoxIcon.Information)
-            : MessageBox.Show(this, "Test failed!\r\n" + ErrorConnection, "Test", MessageBoxButtons.OK, MessageBoxIcon.Error);
+    public bool? TestConnection()
+    {
+        var testForm = new ConnectionTestForm(ConnectionString);
+        return testForm.ShowDialog() switch
+        {
+            DialogResult.No => false,
+            DialogResult.Yes => true,
+            _ => null
+        };
+    }
+
+    private void BtnTest_Click(object sender, EventArgs e)
+    {
+        var result = TestConnection();
+        if (result != null)
+        {
+            _ = true.Equals(result) ? MessageBox.Show(this, "Test successful!", "Test", MessageBoxButtons.OK, MessageBoxIcon.Information) :
+                MessageBox.Show(this, "Test failed!", "Test", MessageBoxButtons.OK, MessageBoxIcon.Error);
+        }
+    }
 
     private void AddComboItem(string item)
     {
         if (!InvokeRequired)
         {
-            _ = cboDatabase.Items.Add(item);
+            cboDatabase.Items.Add(item);
         }
         else
         {
             var add = new addCombo(AddComboItem);
-            _ = Invoke(add, new string[] { item });
+            Invoke(add, [item]);
         }
     }
 
@@ -179,7 +180,7 @@ public partial class SqlServerConnectFront : UserControl, IFront
         else
         {
             var clear = new clearCombo(ClearDatabase);
-            _ = Invoke(clear);
+            Invoke(clear);
         }
     }
 
