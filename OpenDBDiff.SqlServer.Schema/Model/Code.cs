@@ -76,14 +76,14 @@ namespace OpenDBDiff.SqlServer.Schema.Model
         /// <summary>
         /// Names collection of dependant objects of the object
         /// </summary>
-        public List<String> DependenciesOut { get; set; }
+        public List<string> DependenciesOut { get; set; }
 
         /// <summary>
         /// Names collection of objects which the object depends on
         /// </summary>
-        public List<String> DependenciesIn { get; set; }
+        public List<string> DependenciesIn { get; set; }
 
-        public Boolean IsSchemaBinding { get; set; }
+        public bool IsSchemaBinding { get; set; }
 
         public string Text { get; set; }
 
@@ -131,7 +131,7 @@ namespace OpenDBDiff.SqlServer.Schema.Model
         /// Indicates if there are dependant tables on the object which must be rebuild
         /// </summary>
         /// <returns></returns>
-        public Boolean HasToRebuild
+        public bool HasToRebuild
         {
             get
             {

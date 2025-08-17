@@ -1,5 +1,4 @@
-﻿using System;
-using OpenDBDiff.Abstractions.Schema;
+﻿using OpenDBDiff.Abstractions.Schema;
 using OpenDBDiff.Abstractions.Schema.Model;
 
 namespace OpenDBDiff.SqlServer.Schema.Model
@@ -17,15 +16,12 @@ namespace OpenDBDiff.SqlServer.Schema.Model
 
         public string AssemblyName { get; set; }
 
-        public Boolean IsAssembly { get; set; }
+        public bool IsAssembly { get; set; }
 
         public string AssemblyClass { get; set; }
 
         public int AssemblyId { get; set; }
 
-        public override Boolean IsCodeType
-        {
-            get { return true; }
-        }
+        public override bool IsCodeType => true;
     }
 }

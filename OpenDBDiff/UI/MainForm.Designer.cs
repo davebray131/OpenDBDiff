@@ -178,7 +178,7 @@ namespace OpenDBDiff.UI
             this.tabPage5.Location = new System.Drawing.Point(4, 22);
             this.tabPage5.Name = "tabPage5";
             this.tabPage5.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage5.Size = new System.Drawing.Size(668, 428);
+            this.tabPage5.Size = new System.Drawing.Size(668, 448);
             this.tabPage5.TabIndex = 1;
             this.tabPage5.Text = "Old object";
             this.tabPage5.UseVisualStyleBackColor = true;
@@ -189,7 +189,7 @@ namespace OpenDBDiff.UI
             this.txtOldObject.Font = new System.Drawing.Font("Courier New", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.txtOldObject.Location = new System.Drawing.Point(3, 3);
             this.txtOldObject.Name = "txtOldObject";
-            this.txtOldObject.Size = new System.Drawing.Size(662, 422);
+            this.txtOldObject.Size = new System.Drawing.Size(662, 442);
             this.txtOldObject.TabIndex = 0;
             // 
             // tabPage6
@@ -197,7 +197,7 @@ namespace OpenDBDiff.UI
             this.tabPage6.Controls.Add(this.txtDiff);
             this.tabPage6.Location = new System.Drawing.Point(4, 22);
             this.tabPage6.Name = "tabPage6";
-            this.tabPage6.Size = new System.Drawing.Size(668, 428);
+            this.tabPage6.Size = new System.Drawing.Size(668, 448);
             this.tabPage6.TabIndex = 2;
             this.tabPage6.Text = "Diff";
             this.tabPage6.UseVisualStyleBackColor = true;
@@ -207,7 +207,7 @@ namespace OpenDBDiff.UI
             this.txtDiff.Dock = System.Windows.Forms.DockStyle.Fill;
             this.txtDiff.Location = new System.Drawing.Point(0, 0);
             this.txtDiff.Name = "txtDiff";
-            this.txtDiff.Size = new System.Drawing.Size(668, 428);
+            this.txtDiff.Size = new System.Drawing.Size(668, 448);
             this.txtDiff.TabIndex = 0;
             // 
             // groupBox2
@@ -298,7 +298,7 @@ namespace OpenDBDiff.UI
             this.tabPage1.Location = new System.Drawing.Point(4, 22);
             this.tabPage1.Name = "tabPage1";
             this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage1.Size = new System.Drawing.Size(910, 509);
+            this.tabPage1.Size = new System.Drawing.Size(910, 529);
             this.tabPage1.TabIndex = 0;
             this.tabPage1.Text = "Synchronized script";
             this.tabPage1.UseVisualStyleBackColor = true;
@@ -312,7 +312,7 @@ namespace OpenDBDiff.UI
             this.panel1.Controls.Add(this.txtSyncScript);
             this.panel1.Location = new System.Drawing.Point(9, 6);
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(895, 587);
+            this.panel1.Size = new System.Drawing.Size(895, 607);
             this.panel1.TabIndex = 6;
             // 
             // txtSyncScript
@@ -321,7 +321,7 @@ namespace OpenDBDiff.UI
             this.txtSyncScript.Location = new System.Drawing.Point(0, 0);
             this.txtSyncScript.Name = "txtSyncScript";
             this.txtSyncScript.ReadOnly = true;
-            this.txtSyncScript.Size = new System.Drawing.Size(891, 583);
+            this.txtSyncScript.Size = new System.Drawing.Size(891, 603);
             this.txtSyncScript.TabIndex = 0;
             // 
             // tabPage3
@@ -330,7 +330,7 @@ namespace OpenDBDiff.UI
             this.tabPage3.Location = new System.Drawing.Point(4, 22);
             this.tabPage3.Name = "tabPage3";
             this.tabPage3.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage3.Size = new System.Drawing.Size(910, 509);
+            this.tabPage3.Size = new System.Drawing.Size(910, 529);
             this.tabPage3.TabIndex = 2;
             this.tabPage3.Text = "Action report";
             this.tabPage3.UseVisualStyleBackColor = true;
@@ -345,7 +345,7 @@ namespace OpenDBDiff.UI
             this.textBox1.Multiline = true;
             this.textBox1.Name = "textBox1";
             this.textBox1.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.textBox1.Size = new System.Drawing.Size(895, 587);
+            this.textBox1.Size = new System.Drawing.Size(895, 607);
             this.textBox1.TabIndex = 0;
             // 
             // saveFileDialog1

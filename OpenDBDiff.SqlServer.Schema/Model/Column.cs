@@ -70,7 +70,7 @@ namespace OpenDBDiff.SqlServer.Schema.Model
 
         public Default Default { get; set; }
 
-        public Boolean IsFileStream { get; set; }
+        public bool IsFileStream { get; set; }
 
         /// <summary>
         /// Gets or sets a value indicating whether this instance is XML document.
@@ -78,7 +78,7 @@ namespace OpenDBDiff.SqlServer.Schema.Model
         /// <value>
         /// 	<c>true</c> if this instance is XML document; otherwise, <c>false</c>.
         /// </value>
-        public Boolean IsXmlDocument { get; set; }
+        public bool IsXmlDocument { get; set; }
 
         /// <summary>
         /// Gets or sets the XML schema.
@@ -86,7 +86,7 @@ namespace OpenDBDiff.SqlServer.Schema.Model
         /// <value>The XML schema.</value>
         public string XmlSchema { get; set; }
 
-        public Boolean IsSparse { get; set; }
+        public bool IsSparse { get; set; }
 
         /// <summary>
         /// Gets or sets a value indicating whether this instance is user defined type.
@@ -94,7 +94,7 @@ namespace OpenDBDiff.SqlServer.Schema.Model
         /// <value>
         /// 	<c>true</c> if this instance is user defined type; otherwise, <c>false</c>.
         /// </value>
-        public Boolean IsUserDefinedType { get; set; }
+        public bool IsUserDefinedType { get; set; }
 
         public int DataUserTypeId { get; set; }
 
@@ -126,7 +126,7 @@ namespace OpenDBDiff.SqlServer.Schema.Model
         /// Gets or sets a value indicating whether this <see cref="Column"/> is nullable.
         /// </summary>
         /// <value><c>true</c> if nullable; otherwise, <c>false</c>.</value>
-        public Boolean IsNullable { get; set; }
+        public bool IsNullable { get; set; }
 
         /// <summary>
         /// Gets or sets the size.
@@ -146,7 +146,7 @@ namespace OpenDBDiff.SqlServer.Schema.Model
         /// <value>
         /// 	<c>true</c> if this instance is persisted; otherwise, <c>false</c>.
         /// </value>
-        public Boolean IsPersisted { get; set; }
+        public bool IsPersisted { get; set; }
 
         /// <summary>
         /// Gets or sets a value indicating whether this instance has index dependencies.
@@ -154,7 +154,7 @@ namespace OpenDBDiff.SqlServer.Schema.Model
         /// <value>
         /// 	<c>true</c> if this instance has index dependencies; otherwise, <c>false</c>.
         /// </value>
-        public Boolean HasIndexDependencies { get; set; }
+        public bool HasIndexDependencies { get; set; }
 
         /// <summary>
         /// Gets or sets a value indicating whether this instance has computed dependencies.
@@ -162,7 +162,7 @@ namespace OpenDBDiff.SqlServer.Schema.Model
         /// <value>
         /// 	<c>true</c> if this instance has computed dependencies; otherwise, <c>false</c>.
         /// </value>
-        public Boolean HasComputedDependencies { get; set; }
+        public bool HasComputedDependencies { get; set; }
 
         /// <summary>
         /// Gets a value indicating whether this instance has to rebuild only constraint.
@@ -170,7 +170,7 @@ namespace OpenDBDiff.SqlServer.Schema.Model
         /// <value>
         /// 	<c>true</c> if this instance has to rebuild only constraint; otherwise, <c>false</c>.
         /// </value>
-        public Boolean HasToRebuildOnlyConstraint
+        public bool HasToRebuildOnlyConstraint
         {
             get
             {
@@ -183,7 +183,7 @@ namespace OpenDBDiff.SqlServer.Schema.Model
         /// <value>
         /// 	<c>true</c> if this instance has to rebuild; otherwise, <c>false</c>.
         /// </value>
-        public Boolean HasToRebuild(int newPosition, string newType, bool isFileStream)
+        public bool HasToRebuild(int newPosition, string newType, bool isFileStream)
         {
             if (newType.Equals("text") && (!this.IsText)) return true;
             if (newType.Equals("ntext") && (!this.IsText)) return true;
@@ -204,13 +204,13 @@ namespace OpenDBDiff.SqlServer.Schema.Model
         /// <value>
         /// 	<c>true</c> if this instance is computed; otherwise, <c>false</c>.
         /// </value>
-        public Boolean IsComputed { get; set; }
+        public bool IsComputed { get; set; }
 
         /// <summary>
         /// Gets a value indicating whether this column is BLOB.
         /// </summary>
         /// <value><c>true</c> if this column is BLOB; otherwise, <c>false</c>.</value>
-        public Boolean IsBLOB
+        public bool IsBLOB
         {
             get
             {
@@ -218,7 +218,7 @@ namespace OpenDBDiff.SqlServer.Schema.Model
             }
         }
 
-        public Boolean IsText
+        public bool IsText
         {
             get
             {
@@ -226,7 +226,7 @@ namespace OpenDBDiff.SqlServer.Schema.Model
             }
         }
 
-        public Boolean IsBinary
+        public bool IsBinary
         {
             get
             {
@@ -239,7 +239,7 @@ namespace OpenDBDiff.SqlServer.Schema.Model
         /// <value>
         /// 	<c>true</c> if this field is identity for replication; otherwise, <c>false</c>.
         /// </value>
-        public Boolean IsIdentityForReplication { get; set; }
+        public bool IsIdentityForReplication { get; set; }
 
         /// <summary>
         /// Gets or sets a value indicating whether this field is identity.
@@ -247,7 +247,7 @@ namespace OpenDBDiff.SqlServer.Schema.Model
         /// <value>
         /// 	<c>true</c> if this field is identity; otherwise, <c>false</c>.
         /// </value>
-        public Boolean IsIdentity { get; set; }
+        public bool IsIdentity { get; set; }
 
         /// <summary>
         /// Gets or sets the identity increment (only if the field is Identity).
@@ -264,7 +264,7 @@ namespace OpenDBDiff.SqlServer.Schema.Model
         /// <summary>
         /// Indica si el campo es Row Guid
         /// </summary>
-        public Boolean IsRowGuid { get; set; }
+        public bool IsRowGuid { get; set; }
 
         /// <summary>
         /// Nombre completo del objeto, incluyendo el owner.
@@ -301,7 +301,7 @@ namespace OpenDBDiff.SqlServer.Schema.Model
             return serial.ToString();
         }
 
-        public Boolean HasToForceValue
+        public bool HasToForceValue
         {
             get
             {
@@ -403,7 +403,7 @@ namespace OpenDBDiff.SqlServer.Schema.Model
         /// <summary>
         /// Devuelve el schema de la columna en formato SQL.
         /// </summary>
-        public string ToSql(Boolean sqlConstraint)
+        public string ToSql(bool sqlConstraint)
         {
             string sql = "";
             sql += "[" + Name + "] ";
@@ -533,7 +533,7 @@ namespace OpenDBDiff.SqlServer.Schema.Model
             return list;
         }
 
-        public SQLScriptList RebuildConstraint(Boolean Check)
+        public SQLScriptList RebuildConstraint(bool Check)
         {
             SQLScriptList list = new SQLScriptList();
             if (DefaultConstraint != null)
@@ -573,7 +573,7 @@ namespace OpenDBDiff.SqlServer.Schema.Model
         /// Compara solo las propiedades de dos campos relacionadas con los Identity. Si existen
         /// diferencias, devuelve falso, caso contrario, true.
         /// </summary>
-        public static Boolean CompareIdentity(Column origin, Column destination)
+        public static bool CompareIdentity(Column origin, Column destination)
         {
             if (destination == null) throw new ArgumentNullException("destination");
             if (origin == null) throw new ArgumentNullException("origin");
@@ -584,7 +584,7 @@ namespace OpenDBDiff.SqlServer.Schema.Model
             return true;
         }
 
-        public static Boolean CompareRule(Column origin, Column destination)
+        public static bool CompareRule(Column origin, Column destination)
         {
             if (destination == null) throw new ArgumentNullException("destination");
             if (origin == null) throw new ArgumentNullException("origin");
@@ -598,7 +598,7 @@ namespace OpenDBDiff.SqlServer.Schema.Model
         /// <summary>
         /// Compara dos campos y devuelve true si son iguales, caso contrario, devuelve false.
         /// </summary>
-        public static Boolean Compare(Column origin, Column destination)
+        public static bool Compare(Column origin, Column destination)
         {
             if (destination == null) throw new ArgumentNullException("destination");
             if (origin == null) throw new ArgumentNullException("origin");

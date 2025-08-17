@@ -28,10 +28,11 @@ namespace OpenDBDiff.UI
 
             var imageList1 = new ImageList
             {
-                ImageSize = new Size(16, 16)
+                ImageSize = new Size(16, 16),
+                TransparentColor = Color.Transparent
+
             };
 
-            var keys = new string[] { "Folder", "Table", "Procedure", "User", "Column", "Index", "Rol", "Schema", "View", "Function", "XMLSchema", "Database", "UDT", "Assembly", "PartitionFunction", "PartitionScheme" };
             imageList1.Images.Add("Folder", Resources.image0);
             imageList1.Images.Add("Table", Resources.image1);
             imageList1.Images.Add("Procedure", Resources.image2);
@@ -101,6 +102,25 @@ namespace OpenDBDiff.UI
         public void SetCheckedSchemas(List<ISchemaBase> schemas)
         {
             SetCheckedNodesFromList(schemas, treeView1.Nodes);
+        }
+
+        public void SelectAllSchemas()
+        {
+            foreach (TreeNode node in treeView1.Nodes)
+            {
+                node.Checked = true;
+                SelectNode(node.Nodes);
+            }
+        }
+
+        private void SelectNode(TreeNodeCollection nodes)
+        {
+            foreach (TreeNode node in nodes)
+            {
+                node.Checked = true;
+                SelectNode(node.Nodes);
+            }
+
         }
 
         private void GetCheckedNodesToList(List<ISchemaBase> schemas, TreeNodeCollection nodes)
@@ -197,7 +217,7 @@ namespace OpenDBDiff.UI
             string currentlySelectedNode = treeView1.SelectedNode?.Name;
             string currentTopNode = treeView1.TopNode?.Name;
 
-            this.busy = true;
+            busy = true;
             treeView1.BeginUpdate();
             treeView1.Nodes.Clear();
             TreeNode databaseNode = treeView1.Nodes.Add("root", databaseSource.Name);
@@ -219,7 +239,7 @@ namespace OpenDBDiff.UI
             }
 
             treeView1.EndUpdate();
-            this.busy = false;
+            busy = false;
             treeView1.Focus();
         }
 
@@ -278,25 +298,25 @@ namespace OpenDBDiff.UI
             return false;
         }
 
-        public Boolean ShowNewItems
+        public bool ShowNewItems
         {
             get { return chkNew.Checked; }
             set { chkNew.Checked = value; }
         }
 
-        public Boolean ShowMissingItems
+        public bool ShowMissingItems
         {
             get { return chkOld.Checked; }
             set { chkOld.Checked = value; }
         }
 
-        public Boolean ShowChangedItems
+        public bool ShowChangedItems
         {
             get { return chkDifferent.Checked; }
             set { chkDifferent.Checked = value; }
         }
 
-        public Boolean ShowUnchangedItems
+        public bool ShowUnchangedItems
         {
             get { return chkShowUnchangedItems.Checked; }
             set { chkShowUnchangedItems.Checked = value; }

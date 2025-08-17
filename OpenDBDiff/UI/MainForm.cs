@@ -36,9 +36,9 @@ namespace OpenDBDiff.UI
         {
             InitializeComponent();
 
-            Font = new Font("Calibri", 10);
+            Font = new Font("Calibri", 11);
 
-            this.Text = string.Concat(nameof(OpenDBDiff), " v", Assembly.GetExecutingAssembly().GetName().Version.ToString());
+            Text = string.Concat(nameof(OpenDBDiff), " v", Assembly.GetExecutingAssembly().GetName().Version.ToString());
         }
 
         private void StartComparison()
@@ -125,22 +125,8 @@ namespace OpenDBDiff.UI
                 {
                     txtNewObject.Text = database.Find(nodeFullName).ToSql();
                     txtNewObject.SetMarginWidth();
-                    if (database.Find(nodeFullName).Status == ObjectStatus.Original)
-                    {
-                        btnUpdate.Enabled = false;
-                    }
-                    else
-                    {
-                        btnUpdate.Enabled = true;
-                    }
-                    if (database.Find(nodeFullName).ObjectType == ObjectType.Table)
-                    {
-                        btnCompareTableData.Enabled = true;
-                    }
-                    else
-                    {
-                        btnCompareTableData.Enabled = false;
-                    }
+                    btnUpdate.Enabled = database.Find(nodeFullName).Status != ObjectStatus.Original;
+                    btnCompareTableData.Enabled = database.Find(nodeFullName).ObjectType == ObjectType.Table;
                 }
 
                 database = (IDatabase)schemaTreeView1.RightDatabase;
@@ -249,13 +235,13 @@ namespace OpenDBDiff.UI
                 Cursor = Cursors.WaitCursor;
                 _selectedSchemas = schemaTreeView1.GetCheckedSchemas();
                 StartComparison();
-                schemaTreeView1.SetCheckedSchemas(_selectedSchemas);
+                //schemaTreeView1.SetCheckedSchemas(_selectedSchemas);  // If you want to recall last schemas
+                schemaTreeView1.SelectAllSchemas(); // If you want to select all schemas after a compare
                 errorLocation = "Saving Connections";
                 Project.SaveLastConfiguration(LeftDatabaseSelector.ConnectionString, RightDatabaseSelector.ConnectionString);
             }
             catch (Exception ex)
             {
-                Cursor = Cursors.Default;
                 HandleException(errorLocation, ex);
             }
             finally
@@ -356,7 +342,7 @@ namespace OpenDBDiff.UI
         {
             try
             {
-                System.Windows.Forms.Clipboard.SetText(txtSyncScript.Text);
+                Clipboard.SetText(txtSyncScript.Text);
             }
             catch (Exception ex)
             {
