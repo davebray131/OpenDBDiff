@@ -36,6 +36,8 @@ namespace OpenDBDiff.UI
         {
             InitializeComponent();
 
+            Font = new Font("Calibri", 10);
+
             this.Text = string.Concat(nameof(OpenDBDiff), " v", Assembly.GetExecutingAssembly().GetName().Version.ToString());
         }
 

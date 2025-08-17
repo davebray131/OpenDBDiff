@@ -8,6 +8,7 @@ using System.Windows.Forms;
 using OpenDBDiff.Abstractions.Schema;
 using OpenDBDiff.Abstractions.Schema.Attributes;
 using OpenDBDiff.Abstractions.Schema.Model;
+using OpenDBDiff.Properties;
 
 namespace OpenDBDiff.UI
 {
@@ -24,6 +25,52 @@ namespace OpenDBDiff.UI
         public SchemaTreeView()
         {
             InitializeComponent();
+
+            var imageList1 = new ImageList
+            {
+                ImageSize = new Size(16, 16)
+            };
+
+            var keys = new string[] { "Folder", "Table", "Procedure", "User", "Column", "Index", "Rol", "Schema", "View", "Function", "XMLSchema", "Database", "UDT", "Assembly", "PartitionFunction", "PartitionScheme" };
+            imageList1.Images.Add("Folder", Resources.image0);
+            imageList1.Images.Add("Table", Resources.image1);
+            imageList1.Images.Add("Procedure", Resources.image2);
+            imageList1.Images.Add("User", Resources.image3);
+            imageList1.Images.Add("Column", Resources.image4);
+            imageList1.Images.Add("Index", Resources.image5);
+            imageList1.Images.Add("Rol", Resources.image6);
+            imageList1.Images.Add("Schema", Resources.image7);
+            imageList1.Images.Add("View", Resources.image8);
+            imageList1.Images.Add("Function", Resources.image9);
+            imageList1.Images.Add("XMLSchema", Resources.image10);
+            imageList1.Images.Add("Database", Resources.image11);
+            imageList1.Images.Add("UDT", Resources.image12);
+            imageList1.Images.Add("Assembly", Resources.image13);
+            imageList1.Images.Add("PartitionFunction", Resources.image14);
+            imageList1.Images.Add("PartitionScheme", Resources.image15);
+            this.treeView1.ImageList = imageList1;
+
+
+
+            /*     System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(SchemaTreeView));
+                 var stream = (System.Windows.Forms.ImageListStreamer)resources.GetObject("imageList1.ImageStream");
+                 if (stream != null)
+                 {
+                     var il = new ImageList
+                     {
+                         ImageStream = stream
+                     };
+
+                     for (int q = 0; q < il.Images.Count; q++)
+                     {
+                         var image = il.Images[q];
+                         image.Save($@"c:\output\image{q}.bmp");
+
+                     }
+
+                     stream = null;
+                 }*/
+
         }
 
         public ISchemaBase RightDatabase { get; set; }

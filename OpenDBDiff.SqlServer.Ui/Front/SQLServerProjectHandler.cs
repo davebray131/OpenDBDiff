@@ -11,8 +11,6 @@ namespace OpenDBDiff.SqlServer.Ui
     {
         private SqlServerConnectFront DestinationControl;
         private SqlServerConnectFront SourceControl;
-        private SQLServerGenerator SourceGenerator;
-        private SQLServerGenerator DestinationGenerator;
 
         private SqlOption Option;
 
@@ -27,9 +25,9 @@ namespace OpenDBDiff.SqlServer.Ui
                 DatabaseName = "",
                 Location = new Point(1, 1),
                 Name = "DestinationControl",
-                Anchor = (AnchorStyles)((int)AnchorStyles.Bottom + (int)AnchorStyles.Left + (int)AnchorStyles.Right),
+                Dock = DockStyle.Fill,
                 TabIndex = 10,
-                Text = "Destination database:"
+                Text = "DESTINATION DATABASE"
             };
 
             return this.DestinationControl;
@@ -43,64 +41,35 @@ namespace OpenDBDiff.SqlServer.Ui
                 UseWindowsAuthentication = true,
                 UserName = "sa",
                 Password = "",
-                DatabaseName = ""
-            };
+                DatabaseName = "",
 
-            SourceControl.Location = new Point(1, 1);
-            SourceControl.Name = "SourceControl";
-            SourceControl.Anchor = (AnchorStyles)((int)AnchorStyles.Bottom + (int)AnchorStyles.Left + (int)AnchorStyles.Right);
-            SourceControl.TabIndex = 10;
-            SourceControl.Text = "Source database:";
+                Location = new Point(1, 1),
+                Name = "SourceControl",
+                TabIndex = 10,
+                Text = "SOURCE DATABASE",
+                Dock = DockStyle.Fill,
+            };
 
             return SourceControl;
         }
 
-        public IDatabaseComparer GetDatabaseComparer()
-        {
-            return new SQLServerComparer();
-        }
+        public IDatabaseComparer GetDatabaseComparer() => new SQLServerComparer();
 
-        public IGenerator SetDestinationGenerator(string connectionString, IOption options)
-        {
-            DestinationGenerator = new SQLServerGenerator(connectionString, options);
-            return DestinationGenerator;
-        }
+        public IGenerator SetDestinationGenerator(string connectionString, IOption options) => new SQLServerGenerator(connectionString, options);
 
-        public IGenerator SetSourceGenerator(string connectionString, IOption options)
-        {
-            SourceGenerator = new SQLServerGenerator(connectionString, options);
-            return SourceGenerator;
-        }
+        public IGenerator SetSourceGenerator(string connectionString, IOption options) => new SQLServerGenerator(connectionString, options);
 
-        public string GetDestinationConnectionString()
-        {
-            return DestinationControl.ConnectionString;
-        }
+        public string GetDestinationConnectionString() => DestinationControl.ConnectionString;
 
-        public string GetDestinationDatabaseName()
-        {
-            return DestinationControl.DatabaseName;
-        }
+        public string GetDestinationDatabaseName() => DestinationControl.DatabaseName;
 
-        public string GetDestinationServerName()
-        {
-            return DestinationControl.ServerName;
-        }
+        public string GetDestinationServerName() => DestinationControl.ServerName;
 
-        public string GetSourceConnectionString()
-        {
-            return SourceControl.ConnectionString;
-        }
+        public string GetSourceConnectionString() => SourceControl.ConnectionString;
 
-        public string GetSourceDatabaseName()
-        {
-            return SourceControl.DatabaseName;
-        }
+        public string GetSourceDatabaseName() => SourceControl.DatabaseName;
 
-        public string GetSourceServerName()
-        {
-            return SourceControl.ServerName;
-        }
+        public string GetSourceServerName() => SourceControl.ServerName;
 
         public IOption GetDefaultProjectOptions()
         {
@@ -124,15 +93,9 @@ namespace OpenDBDiff.SqlServer.Ui
             Option = option as SqlOption;
         }
 
-        public OptionControl CreateOptionControl()
-        {
-            return new SqlOptionsFront();
-        }
+        public OptionControl CreateOptionControl() => new SqlOptionsFront();
 
-        public string GetScriptLanguage()
-        {
-            return "mssql";
-        }
+        public string GetScriptLanguage() => "mssql";
 
         public void Unload()
         {
@@ -142,9 +105,6 @@ namespace OpenDBDiff.SqlServer.Ui
             this.DestinationControl = null;
         }
 
-        public override string ToString()
-        {
-            return "SQLServer 2005 or higher";
-        }
+        public override string ToString() => "SQLServer 2005 or higher";
     }
 }

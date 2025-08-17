@@ -33,14 +33,8 @@ namespace OpenDBDiff.SqlServer.Ui
 
         public bool UseWindowsAuthentication
         {
-            get
-            {
-                return cboAuthentication.SelectedIndex == 0;
-            }
-            set
-            {
-                cboAuthentication.SelectedIndex = value ? 0 : 1;
-            }
+            get { return cboAuthentication.SelectedIndex == 0; }
+            set { cboAuthentication.SelectedIndex = value ? 0 : 1; }
         }
 
         public string DatabaseName

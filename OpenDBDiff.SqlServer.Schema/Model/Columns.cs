@@ -1,4 +1,3 @@
-using System;
 using System.Linq;
 using OpenDBDiff.Abstractions.Schema;
 using OpenDBDiff.Abstractions.Schema.Model;

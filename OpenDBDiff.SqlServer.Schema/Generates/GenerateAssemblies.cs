@@ -1,4 +1,3 @@
-using System;
 using Microsoft.Data.SqlClient;
 using OpenDBDiff.SqlServer.Schema.Generates.Util;
 using OpenDBDiff.SqlServer.Schema.Model;
