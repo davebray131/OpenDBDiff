@@ -1,25 +1,17 @@
-﻿namespace OpenDBDiff.Abstractions.Schema.Errors
+﻿namespace OpenDBDiff.Abstractions.Schema.Errors;
+
+public class MessageLog(string description, string fullDescription, MessageLog.LogType type)
 {
-    public class MessageLog
+    public enum LogType
     {
-        public enum LogType
-        {
-            Information = 0,
-            Warning = 1,
-            Error = 2
-        }
-
-        public MessageLog(string description, string fullDescription, LogType type)
-        {
-            this.Description = description;
-            this.FullDescription = fullDescription;
-            this.Type = type;
-        }
-
-        public LogType Type { get; private set; }
-
-        public string FullDescription { get; private set; }
-
-        public string Description { get; private set; }
+        Information = 0,
+        Warning = 1,
+        Error = 2
     }
+
+    public LogType Type { get; private set; } = type;
+
+    public string FullDescription { get; private set; } = fullDescription;
+
+    public string Description { get; private set; } = description;
 }

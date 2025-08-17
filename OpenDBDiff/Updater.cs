@@ -16,11 +16,8 @@ static class Updater
 {
     public static string CreateNew(ISchemaBase target, string connectionString)
     {
-        var script = target.ToSql();
-        script = script.Replace("GO", "");
-        //script = script.Replace("\r", "");
-        //script = script.Replace("\t", "");
-        //script = script.Replace("\n", "");
+        var script = target.ToSql().Replace("GO", ""); // DAVID - This does not seem good because "GO" could exist in other parts of the script
+
         var result = string.Empty;
         using (var connection = new SqlConnection(connectionString))
         {
@@ -43,11 +40,7 @@ static class Updater
     public static string AddNew(ISchemaBase target, string connectionString)
     {
         var result = string.Empty;
-        var script = target.ToSqlAdd();
-        script = script.Replace("GO", "");
-        //script = script.Replace("\r", "");
-        //script = script.Replace("\t", "");
-        //script = script.Replace("\n", "");
+        var script = target.ToSqlAdd().Replace("GO", ""); // DAVID - This does not seem good because "GO" could exist in other parts of the script
 
         using (var connection = new SqlConnection(connectionString))
         {
@@ -76,7 +69,7 @@ static class Updater
             var command = new SqlCommand
             {
                 Connection = connection,
-                CommandText = "SELECT * FROM " + selected.FullName
+                CommandText = $"SELECT * FROM {selected.FullName}"
             };
 
             connection.Open();
@@ -97,11 +90,7 @@ static class Updater
     {
         var db = target.RootParent;
         using var connection = new SqlConnection(connectionString);
-        if (db != null && DialogResult.Yes != MessageBox.Show(string.Format("Alter {0} {1} in {2}..{3}?\n(WARNING: No automatic backup is made!)",
-                target.ObjectType,
-                target.Name,
-                connection.DataSource,
-                connection.Database), "ALTER Destination?", MessageBoxButtons.YesNo, MessageBoxIcon.Hand, MessageBoxDefaultButton.Button2))
+        if (db != null && DialogResult.Yes != MessageBox.Show($"Alter {target.ObjectType} {target.Name} in {connection.DataSource}..{connection.Database}?\n(WARNING: No automatic backup is made!)", "ALTER Destination?", MessageBoxButtons.YesNo, MessageBoxIcon.Hand, MessageBoxDefaultButton.Button2))
         {
             return "Cancelled.";
         }
@@ -138,6 +127,7 @@ static class Updater
         return sb.ToString();
     }
 
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0060:Remove unused parameter", Justification = "<Pending>")]
     public static string Rebuild(ISchemaBase target, string connectionString)
     {
         var SqlDiff = target.ToSqlDiff([]);

@@ -5,12 +5,9 @@ using OpenDBDiff.Abstractions.Schema.Model;
 
 namespace OpenDBDiff.SqlServer.Schema.Model;
 
-public class PartitionScheme : SQLServerSchemaBase
+public class PartitionScheme(ISchemaBase parent) : SQLServerSchemaBase(parent, ObjectType.PartitionFunction)
 {
-    public PartitionScheme(ISchemaBase parent)
-        : base(parent, ObjectType.PartitionFunction) => FileGroups = [];
-
-    public List<string> FileGroups { get; set; }
+    public List<string> FileGroups { get; set; } = [];
 
     public string PartitionFunction { get; set; }
 

@@ -29,12 +29,8 @@ public class Generate
     {
         get
         {
-            string name;
-            using (var conn = new SqlConnection(ConnectionString))
-            {
-                name = conn.Database;
-            }
-            return name;
+            using var conn = new SqlConnection(ConnectionString);
+            return conn.Database;
         }
     }
 

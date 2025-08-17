@@ -62,6 +62,7 @@ namespace OpenDBDiff.UI
             this.ProjectsListView.FullRowSelect = true;
             this.ProjectsListView.GridLines = true;
             this.ProjectsListView.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.None;
+            this.ProjectsListView.HideSelection = false;
             this.ProjectsListView.Items.AddRange(new System.Windows.Forms.ListViewItem[] {
             listViewItem1});
             this.ProjectsListView.LabelWrap = false;
@@ -156,7 +157,7 @@ namespace OpenDBDiff.UI
             this.Name = "ListProjectsForm";
             this.ShowInTaskbar = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
-            this.Text = "OpenDBDiff projects";
+            this.Text = "Project List";
             this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.ListProjectsForm_KeyDown);
             this.ActionsContextMenuStrip.ResumeLayout(false);
             this.statusStrip1.ResumeLayout(false);

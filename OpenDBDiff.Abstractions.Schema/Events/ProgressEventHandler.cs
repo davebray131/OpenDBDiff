@@ -1,14 +1,10 @@
-namespace OpenDBDiff.Abstractions.Schema.Events
+namespace OpenDBDiff.Abstractions.Schema.Events;
+
+public class ProgressEventHandler
 {
-    public class ProgressEventHandler
-    {
-        public delegate void ProgressHandler(ProgressEventArgs e);
+    public delegate void ProgressHandler(ProgressEventArgs e);
 
-        public static event ProgressHandler OnProgress;
+    public static event ProgressHandler OnProgress;
 
-        public static void RaiseOnChange(ProgressEventArgs e)
-        {
-            OnProgress?.Invoke(e);
-        }
-    }
+    public static void RaiseOnChange(ProgressEventArgs e) => OnProgress?.Invoke(e);
 }

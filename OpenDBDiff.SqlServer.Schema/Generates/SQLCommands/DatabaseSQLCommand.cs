@@ -4,6 +4,7 @@ namespace OpenDBDiff.SqlServer.Schema.Generates.SQLCommands;
 
 internal class DatabaseSQLCommand
 {
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0060:Remove unused parameter", Justification = "<Pending>")]
     public static string GetVersion(Database databaseSchema) =>
         "SELECT SERVERPROPERTY('productversion') AS Version, SERVERPROPERTY('EngineEdition') AS Edition";
 

@@ -7,12 +7,8 @@ public class GenerateFileGroups(Generate root)
 {
     private readonly Generate root = root;
 
-    private static string GetSQLFile(FileGroup filegroup)
-    {
-        var query = SQLQueries.SQLQueryFactory.Get("GetDatabaseFile");
-
-        return query.Replace("{ID}", filegroup.Id.ToString());
-    }
+    private static string GetSQLFile(FileGroup filegroup) =>
+      SQLQueries.SQLQueryFactory.Get("GetDatabaseFile").Replace("{ID}", filegroup.Id.ToString());
 
     private static string GetSQL() => SQLQueries.SQLQueryFactory.Get("GetFileGroups");
 

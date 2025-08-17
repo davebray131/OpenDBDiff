@@ -4,30 +4,17 @@ using OpenDBDiff.SqlServer.Schema.Model.Util;
 
 namespace OpenDBDiff.SqlServer.Schema.Model;
 
-public class StoredProcedure : Code
+public class StoredProcedure(ISchemaBase parent) : Code(parent, ObjectType.StoredProcedure, ScriptAction.AddStoredProcedure, ScriptAction.DropStoredProcedure)
 {
-    public StoredProcedure(ISchemaBase parent)
-        : base(parent, ObjectType.StoredProcedure, ScriptAction.AddStoredProcedure, ScriptAction.DropStoredProcedure)
+    public override ISchemaBase Clone(ISchemaBase parent) => new StoredProcedure(parent)
     {
-
-    }
-
-    /// <summary>
-    /// Clona el objeto en una nueva instancia.
-    /// </summary>
-    public override ISchemaBase Clone(ISchemaBase parent)
-    {
-        var item = new StoredProcedure(parent)
-        {
-            Text = Text,
-            Status = Status,
-            Name = Name,
-            Id = Id,
-            Owner = Owner,
-            Guid = Guid
-        };
-        return item;
-    }
+        Text = Text,
+        Status = Status,
+        Name = Name,
+        Id = Id,
+        Owner = Owner,
+        Guid = Guid
+    };
 
     public override bool IsCodeType => true;
 
@@ -35,9 +22,6 @@ public class StoredProcedure : Code
 
     public string ToSQLAlter() => FormatCode.FormatAlter("PROC(EDURE)?", ToSql(), this, false);
 
-    /// <summary>
-    /// Devuelve el schema de diferencias del Schema en formato SQL.
-    /// </summary>
     public override SQLScriptList ToSqlDiff(System.Collections.Generic.ICollection<ISchemaBase> schemas)
     {
         var list = new SQLScriptList();

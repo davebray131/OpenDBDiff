@@ -1,90 +1,111 @@
 ﻿using System.Collections.Generic;
 using OpenDBDiff.Abstractions.Schema.Model;
 
-namespace OpenDBDiff.Abstractions.Schema
+namespace OpenDBDiff.Abstractions.Schema;
+
+public class SqlAction(ISchemaBase item)
 {
-    public class SqlAction
+    public void Add(ISchemaBase item) => Childs.Add(new SqlAction(item));
+
+    public SqlAction this[string name]
     {
-        public SqlAction(ISchemaBase item)
+        get
         {
-            if ((item.ObjectType == ObjectType.Column) || (item.ObjectType == ObjectType.Index) || (item.ObjectType == ObjectType.Constraint))
-                this.Name = item.Name;
-            else
-                this.Name = item.FullName;
-            this.Action = item.Status;
-            this.Type = item.ObjectType;
-            Childs = new List<SqlAction>();
-        }
-
-        public void Add(ISchemaBase item)
-        {
-            Childs.Add(new SqlAction(item));
-        }
-
-        public SqlAction this[string name]
-        {
-            get
+            for (var j = 0; j < Childs.Count; j++)
             {
-                for (int j = 0; j < Childs.Count; j++)
+                if (Childs[j].Name.Equals(name))
                 {
-                    if (Childs[j].Name.Equals(name))
-                        return Childs[j];
+                    return Childs[j];
                 }
-                return null;
             }
+            return null;
+        }
+    }
+
+    public string Name { get; private set; } = (item.ObjectType == ObjectType.Column) || (item.ObjectType == ObjectType.Index) || (item.ObjectType == ObjectType.Constraint)
+            ? item.Name
+            : item.FullName;
+
+    public ObjectType Type { get; set; } = item.ObjectType;
+
+    public ObjectStatus Action { get; set; } = item.Status;
+
+    public List<SqlAction> Childs { get; private set; } = [];
+
+    private string GetTypeName()
+    {
+        if (Type == ObjectType.Table)
+        {
+            return "TABLE";
         }
 
-        public string Name { get; private set; }
-
-        public ObjectType Type { get; set; }
-
-        public ObjectStatus Action { get; set; }
-
-        public List<SqlAction> Childs { get; private set; }
-
-        private string GetTypeName()
+        if (Type == ObjectType.Column)
         {
-            if (Type == ObjectType.Table) return "TABLE";
-            if (Type == ObjectType.Column) return "COLUMN";
-            if (Type == ObjectType.Constraint) return "CONSTRAINT";
-            if (Type == ObjectType.Index) return "INDEX";
-            if (Type == ObjectType.View) return "VIEW";
-            if (Type == ObjectType.StoredProcedure) return "STORED PROCEDURE";
-            if (Type == ObjectType.Synonym) return "SYNONYM";
-            if (Type == ObjectType.Function) return "FUNCTION";
-            if (Type == ObjectType.Assembly) return "ASSEMBLY";
-            if (Type == ObjectType.Trigger) return "TRIGGER";
-            return "";
+            return "COLUMN";
         }
 
-        private bool IsRoot
+        if (Type == ObjectType.Constraint)
         {
-            get
+            return "CONSTRAINT";
+        }
+
+        if (Type == ObjectType.Index)
+        {
+            return "INDEX";
+        }
+
+        if (Type == ObjectType.View)
+        {
+            return "VIEW";
+        }
+
+        if (Type == ObjectType.StoredProcedure)
+        {
+            return "STORED PROCEDURE";
+        }
+
+        if (Type == ObjectType.Synonym)
+        {
+            return "SYNONYM";
+        }
+
+        return Type == ObjectType.Function
+            ? "FUNCTION"
+            : Type == ObjectType.Assembly ? "ASSEMBLY" : Type == ObjectType.Trigger ? "TRIGGER" : "";
+    }
+
+    private bool IsRoot => (Type != ObjectType.Function) && (Type != ObjectType.StoredProcedure) && (Type != ObjectType.View) && (Type != ObjectType.Table) && (Type != ObjectType.Database);
+
+    public string Message
+    {
+        get
+        {
+            var message = "";
+            if (Action == ObjectStatus.Drop)
             {
-                return (this.Type != ObjectType.Function) && (this.Type != ObjectType.StoredProcedure) && (this.Type != ObjectType.View) && (this.Type != ObjectType.Table) && (this.Type != ObjectType.Database);
+                message = "DROP " + GetTypeName() + " " + Name + "\r\n";
             }
-        }
 
-        public string Message
-        {
-            get
+            if (Action == ObjectStatus.Create)
             {
-                string message = "";
-                if (Action == ObjectStatus.Drop)
-                    message = "DROP " + GetTypeName() + " " + Name + "\r\n";
-                if (Action == ObjectStatus.Create)
-                    message = "ADD " + GetTypeName() + " " + Name + "\r\n";
-                if ((Action == ObjectStatus.Alter) || (Action == ObjectStatus.Rebuild) || (Action == ObjectStatus.RebuildDependencies))
-                    message = "MODIFY " + GetTypeName() + " " + Name + "\r\n";
+                message = "ADD " + GetTypeName() + " " + Name + "\r\n";
+            }
 
-                Childs.ForEach(item =>
+            if ((Action == ObjectStatus.Alter) || (Action == ObjectStatus.Rebuild) || (Action == ObjectStatus.RebuildDependencies))
+            {
+                message = "MODIFY " + GetTypeName() + " " + Name + "\r\n";
+            }
+
+            Childs.ForEach(item =>
+                {
+                    if (item.IsRoot)
                     {
-                        if (item.IsRoot)
-                            message += "    ";
-                        message += item.Message;
-                    });
-                return message;
-            }
+                        message += "    ";
+                    }
+
+                    message += item.Message;
+                });
+            return message;
         }
     }
 }

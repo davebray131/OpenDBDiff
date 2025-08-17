@@ -258,6 +258,7 @@ public partial class MainForm : Form
         }
     }
 
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0060:Remove unused parameter", Justification = "<Pending>")]
     private void HandleException(string errorLocation, Exception ex) => new ErrorForm(ex).ShowDialog(this);
 
     private void UnloadProjectHandler()

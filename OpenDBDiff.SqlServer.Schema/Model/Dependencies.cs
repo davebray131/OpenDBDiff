@@ -136,14 +136,18 @@ internal class Dependencies : List<Dependency>
         List<string> cons = [];
         List<ISchemaBase> real = [];
 
-        cons = (from depends in this
-                where (depends.Type == ObjectType.Constraint || depends.Type == ObjectType.Index) &&
-                (depends.DataTypeId == dataTypeId || dataTypeId == 0) && (depends.SubObjectId == columnId || columnId == 0) && (depends.ObjectId == tableId)
-                select depends.FullName)
-                    .Concat(from depends in this
-                            where (depends.Type == ObjectType.View || depends.Type == ObjectType.Function) &&
-                            (depends.ObjectId == tableId)
-                            select depends.FullName).ToList();
+        cons =
+        [
+            .. from depends in this
+                            where (depends.Type == ObjectType.Constraint || depends.Type == ObjectType.Index) &&
+                            (depends.DataTypeId == dataTypeId || dataTypeId == 0) && (depends.SubObjectId == columnId || columnId == 0) && (depends.ObjectId == tableId)
+                            select depends.FullName
+,
+            .. from depends in this
+                                where (depends.Type == ObjectType.View || depends.Type == ObjectType.Function) &&
+                                (depends.ObjectId == tableId)
+                                select depends.FullName,
+        ];
 
         cons.ForEach(item =>
             {

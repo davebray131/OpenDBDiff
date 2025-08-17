@@ -9,7 +9,7 @@ internal static class FormatCode
 {
     private static readonly Regex RegCreateAlter = new("CREATE", RegexOptions.Compiled);
     private static readonly Regex SchemaBindingRegex = new("WITH SCHEMABINDING", RegexOptions.IgnoreCase | RegexOptions.Compiled);
-    private static readonly char[] TrimCharacters = { ' ', '\r', '\n', '\t' };
+    private static readonly char[] TrimCharacters = [' ', '\r', '\n', '\t'];
 
     /// <summary>
     /// Find the first entry with the full name within a function, store, view, trigger or rule.

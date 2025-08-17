@@ -1,17 +1,10 @@
 using System;
 
-namespace OpenDBDiff.Abstractions.Schema.Events
+namespace OpenDBDiff.Abstractions.Schema.Events;
+
+public class ProgressEventArgs(string message, int progress) : EventArgs
 {
-    public class ProgressEventArgs : EventArgs
-    {
-        public string Message { get; set; }
+    public string Message { get; set; } = message;
 
-        public ProgressEventArgs(string message, int progress)
-        {
-            this.Progress = progress;
-            this.Message = message;
-        }
-
-        public int Progress { get; set; }
-    }
+    public int Progress { get; set; } = progress;
 }

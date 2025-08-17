@@ -93,7 +93,6 @@ public class GenerateTables(Generate root)
         {
             throw new ArgumentNullException(nameof(reader));
         }
-
         if (colNameIndex == -1)
         {
             colIDIndex = reader.GetOrdinal("ID");
@@ -164,7 +163,7 @@ public class GenerateTables(Generate root)
                 col.IsIdentityForReplication = (int)reader[colIsIdentityReplIndex] == 1;
             }
         }
-        col.Name = (string)reader[colNameIndex];
+        col.Name = reader.GetString(colNameIndex);
         col.Owner = table.Owner;
         col.ComputedFormula = (string)reader[colFormulaIndex];
         col.IsPersisted = (bool)reader[colIsPersistedIndex];

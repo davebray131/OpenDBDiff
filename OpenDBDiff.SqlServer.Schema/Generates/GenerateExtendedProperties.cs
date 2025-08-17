@@ -12,21 +12,15 @@ public class GenerateExtendedProperties(Generate root)
     private readonly Generate root = root;
     private static string GetSQL() => SQLQueries.SQLQueryFactory.Get("GetExtendedProperties");
 
-    private static string GetTypeDescription(string type) => type.Equals("PC")
-            ? "PROCEDURE"
-            : type.Equals("P")
-            ? "PROCEDURE"
-            : type.Equals("V")
-            ? "VIEW"
-            : type.Equals("U")
-            ? "TABLE"
-            : type.Equals("TR")
-            ? "TRIGGER"
-            : type.Equals("TA")
-            ? "TRIGGER"
-            : type.Equals("FS")
-            ? "FUNCTION"
-            : type.Equals("FN") ? "FUNCTION" : type.Equals("IF") ? "FUNCTION" : type.Equals("TF") ? "FUNCTION" : "";
+    private static string GetTypeDescription(string type) => type switch
+    {
+        "P" or "PC" => "PROCEDURE",
+        "V" => "VIEW",
+        "U" => "TABLE",
+        "TR" or "TA" => "TRIGGER",
+        "FS" or "FN" or "IF" or "TF" => "FUNCTION",
+        _ => string.Empty
+    };
 
     public void Fill(Database database, string connectionString, List<MessageLog> messages)
     {

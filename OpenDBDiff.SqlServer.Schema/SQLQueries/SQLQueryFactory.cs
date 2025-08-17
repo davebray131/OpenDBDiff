@@ -29,12 +29,7 @@ public static class SQLQueryFactory
     private static string FetchQuery(string queryFullName)
     {
         var resourceName = queryFullName + ".sql";
-        using var stream = typeof(SQLQueryFactory).Assembly.GetManifestResourceStream(resourceName);
-        if (stream == null)
-        {
-            throw new InvalidOperationException("The Query " + queryFullName + " cannot be found");
-        }
-
+        using var stream = typeof(SQLQueryFactory).Assembly.GetManifestResourceStream(resourceName) ?? throw new InvalidOperationException("The Query " + queryFullName + " cannot be found");
         using var reader = new System.IO.StreamReader(stream);
         return reader.ReadToEnd();
     }

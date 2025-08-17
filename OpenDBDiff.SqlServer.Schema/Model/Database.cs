@@ -139,7 +139,7 @@ public class Database : SQLServerSchemaBase, IDatabase
             var value = property.GetValue(this, null);
 
             //Clone the value
-            value = value.GetType().GetMethod("Clone").Invoke(value, new object[] { this });
+            value = value.GetType().GetMethod("Clone").Invoke(value, [this]);
 
             //Set the value to the cloned object
             property.SetValue(item, value, null);

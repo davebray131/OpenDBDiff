@@ -48,7 +48,7 @@ public class SqlOptionFilterItem
         }
 
         // if criteria is a regular expression, use regex
-        if (pattern.IndexOfAny(new[] { '*', '?' }) > -1)
+        if (pattern.IndexOfAny(['*', '?']) > -1)
         {
             var regex = Regex.Replace(
                 pattern,

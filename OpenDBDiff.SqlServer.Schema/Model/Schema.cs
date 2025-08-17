@@ -3,13 +3,8 @@ using OpenDBDiff.Abstractions.Schema.Model;
 
 namespace OpenDBDiff.SqlServer.Schema.Model;
 
-public class Schema : SQLServerSchemaBase
+public class Schema(Database parent) : SQLServerSchemaBase(parent, ObjectType.Schema)
 {
-    public Schema(Database parent)
-        : base(parent, ObjectType.Schema)
-    {
-    }
-
     public override string ToSql() => $"CREATE SCHEMA[{Name}] AUTHORIZATION[{Owner}]\r\nGO\r\n";
 
     public override string ToSqlAdd() => ToSql();
