@@ -3,102 +3,97 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Text;
 
-namespace OpenDBDiff.SqlServer.Schema.Model
+namespace OpenDBDiff.SqlServer.Schema.Model;
+
+public class FileGroupFiles : List<FileGroupFile>
 {
-    public class FileGroupFiles : List<FileGroupFile>
+    private readonly Hashtable hash = [];
+
+    /// <summary>
+    /// Constructor de la clase.
+    /// </summary>
+    /// <param name="parent">
+    /// Objeto Database padre.
+    /// </param>
+    public FileGroupFiles(FileGroup parent) => this.Parent = parent;
+
+    /// <summary>
+    /// Clona el objeto FileGroups en una nueva instancia.
+    /// </summary>
+    public FileGroupFiles Clone(FileGroup parentObject)
     {
-        private readonly Hashtable hash = new Hashtable();
-
-        /// <summary>
-        /// Constructor de la clase.
-        /// </summary>
-        /// <param name="parent">
-        /// Objeto Database padre.
-        /// </param>
-        public FileGroupFiles(FileGroup parent)
+        var columns = new FileGroupFiles(parentObject);
+        for (var index = 0; index < this.Count; index++)
         {
-            this.Parent = parent;
+            columns.Add((FileGroupFile)this[index].Clone(parentObject));
         }
+        return columns;
+    }
 
-        /// <summary>
-        /// Clona el objeto FileGroups en una nueva instancia.
-        /// </summary>
-        public FileGroupFiles Clone(FileGroup parentObject)
+    /// <summary>
+    /// Indica si el nombre del FileGroup existe en la coleccion de tablas del objeto.
+    /// </summary>
+    /// <param name="table">
+    /// Nombre de la tabla a buscar.
+    /// </param>
+    /// <returns></returns>
+    public bool Find(string table) => hash.ContainsKey(table);
+
+    /// <summary>
+    /// Agrega un objeto columna a la coleccion de columnas.
+    /// </summary>
+    public new void Add(FileGroupFile file)
+    {
+        if (file != null)
         {
-            FileGroupFiles columns = new FileGroupFiles(parentObject);
-            for (int index = 0; index < this.Count; index++)
+            hash.Add(file.FullName, file);
+            base.Add(file);
+        }
+        else
+        {
+            throw new ArgumentNullException("file");
+        }
+    }
+
+    public FileGroupFile this[string name]
+    {
+        get => (FileGroupFile)hash[name];
+        set
+        {
+            hash[name] = value;
+            for (var index = 0; index < base.Count; index++)
             {
-                columns.Add((FileGroupFile)this[index].Clone(parentObject));
-            }
-            return columns;
-        }
-
-        /// <summary>
-        /// Indica si el nombre del FileGroup existe en la coleccion de tablas del objeto.
-        /// </summary>
-        /// <param name="table">
-        /// Nombre de la tabla a buscar.
-        /// </param>
-        /// <returns></returns>
-        public bool Find(string table)
-        {
-            return hash.ContainsKey(table);
-        }
-
-        /// <summary>
-        /// Agrega un objeto columna a la coleccion de columnas.
-        /// </summary>
-        public new void Add(FileGroupFile file)
-        {
-            if (file != null)
-            {
-                hash.Add(file.FullName, file);
-                base.Add(file);
-            }
-            else
-                throw new ArgumentNullException("file");
-        }
-
-        public FileGroupFile this[string name]
-        {
-            get { return (FileGroupFile)hash[name]; }
-            set
-            {
-                hash[name] = value;
-                for (int index = 0; index < base.Count; index++)
+                if (base[index].Name.Equals(name))
                 {
-                    if (base[index].Name.Equals(name))
-                    {
-                        base[index] = value;
-                        break;
-                    }
+                    base[index] = value;
+                    break;
                 }
             }
         }
+    }
 
-        /// <summary>
-        /// Devuelve la tabla perteneciente a la coleccion de campos.
-        /// </summary>
-        public FileGroup Parent { get; private set; }
+    /// <summary>
+    /// Devuelve la tabla perteneciente a la coleccion de campos.
+    /// </summary>
+    public FileGroup Parent { get; private set; }
 
-        public string ToSQL()
+    public string ToSQL()
+    {
+        var sql = new StringBuilder();
+        for (var index = 0; index < this.Count; index++)
         {
-            StringBuilder sql = new StringBuilder();
-            for (int index = 0; index < this.Count; index++)
-            {
-                sql.Append(this[index].ToSql());
-            }
-            return sql.ToString();
+            _ = sql.Append(this[index].ToSql());
         }
+        return sql.ToString();
+    }
 
-        public string ToSQLDrop()
+    public string ToSQLDrop()
+    {
+        var sql = new StringBuilder();
+        for (var index = 0; index < this.Count; index++)
         {
-            StringBuilder sql = new StringBuilder();
-            for (int index = 0; index < this.Count; index++)
-            {
-                sql.Append(this[index].ToSqlDrop());
-            }
-            return sql.ToString();
+            _ = sql.Append(this[index].ToSqlDrop());
         }
+        return sql.ToString();
     }
 }

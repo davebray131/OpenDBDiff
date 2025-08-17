@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using OpenDBDiff.Abstractions.Schema;
 using OpenDBDiff.Abstractions.Schema.Model;
 using OpenDBDiff.SqlServer.Schema.Compare;
 using OpenDBDiff.SqlServer.Schema.Model;
@@ -15,10 +14,10 @@ namespace OpenDBDiff.Tests.Model.Tests
         [TestMethod()]
         public void OriginHasExtraColumn_NothingSelected_ShouldDropExtraColumn()
         {
-            int idStorage = 1;
-            System.Func<int> getId = new Func<int>(() => ++idStorage);
+            var idStorage = 1;
+            var getId = new Func<int>(() => ++idStorage);
 
-            Database originDatabase = new Database
+            var originDatabase = new Database
             {
                 Info = new DatabaseInfo()
                 {
@@ -27,7 +26,7 @@ namespace OpenDBDiff.Tests.Model.Tests
                 Options = new SqlOption(),
                 Id = getId()
             };
-            Table originTable = new Table(originDatabase)
+            var originTable = new Table(originDatabase)
             {
                 Name = "Example",
                 Id = getId()
@@ -56,7 +55,7 @@ namespace OpenDBDiff.Tests.Model.Tests
             originDatabase.Tables.Add(originTable);
 
 
-            Database destinationDatabase = new Database
+            var destinationDatabase = new Database
             {
                 Info = new DatabaseInfo()
                 {
@@ -65,7 +64,7 @@ namespace OpenDBDiff.Tests.Model.Tests
                 Id = getId(),
                 Options = new SqlOption()
             };
-            Table destinationTable = new Table(destinationDatabase)
+            var destinationTable = new Table(destinationDatabase)
             {
                 Name = "Example",
                 Id = getId()
@@ -90,16 +89,16 @@ namespace OpenDBDiff.Tests.Model.Tests
             originTable.OriginalTable = (Table)originTable.Clone((Database)originTable.Parent);
             new CompareColumns().GenerateDifferences<Table>(originTable.Columns, destinationTable.Columns);
 
-            SQLScriptList sqlList = originTable.ToSqlDiff(new List<ISchemaBase>());
-            string sql = sqlList.ToSQL();
+            var sqlList = originTable.ToSqlDiff(new List<ISchemaBase>());
+            var sql = sqlList.ToSQL();
             Assert.AreEqual(originColumn2.ToSqlDrop(), sql);
         }
         [TestMethod()]
         public void OriginHasExtraColumn_NotChangedColumnSelected_ShouldBeEmptyScript()
         {
-            int idStorage = 1;
-            System.Func<int> getId = new Func<int>(() => ++idStorage);
-            Database originDatabase = new Database
+            var idStorage = 1;
+            var getId = new Func<int>(() => ++idStorage);
+            var originDatabase = new Database
             {
                 Info = new DatabaseInfo()
                 {
@@ -108,7 +107,7 @@ namespace OpenDBDiff.Tests.Model.Tests
                 Id = getId(),
                 Options = new SqlOption()
             };
-            Table originTable = new Table(originDatabase)
+            var originTable = new Table(originDatabase)
             {
                 Name = "Example",
                 Id = getId()
@@ -137,7 +136,7 @@ namespace OpenDBDiff.Tests.Model.Tests
             originDatabase.Tables.Add(originTable);
 
 
-            Database destinationDatabase = new Database
+            var destinationDatabase = new Database
             {
                 Info = new DatabaseInfo()
                 {
@@ -146,7 +145,7 @@ namespace OpenDBDiff.Tests.Model.Tests
                 Id = getId(),
                 Options = new SqlOption()
             };
-            Table destinationTable = new Table(destinationDatabase)
+            var destinationTable = new Table(destinationDatabase)
             {
                 Name = "Example",
                 Id = getId()
@@ -171,16 +170,16 @@ namespace OpenDBDiff.Tests.Model.Tests
             originTable.OriginalTable = (Table)originTable.Clone((Database)originTable.Parent);
             new CompareColumns().GenerateDifferences<Table>(originTable.Columns, destinationTable.Columns);
 
-            SQLScriptList sqlList = originTable.ToSqlDiff(new List<ISchemaBase>() { originColumn3 });
-            string sql = sqlList.ToSQL();
+            var sqlList = originTable.ToSqlDiff(new List<ISchemaBase>() { originColumn3 });
+            var sql = sqlList.ToSQL();
             Assert.AreEqual("", sql);
         }
         [TestMethod()]
         public void OriginHasExtraColumn_ExtraColumnSelected_ShouldBeDropColumnScript()
         {
-            int idStorage = 1;
-            System.Func<int> getId = new Func<int>(() => ++idStorage);
-            Database originDatabase = new Database
+            var idStorage = 1;
+            var getId = new Func<int>(() => ++idStorage);
+            var originDatabase = new Database
             {
                 Info = new DatabaseInfo()
                 {
@@ -189,7 +188,7 @@ namespace OpenDBDiff.Tests.Model.Tests
                 Id = getId(),
                 Options = new SqlOption()
             };
-            Table originTable = new Table(originDatabase)
+            var originTable = new Table(originDatabase)
             {
                 Name = "Example",
                 Id = getId()
@@ -218,7 +217,7 @@ namespace OpenDBDiff.Tests.Model.Tests
             originDatabase.Tables.Add(originTable);
 
 
-            Database destinationDatabase = new Database
+            var destinationDatabase = new Database
             {
                 Info = new DatabaseInfo()
                 {
@@ -227,7 +226,7 @@ namespace OpenDBDiff.Tests.Model.Tests
                 Id = getId(),
                 Options = new SqlOption()
             };
-            Table destinationTable = new Table(destinationDatabase)
+            var destinationTable = new Table(destinationDatabase)
             {
                 Name = "Example",
                 Id = getId()
@@ -252,8 +251,8 @@ namespace OpenDBDiff.Tests.Model.Tests
             originTable.OriginalTable = (Table)originTable.Clone((Database)originTable.Parent);
             new CompareColumns().GenerateDifferences<Table>(originTable.Columns, destinationTable.Columns);
 
-            SQLScriptList sqlList = originTable.ToSqlDiff(new List<ISchemaBase>() { originColumn2 });
-            string sql = sqlList.ToSQL();
+            var sqlList = originTable.ToSqlDiff(new List<ISchemaBase>() { originColumn2 });
+            var sql = sqlList.ToSQL();
             Assert.AreEqual(originColumn2.ToSqlDrop(), sql);
         }
     }

@@ -4,147 +4,147 @@ using System.Linq;
 using System.Windows.Forms;
 using OpenDBDiff.Settings;
 
-namespace OpenDBDiff.UI
+namespace OpenDBDiff.UI;
+
+public delegate void ListProjectHandler(Project itemSelected);
+
+public sealed partial class ListProjectsForm : Form
 {
-    public delegate void ListProjectHandler(Project itemSelected);
+    public event ListProjectHandler OnSelect;
 
-    public sealed partial class ListProjectsForm : Form
+    public event ListProjectHandler OnDelete;
+
+    public event ListProjectHandler OnRename;
+
+    private IList<Project> Projects { get; }
+
+    public ListProjectsForm(IEnumerable<Project> projects)
     {
-        public event ListProjectHandler OnSelect;
+        InitializeComponent();
 
-        public event ListProjectHandler OnDelete;
+        Projects = projects.ToList();
 
-        public event ListProjectHandler OnRename;
+        ProjectsListView.Items.Clear();
 
-        private IList<Project> Projects { get; }
-
-        public ListProjectsForm(IEnumerable<Project> projects)
+        if (Projects.Any())
         {
-            InitializeComponent();
-
-            Projects = projects.ToList();
-
-            ProjectsListView.Items.Clear();
-
-            if (Projects.Any())
+            foreach (var p in Projects)
             {
-                foreach (var p in Projects)
-                    ProjectsListView.Items.Add(new ListViewItem(items: new string[] { p.ProjectName, p.ConnectionStringSource, p.ConnectionStringDestination }, imageIndex: 0));
-
-                ProjectsListView.AutoResizeColumns(ColumnHeaderAutoResizeStyle.ColumnContent);
-            }
-            else
-            {
-                ProjectsListView.Items.Add(new ListViewItem
-                {
-                    Text = "There are no saved projects."
-                });
+                _ = ProjectsListView.Items.Add(new ListViewItem(items: new string[] { p.ProjectName, p.ConnectionStringSource, p.ConnectionStringDestination }, imageIndex: 0));
             }
 
-            ProjectsListView.LabelEdit = true;
+            ProjectsListView.AutoResizeColumns(ColumnHeaderAutoResizeStyle.ColumnContent);
+        }
+        else
+        {
+            _ = ProjectsListView.Items.Add(new ListViewItem
+            {
+                Text = "There are no saved projects."
+            });
         }
 
-        private void OpenProject()
-        {
-            try
-            {
-                if (ProjectsListView.SelectedItems.Count != 0)
-                {
-                    var item = new Project
-                    {
-                        Id = Projects[ProjectsListView.SelectedItems[0].Index].Id,
-                        ConnectionStringDestination = Projects[ProjectsListView.SelectedItems[0].Index].ConnectionStringDestination,
-                        ConnectionStringSource = Projects[ProjectsListView.SelectedItems[0].Index].ConnectionStringSource,
-                        ProjectName = Projects[ProjectsListView.SelectedItems[0].Index].ProjectName,
-                        Options = Projects[ProjectsListView.SelectedItems[0].Index].Options,
-                        Type = Projects[ProjectsListView.SelectedItems[0].Index].Type,
-                    };
-                    OnSelect?.Invoke(item);
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(this, ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-        }
+        ProjectsListView.LabelEdit = true;
+    }
 
-        private void DeleteProject()
-        {
-            try
-            {
-                if (ProjectsListView.SelectedItems.Count != 0)
-                {
-                    if (MessageBox.Show(this,
-                                        "Are you sure you want delete this project?",
-                                        "Confirm project deletion", MessageBoxButtons.YesNo,
-                                        MessageBoxIcon.Question) == DialogResult.Yes)
-                    {
-                        OnDelete?.Invoke(Projects[ProjectsListView.SelectedItems[0].Index]);
-                        Projects.Remove(Projects[ProjectsListView.SelectedItems[0].Index]);
-                        ProjectsListView.Items.Remove(ProjectsListView.SelectedItems[0]);
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(this, ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-        }
-
-        private void MnuItemRename_Click(object sender, EventArgs e)
+    private void OpenProject()
+    {
+        try
         {
             if (ProjectsListView.SelectedItems.Count != 0)
             {
-                ProjectsListView.SelectedItems[0].BeginEdit();
+                var item = new Project
+                {
+                    Id = Projects[ProjectsListView.SelectedItems[0].Index].Id,
+                    ConnectionStringDestination = Projects[ProjectsListView.SelectedItems[0].Index].ConnectionStringDestination,
+                    ConnectionStringSource = Projects[ProjectsListView.SelectedItems[0].Index].ConnectionStringSource,
+                    ProjectName = Projects[ProjectsListView.SelectedItems[0].Index].ProjectName,
+                    Options = Projects[ProjectsListView.SelectedItems[0].Index].Options,
+                    Type = Projects[ProjectsListView.SelectedItems[0].Index].Type,
+                };
+                OnSelect?.Invoke(item);
             }
         }
-
-        private void ProjectsListView_AfterLabelEdit(object sender, LabelEditEventArgs e)
+        catch (Exception ex)
         {
-            if (string.IsNullOrWhiteSpace(e.Label))
-            {
-                e.CancelEdit = true;
-                return;
-            }
+            _ = MessageBox.Show(this, ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+        }
+    }
 
+    private void DeleteProject()
+    {
+        try
+        {
             if (ProjectsListView.SelectedItems.Count != 0)
             {
-                Projects[ProjectsListView.SelectedItems[0].Index].ProjectName = e.Label.Trim();
-                OnRename?.Invoke(Projects[ProjectsListView.SelectedItems[0].Index]);
+                if (MessageBox.Show(this,
+                                    "Are you sure you want delete this project?",
+                                    "Confirm project deletion", MessageBoxButtons.YesNo,
+                                    MessageBoxIcon.Question) == DialogResult.Yes)
+                {
+                    OnDelete?.Invoke(Projects[ProjectsListView.SelectedItems[0].Index]);
+                    _ = Projects.Remove(Projects[ProjectsListView.SelectedItems[0].Index]);
+                    ProjectsListView.Items.Remove(ProjectsListView.SelectedItems[0]);
+                }
             }
         }
-
-        private void MnuItemOpen_Click(object sender, EventArgs e)
+        catch (Exception ex)
         {
-            OpenProject();
-            Dispose();
+            _ = MessageBox.Show(this, ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+        }
+    }
+
+    private void MnuItemRename_Click(object sender, EventArgs e)
+    {
+        if (ProjectsListView.SelectedItems.Count != 0)
+        {
+            ProjectsListView.SelectedItems[0].BeginEdit();
+        }
+    }
+
+    private void ProjectsListView_AfterLabelEdit(object sender, LabelEditEventArgs e)
+    {
+        if (string.IsNullOrWhiteSpace(e.Label))
+        {
+            e.CancelEdit = true;
+            return;
         }
 
-        private void MnuItemDelete_Click(object sender, EventArgs e)
+        if (ProjectsListView.SelectedItems.Count != 0)
         {
-            DeleteProject();
+            Projects[ProjectsListView.SelectedItems[0].Index].ProjectName = e.Label.Trim();
+            OnRename?.Invoke(Projects[ProjectsListView.SelectedItems[0].Index]);
         }
+    }
 
-        private void ProjectsListView_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            OpenProject();
-        }
+    private void MnuItemOpen_Click(object sender, EventArgs e)
+    {
+        OpenProject();
+        Dispose();
+    }
 
-        private void ProjectsListView_DoubleClick(object sender, EventArgs e)
-        {
-            Dispose();
-        }
+    private void MnuItemDelete_Click(object sender, EventArgs e) => DeleteProject();
 
-        private void ListProjectsForm_KeyDown(object sender, KeyEventArgs e)
+    private void ProjectsListView_SelectedIndexChanged(object sender, EventArgs e) => OpenProject();
+
+    private void ProjectsListView_DoubleClick(object sender, EventArgs e) => Dispose();
+
+    private void ListProjectsForm_KeyDown(object sender, KeyEventArgs e)
+    {
+        if (e != null)
         {
-            if (e != null)
+            if (e.KeyCode == Keys.Escape)
             {
-                if (e.KeyCode == Keys.Escape)
-                    Dispose();
-                if (e.KeyCode == Keys.Enter)
-                    Dispose();
-                if (e.KeyCode == Keys.Delete)
-                    DeleteProject();
+                Dispose();
+            }
+
+            if (e.KeyCode == Keys.Enter)
+            {
+                Dispose();
+            }
+
+            if (e.KeyCode == Keys.Delete)
+            {
+                DeleteProject();
             }
         }
     }

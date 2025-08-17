@@ -1,47 +1,34 @@
 using Microsoft.Data.SqlClient;
 using OpenDBDiff.SqlServer.Schema.Model;
 
-namespace OpenDBDiff.SqlServer.Schema.Generates
+namespace OpenDBDiff.SqlServer.Schema.Generates;
+
+public class GenerateRules
 {
-    public class GenerateRules
+    private readonly Generate root;
+
+    public GenerateRules(Generate root) => this.root = root;
+
+    private static string GetSQL() => SQLQueries.SQLQueryFactory.Get("GetRules");
+
+    public void Fill(Database database, string connectionString)
     {
-        private readonly Generate root;
-
-        public GenerateRules(Generate root)
+        if (database.Options.Ignore.FilterRules)
         {
-            this.root = root;
-        }
-
-        private static string GetSQL()
-        {
-            return SQLQueries.SQLQueryFactory.Get("GetRules");
-        }
-
-        public void Fill(Database database, string connectionString)
-        {
-            if (database.Options.Ignore.FilterRules)
+            using var conn = new SqlConnection(connectionString);
+            using var command = new SqlCommand(GetSQL(), conn);
+            conn.Open();
+            using var reader = command.ExecuteReader();
+            while (reader.Read())
             {
-                using (SqlConnection conn = new SqlConnection(connectionString))
+                var item = new Rule(database)
                 {
-                    using (SqlCommand command = new SqlCommand(GetSQL(), conn))
-                    {
-                        conn.Open();
-                        using (SqlDataReader reader = command.ExecuteReader())
-                        {
-                            while (reader.Read())
-                            {
-                                Rule item = new Rule(database)
-                                {
-                                    Id = (int)reader["object_id"],
-                                    Name = reader["Name"].ToString(),
-                                    Owner = reader["Owner"].ToString(),
-                                    Text = reader["Definition"].ToString()
-                                };
-                                database.Rules.Add(item);
-                            }
-                        }
-                    }
-                }
+                    Id = (int)reader["object_id"],
+                    Name = reader["Name"].ToString(),
+                    Owner = reader["Owner"].ToString(),
+                    Text = reader["Definition"].ToString()
+                };
+                database.Rules.Add(item);
             }
         }
     }

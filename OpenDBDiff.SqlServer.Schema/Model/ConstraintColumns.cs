@@ -1,53 +1,74 @@
 using System;
 using OpenDBDiff.Abstractions.Schema.Model;
 
-namespace OpenDBDiff.SqlServer.Schema.Model
+namespace OpenDBDiff.SqlServer.Schema.Model;
+
+public class ConstraintColumns : SchemaList<ConstraintColumn, Constraint>
 {
-    public class ConstraintColumns : SchemaList<ConstraintColumn, Constraint>
+    public ConstraintColumns(Constraint parent)
+        : base(parent)
     {
-        public ConstraintColumns(Constraint parent)
-            : base(parent)
+    }
+
+    /// <summary>
+    /// Clona el objeto ColumnConstraints en una nueva instancia.
+    /// </summary>
+    public ConstraintColumns Clone()
+    {
+        var columns = new ConstraintColumns(this.Parent);
+        for (var index = 0; index < this.Count; index++)
         {
+            columns.Add(this[index].Clone());
+        }
+        return columns;
+    }
+
+    /// <summary>
+    /// Compara dos campos y devuelve true si son iguales, caso contrario, devuelve false.
+    /// </summary>
+    public static bool Compare(ConstraintColumns origin, ConstraintColumns destination)
+    {
+        if (destination == null)
+        {
+            throw new ArgumentNullException("destination");
         }
 
-        /// <summary>
-        /// Clona el objeto ColumnConstraints en una nueva instancia.
-        /// </summary>
-        public ConstraintColumns Clone()
+        if (origin == null)
         {
-            ConstraintColumns columns = new ConstraintColumns(this.Parent);
-            for (int index = 0; index < this.Count; index++)
-            {
-                columns.Add(this[index].Clone());
-            }
-            return columns;
+            throw new ArgumentNullException("origin");
         }
 
-        /// <summary>
-        /// Compara dos campos y devuelve true si son iguales, caso contrario, devuelve false.
-        /// </summary>
-        public static bool Compare(ConstraintColumns origin, ConstraintColumns destination)
+        if (origin.Count != destination.Count)
         {
-            if (destination == null) throw new ArgumentNullException("destination");
-            if (origin == null) throw new ArgumentNullException("origin");
-            if (origin.Count != destination.Count) return false;
-            for (int j = 0; j < origin.Count; j++)
-            {
-                ConstraintColumn item = destination[origin[j].FullName];
-                if (item == null)
-                    return false;
-                else
-                    if (!ConstraintColumn.Compare(origin[j], item)) return false;
-            }
-            for (int j = 0; j < destination.Count; j++)
-            {
-                ConstraintColumn item = origin[destination[j].FullName];
-                if (item == null)
-                    return false;
-                else
-                    if (!ConstraintColumn.Compare(destination[j], item)) return false;
-            }
-            return true;
+            return false;
         }
+
+        for (var j = 0; j < origin.Count; j++)
+        {
+            var item = destination[origin[j].FullName];
+            if (item == null)
+            {
+                return false;
+            }
+            else
+                if (!ConstraintColumn.Compare(origin[j], item))
+            {
+                return false;
+            }
+        }
+        for (var j = 0; j < destination.Count; j++)
+        {
+            var item = origin[destination[j].FullName];
+            if (item == null)
+            {
+                return false;
+            }
+            else
+                if (!ConstraintColumn.Compare(destination[j], item))
+            {
+                return false;
+            }
+        }
+        return true;
     }
 }

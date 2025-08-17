@@ -26,9 +26,9 @@ namespace OpenDBDiff.Tests.Utils
         {
             get
             {
-                Assembly _assembly = Assembly.GetCallingAssembly();
-                string _key = _assembly.GetName().FullName;
-                if (!extractors.TryGetValue(_key, out ResourceFileExtractor extractor)
+                var _assembly = Assembly.GetCallingAssembly();
+                var _key = _assembly.GetName().FullName;
+                if (!extractors.TryGetValue(_key, out var extractor)
                     && !extractors.TryGetValue(_key, out extractor))
                 {
                     extractor = new ResourceFileExtractor(_assembly, true, null);
@@ -57,10 +57,7 @@ namespace OpenDBDiff.Tests.Utils
         /// <param name="resourceFilePath"><c>ResourceFilePath</c> in assembly. Example: .Properties.Scripts.</param>
         /// <param name="baseExtractor"></param>
         public ResourceFileExtractor(string resourceFilePath, ResourceFileExtractor baseExtractor)
-                : this(Assembly.GetCallingAssembly(), baseExtractor)
-        {
-            ResourceFilePath = resourceFilePath;
-        }
+                : this(Assembly.GetCallingAssembly(), baseExtractor) => ResourceFilePath = resourceFilePath;
 
         /// <summary>
         /// Create instance
@@ -86,10 +83,7 @@ namespace OpenDBDiff.Tests.Utils
         /// <param name="assembly"></param>
         /// <param name="resourcePath"></param>
         public ResourceFileExtractor(Assembly assembly, string resourcePath)
-                : this(assembly ?? Assembly.GetCallingAssembly())
-        {
-            ResourceFilePath = resourcePath;
-        }
+                : this(assembly ?? Assembly.GetCallingAssembly()) => ResourceFilePath = resourcePath;
 
         /// <summary>
         /// Instance constructor
@@ -164,8 +158,8 @@ namespace OpenDBDiff.Tests.Utils
         {
             predicate = predicate ?? (s => true);
 
-            string _path = AssemblyName + ResourceFilePath;
-            foreach (string _resourceName in Assembly.GetManifestResourceNames())
+            var _path = AssemblyName + ResourceFilePath;
+            foreach (var _resourceName in Assembly.GetManifestResourceNames())
             {
                 if (_resourceName.StartsWith(_path) && predicate(_resourceName))
                 {
@@ -180,9 +174,9 @@ namespace OpenDBDiff.Tests.Utils
 
         public string ReadFileFromResource(string fileName)
         {
-            Stream _stream = ReadFileFromResourceToStream(fileName);
+            var _stream = ReadFileFromResourceToStream(fileName);
             string _result;
-            StreamReader sr = new StreamReader(_stream);
+            var sr = new StreamReader(_stream);
             try
             {
                 _result = sr.ReadToEnd();
@@ -194,10 +188,7 @@ namespace OpenDBDiff.Tests.Utils
             return _result;
         }
 
-        public string ReadFileFromResourceFormat(string fileName, params object[] formatArgs)
-        {
-            return string.Format(ReadFileFromResource(fileName), formatArgs);
-        }
+        public string ReadFileFromResourceFormat(string fileName, params object[] formatArgs) => string.Format(ReadFileFromResource(fileName), formatArgs);
 
         /// <summary>
         /// Read file in current assembly by specific file name
@@ -207,8 +198,8 @@ namespace OpenDBDiff.Tests.Utils
         /// <exception cref="ApplicationException"><c>ApplicationException</c>.</exception>
         public Stream ReadFileFromResourceToStream(string fileName)
         {
-            string _nameResFile = AssemblyName + ResourceFilePath + fileName;
-            Stream _stream = Assembly.GetManifestResourceStream(_nameResFile);
+            var _nameResFile = AssemblyName + ResourceFilePath + fileName;
+            var _stream = Assembly.GetManifestResourceStream(_nameResFile);
 
             #region Not found
 
@@ -239,7 +230,7 @@ namespace OpenDBDiff.Tests.Utils
         /// <returns></returns>
         public string ReadSpecificFileFromResource(string specificPath, string fileName)
         {
-            ResourceFileExtractor _ext = new ResourceFileExtractor(Assembly, specificPath);
+            var _ext = new ResourceFileExtractor(Assembly, specificPath);
             return _ext.ReadFileFromResource(fileName);
         }
 

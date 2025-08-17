@@ -2,51 +2,50 @@
 using System.Collections.Generic;
 using OpenDBDiff.Abstractions.Schema.Model;
 
-namespace OpenDBDiff.SqlServer.Schema.Options
+namespace OpenDBDiff.SqlServer.Schema.Options;
+
+public class SqlOptionComparison : IOptionComparison
 {
-    public class SqlOptionComparison : IOptionComparison
+
+    public enum CaseSensityOptions
     {
+        Automatic = 0,
+        CaseInsensity = 1,
+        CaseSensity = 2
+    }
 
-        public enum CaseSensityOptions
+    public SqlOptionComparison()
+    {
+        CaseSensityInCode = CaseSensityOptions.CaseInsensity;
+        IgnoreWhiteSpacesInCode = false;
+    }
+
+    public SqlOptionComparison(IOptionComparison comparison)
+    {
+        this.ReloadComparisonOnUpdate = comparison.ReloadComparisonOnUpdate;
+        var options = comparison.GetOptions();
+        IgnoreWhiteSpacesInCode = bool.Parse(options["IgnoreWhiteSpacesInCode"]);
+        CaseSensityInCode = (CaseSensityOptions)Enum.Parse(typeof(CaseSensityOptions), options["CaseSensityInCode"], true);
+        CaseSensityType = (CaseSensityOptions)Enum.Parse(typeof(CaseSensityOptions), options["CaseSensityType"], true);
+    }
+
+    public bool IgnoreWhiteSpacesInCode { get; set; }
+    public bool ReloadComparisonOnUpdate { get; set; }
+
+
+    public CaseSensityOptions CaseSensityInCode { get; set; }
+
+    public CaseSensityOptions CaseSensityType { get; set; }
+
+    public IDictionary<string, string> GetOptions()
+    {
+        var options = new Dictionary<string, string>
         {
-            Automatic = 0,
-            CaseInsensity = 1,
-            CaseSensity = 2
-        }
-
-        public SqlOptionComparison()
-        {
-            CaseSensityInCode = CaseSensityOptions.CaseInsensity;
-            IgnoreWhiteSpacesInCode = false;
-        }
-
-        public SqlOptionComparison(IOptionComparison comparison)
-        {
-            this.ReloadComparisonOnUpdate = comparison.ReloadComparisonOnUpdate;
-            var options = comparison.GetOptions();
-            IgnoreWhiteSpacesInCode = bool.Parse(options["IgnoreWhiteSpacesInCode"]);
-            CaseSensityInCode = (CaseSensityOptions)Enum.Parse(typeof(CaseSensityOptions), options["CaseSensityInCode"], true);
-            CaseSensityType = (CaseSensityOptions)Enum.Parse(typeof(CaseSensityOptions), options["CaseSensityType"], true);
-        }
-
-        public bool IgnoreWhiteSpacesInCode { get; set; }
-        public bool ReloadComparisonOnUpdate { get; set; }
-
-
-        public CaseSensityOptions CaseSensityInCode { get; set; }
-
-        public CaseSensityOptions CaseSensityType { get; set; }
-
-        public IDictionary<string, string> GetOptions()
-        {
-            Dictionary<string, string> options = new Dictionary<string, string>
-            {
-                { "IgnoreWhiteSpacesInCode", IgnoreWhiteSpacesInCode.ToString() },
-                { "ReloadComparisonOnUpdate", ReloadComparisonOnUpdate.ToString() },
-                { "CaseSensityInCode", CaseSensityInCode.ToString() },
-                { "CaseSensityType", CaseSensityType.ToString() }
-            };
-            return options;
-        }
+            { "IgnoreWhiteSpacesInCode", IgnoreWhiteSpacesInCode.ToString() },
+            { "ReloadComparisonOnUpdate", ReloadComparisonOnUpdate.ToString() },
+            { "CaseSensityInCode", CaseSensityInCode.ToString() },
+            { "CaseSensityType", CaseSensityType.ToString() }
+        };
+        return options;
     }
 }

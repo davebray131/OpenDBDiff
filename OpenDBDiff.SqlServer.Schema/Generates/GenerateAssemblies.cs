@@ -2,101 +2,86 @@ using Microsoft.Data.SqlClient;
 using OpenDBDiff.SqlServer.Schema.Generates.Util;
 using OpenDBDiff.SqlServer.Schema.Model;
 
-namespace OpenDBDiff.SqlServer.Schema.Generates
+namespace OpenDBDiff.SqlServer.Schema.Generates;
+
+public class GenerateAssemblies
 {
-    public class GenerateAssemblies
+    private readonly Generate root;
+
+    public GenerateAssemblies(Generate root) => this.root = root;
+
+    private static string GetSQLFiles() => SQLQueries.SQLQueryFactory.Get("GetAssemblyFiles");
+
+    private static string GetSQL() => SQLQueries.SQLQueryFactory.Get("GetAssemblies");
+
+    private static string ToHex(byte[] stream) => ByteToHexEncoder.ByteArrayToHex(stream);
+
+    private static void FillFiles(Database database, string connectionString)
     {
-        private readonly Generate root;
-
-        public GenerateAssemblies(Generate root)
+        if (database.Options.Ignore.FilterAssemblies)
         {
-            this.root = root;
-        }
-
-        private static string GetSQLFiles()
-        {
-            return SQLQueries.SQLQueryFactory.Get("GetAssemblyFiles");
-        }
-
-        private static string GetSQL()
-        {
-            return SQLQueries.SQLQueryFactory.Get("GetAssemblies");
-        }
-
-        private static string ToHex(byte[] stream)
-        {
-            return ByteToHexEncoder.ByteArrayToHex(stream);
-        }
-
-        private static void FillFiles(Database database, string connectionString)
-        {
-            if (database.Options.Ignore.FilterAssemblies)
+            using var conn = new SqlConnection(connectionString);
+            using var command = new SqlCommand(GetSQLFiles(), conn);
+            conn.Open();
+            command.CommandTimeout = 0;
+            using var reader = command.ExecuteReader();
+            while (reader.Read())
             {
-                using (SqlConnection conn = new SqlConnection(connectionString))
+                if (((int)reader["FileId"]) != 1)
                 {
-                    using (SqlCommand command = new SqlCommand(GetSQLFiles(), conn))
-                    {
-                        conn.Open();
-                        command.CommandTimeout = 0;
-                        using (SqlDataReader reader = command.ExecuteReader())
-                        {
-                            while (reader.Read())
-                            {
-                                if (((int)reader["FileId"]) != 1)
-                                {
-                                    Assembly assem = database.Assemblies[reader["Name"].ToString()];
-                                    AssemblyFile file = new AssemblyFile(assem, reader["FileName"].ToString(), ToHex((byte[])reader["FileContent"]));
-                                    assem.Files.Add(file);
-                                }
-                            }
-                        }
-                    }
+                    var assem = database.Assemblies[reader["Name"].ToString()];
+                    var file = new AssemblyFile(assem, reader["FileName"].ToString(), ToHex((byte[])reader["FileContent"]));
+                    assem.Files.Add(file);
                 }
             }
         }
-        public void Fill(Database database, string connectionString)
+    }
+    public void Fill(Database database, string connectionString)
+    {
+        var lastViewId = 0;
+        if (database.Options.Ignore.FilterAssemblies)
         {
-            int lastViewId = 0;
-            if (database.Options.Ignore.FilterAssemblies)
+            using var conn = new SqlConnection(connectionString);
+            using (var command = new SqlCommand(GetSQL(), conn))
             {
-                using (SqlConnection conn = new SqlConnection(connectionString))
+                conn.Open();
+                command.CommandTimeout = 0;
+                using var reader = command.ExecuteReader();
+                Assembly item = null;
+                while (reader.Read())
                 {
-                    using (SqlCommand command = new SqlCommand(GetSQL(), conn))
+                    if (lastViewId != (int)reader["assembly_id"])
                     {
-                        conn.Open();
-                        command.CommandTimeout = 0;
-                        using (SqlDataReader reader = command.ExecuteReader())
+                        item = new Assembly(database)
                         {
-                            Assembly item = null;
-                            while (reader.Read())
-                            {
-                                if (lastViewId != (int)reader["assembly_id"])
-                                {
-                                    item = new Assembly(database)
-                                    {
-                                        Id = (int)reader["assembly_id"],
-                                        Name = reader["Name"].ToString(),
-                                        Owner = reader["Owner"].ToString(),
-                                        CLRName = reader["clr_name"].ToString(),
-                                        PermissionSet = reader["permission_set_desc"].ToString(),
-                                        Text = ToHex((byte[])reader["content"]),
-                                        Visible = (bool)reader["is_visible"]
-                                    };
-                                    lastViewId = item.Id;
-                                    database.Assemblies.Add(item);
-                                }
-                                if (!string.IsNullOrEmpty(reader["Dependency"].ToString()))
-                                    item.DependenciesOut.Add(reader["Dependency"].ToString());
-                                if (!string.IsNullOrEmpty(reader["ObjectDependency"].ToString()))
-                                    item.DependenciesOut.Add(reader["ObjectDependency"].ToString());
-                                if (!string.IsNullOrEmpty(reader["UDTName"].ToString()))
-                                    item.DependenciesOut.Add(reader["UDTName"].ToString());
-                            }
-                        }
+                            Id = (int)reader["assembly_id"],
+                            Name = reader["Name"].ToString(),
+                            Owner = reader["Owner"].ToString(),
+                            CLRName = reader["clr_name"].ToString(),
+                            PermissionSet = reader["permission_set_desc"].ToString(),
+                            Text = ToHex((byte[])reader["content"]),
+                            Visible = (bool)reader["is_visible"]
+                        };
+                        lastViewId = item.Id;
+                        database.Assemblies.Add(item);
                     }
-                    FillFiles(database, connectionString);
+                    if (!string.IsNullOrEmpty(reader["Dependency"].ToString()))
+                    {
+                        item.DependenciesOut.Add(reader["Dependency"].ToString());
+                    }
+
+                    if (!string.IsNullOrEmpty(reader["ObjectDependency"].ToString()))
+                    {
+                        item.DependenciesOut.Add(reader["ObjectDependency"].ToString());
+                    }
+
+                    if (!string.IsNullOrEmpty(reader["UDTName"].ToString()))
+                    {
+                        item.DependenciesOut.Add(reader["UDTName"].ToString());
+                    }
                 }
             }
+            FillFiles(database, connectionString);
         }
     }
 }

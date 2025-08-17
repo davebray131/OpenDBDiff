@@ -8,184 +8,173 @@ using OpenDBDiff.SqlServer.Schema.Generates.Util;
 using OpenDBDiff.SqlServer.Schema.Model;
 using OpenDBDiff.SqlServer.Schema.Options;
 
-namespace OpenDBDiff.SqlServer.Schema.Generates
+namespace OpenDBDiff.SqlServer.Schema.Generates;
+
+public class Generate
 {
-    public class Generate
+    private readonly List<MessageLog> messages;
+    private ProgressEventArgs currentlyReading;
+
+    public Generate()
     {
-        private readonly List<MessageLog> messages;
-        private ProgressEventArgs currentlyReading;
+        messages = [];
+        OnReading += Generate_OnReading;
+    }
 
-        public Generate()
+    public static int MaxValue => Constants.READING_MAX;
+
+    public string ConnectionString { get; set; }
+
+    private string Name
+    {
+        get
         {
-            messages = new List<MessageLog>();
-            OnReading += Generate_OnReading;
-        }
-
-        public static int MaxValue
-        {
-            get { return Constants.READING_MAX; }
-        }
-
-        public string ConnectionString { get; set; }
-
-        private string Name
-        {
-            get
+            string name;
+            using (var conn = new SqlConnection(ConnectionString))
             {
-                string name;
-                using (var conn = new SqlConnection(ConnectionString))
+                name = conn.Database;
+            }
+            return name;
+        }
+    }
+
+    public SqlOption Options { get; set; }
+
+    private event ProgressEventHandler.ProgressHandler OnReading;
+
+    public event ProgressEventHandler.ProgressHandler OnProgress;
+
+    private void Generate_OnReading(ProgressEventArgs e) => OnProgress?.Invoke(e);
+
+    public void RaiseOnReading(ProgressEventArgs e)
+    {
+        this.currentlyReading = e;
+        OnReading?.Invoke(e);
+    }
+
+    public void RaiseOnReadingOne(object name)
+    {
+        if (name != null && this.OnReading != null && this.currentlyReading != null)
+        {
+            var eOne = new ProgressEventArgs(this.currentlyReading.Message, this.currentlyReading.Progress);
+            eOne.Message = eOne.Message.Replace("...", string.Format(": [{0}]", name));
+            this.OnReading(eOne);
+        }
+    }
+
+    /// <summary>
+    /// Genera el schema de la base de datos seleccionada y devuelve un objeto Database.
+    /// </summary>
+    public Database Process()
+    {
+        var error = "";
+        var databaseSchema = new Database
+        {
+            //tables.OnTableProgress += new Progress.ProgressHandler(tables_OnTableProgress);
+            Options = Options,
+            Name = Name
+        };
+        databaseSchema.Info = new GenerateDatabase(ConnectionString, Options).Get(databaseSchema);
+        /*Thread t1 = new Thread(delegate()
+            {
+                try
+                {*/
+        new GenerateRules(this).Fill(databaseSchema, ConnectionString);
+        new GenerateTables(this).Fill(databaseSchema, ConnectionString, messages);
+        new GenerateViews(this).Fill(databaseSchema, ConnectionString, messages);
+
+        if (Options.Ignore.FilterIndex)
+        {
+            new GenerateIndex(this).Fill(databaseSchema, ConnectionString);
+            new GenerateFullTextIndex(this).Fill(databaseSchema, ConnectionString);
+        }
+        new GenerateUserDataTypes(this).Fill(databaseSchema, ConnectionString, messages);
+        new GenerateXMLSchemas(this).Fill(databaseSchema, ConnectionString);
+        new GenerateSchemas(this).Fill(databaseSchema, ConnectionString);
+        /*}
+                catch (Exception ex)
                 {
-                    name = conn.Database;
+                    error = ex.StackTrace;
                 }
-                return name;
-            }
-        }
-
-        public SqlOption Options { get; set; }
-
-        private event ProgressEventHandler.ProgressHandler OnReading;
-
-        public event ProgressEventHandler.ProgressHandler OnProgress;
-
-        private void Generate_OnReading(ProgressEventArgs e)
-        {
-            OnProgress?.Invoke(e);
-        }
-
-        public void RaiseOnReading(ProgressEventArgs e)
-        {
-            this.currentlyReading = e;
-            OnReading?.Invoke(e);
-        }
-
-        public void RaiseOnReadingOne(object name)
-        {
-            if (name != null && this.OnReading != null && this.currentlyReading != null)
+            });
+            Thread t2 = new Thread(delegate()
             {
-                var eOne = new ProgressEventArgs(this.currentlyReading.Message, this.currentlyReading.Progress);
-                eOne.Message = eOne.Message.Replace("...", string.Format(": [{0}]", name));
-                this.OnReading(eOne);
-            }
+                try
+                {*/
+
+        //not supported in azure yet
+        if (databaseSchema.Info.Version != DatabaseInfo.SQLServerVersion.SQLServerAzure10)
+        {
+            new GeneratePartitionFunctions(this).Fill(databaseSchema, ConnectionString);
+            new GeneratePartitionScheme(this).Fill(databaseSchema, ConnectionString);
+            new GenerateFileGroups(this).Fill(databaseSchema, ConnectionString);
         }
 
-        /// <summary>
-        /// Genera el schema de la base de datos seleccionada y devuelve un objeto Database.
-        /// </summary>
-        public Database Process()
+        new GenerateDDLTriggers(this).Fill(databaseSchema, ConnectionString);
+        new GenerateSynonyms(this).Fill(databaseSchema, ConnectionString);
+
+        //not supported in azure yet
+        if (databaseSchema.Info.Version != DatabaseInfo.SQLServerVersion.SQLServerAzure10)
         {
-            string error = "";
-            var databaseSchema = new Database
-            {
-                //tables.OnTableProgress += new Progress.ProgressHandler(tables_OnTableProgress);
-                Options = Options,
-                Name = Name
-            };
-            databaseSchema.Info = new GenerateDatabase(ConnectionString, Options).Get(databaseSchema);
-            /*Thread t1 = new Thread(delegate()
+            new GenerateAssemblies(this).Fill(databaseSchema, ConnectionString);
+            new GenerateFullText(this).Fill(databaseSchema, ConnectionString);
+        }
+        /*}
+                catch (Exception ex)
                 {
-                    try
-                    {*/
-            new GenerateRules(this).Fill(databaseSchema, ConnectionString);
-            new GenerateTables(this).Fill(databaseSchema, ConnectionString, messages);
-            new GenerateViews(this).Fill(databaseSchema, ConnectionString, messages);
-
-            if (Options.Ignore.FilterIndex)
+                    error = ex.StackTrace;
+                }
+            });
+            Thread t3 = new Thread(delegate()
             {
-                new GenerateIndex(this).Fill(databaseSchema, ConnectionString);
-                new GenerateFullTextIndex(this).Fill(databaseSchema, ConnectionString);
-            }
-            new GenerateUserDataTypes(this).Fill(databaseSchema, ConnectionString, messages);
-            new GenerateXMLSchemas(this).Fill(databaseSchema, ConnectionString);
-            new GenerateSchemas(this).Fill(databaseSchema, ConnectionString);
-            /*}
-                    catch (Exception ex)
-                    {
-                        error = ex.StackTrace;
-                    }
-                });
-                Thread t2 = new Thread(delegate()
+                try
+                {*/
+        new GenerateStoredProcedures(this).Fill(databaseSchema, ConnectionString);
+        new GenerateFunctions(this).Fill(databaseSchema, ConnectionString);
+        new GenerateTriggers(this).Fill(databaseSchema, ConnectionString, messages);
+        new GenerateTextObjects(this).Fill(databaseSchema, ConnectionString);
+        new GenerateUsers(this).Fill(databaseSchema, ConnectionString);
+        /*}
+                catch (Exception ex)
                 {
-                    try
-                    {*/
-
-            //not supported in azure yet
-            if (databaseSchema.Info.Version != DatabaseInfo.SQLServerVersion.SQLServerAzure10)
-            {
-                new GeneratePartitionFunctions(this).Fill(databaseSchema, ConnectionString);
-                new GeneratePartitionScheme(this).Fill(databaseSchema, ConnectionString);
-                new GenerateFileGroups(this).Fill(databaseSchema, ConnectionString);
-            }
-
-            new GenerateDDLTriggers(this).Fill(databaseSchema, ConnectionString);
-            new GenerateSynonyms(this).Fill(databaseSchema, ConnectionString);
-
-            //not supported in azure yet
-            if (databaseSchema.Info.Version != DatabaseInfo.SQLServerVersion.SQLServerAzure10)
-            {
-                new GenerateAssemblies(this).Fill(databaseSchema, ConnectionString);
-                new GenerateFullText(this).Fill(databaseSchema, ConnectionString);
-            }
-            /*}
-                    catch (Exception ex)
-                    {
-                        error = ex.StackTrace;
-                    }
-                });
-                Thread t3 = new Thread(delegate()
-                {
-                    try
-                    {*/
-            new GenerateStoredProcedures(this).Fill(databaseSchema, ConnectionString);
-            new GenerateFunctions(this).Fill(databaseSchema, ConnectionString);
-            new GenerateTriggers(this).Fill(databaseSchema, ConnectionString, messages);
-            new GenerateTextObjects(this).Fill(databaseSchema, ConnectionString);
-            new GenerateUsers(this).Fill(databaseSchema, ConnectionString);
-            /*}
-                    catch (Exception ex)
-                    {
-                        error = ex.StackTrace;
-                    }
-                });
-                t1.Start();
-                t2.Start();
-                t3.Start();
-                t1.Join();
-                t2.Join();
-                t3.Join();*/
-            if (string.IsNullOrEmpty(error))
-            {
-                /*Las propiedades extendidas deben ir despues de haber capturado el resto de los objetos de la base*/
-                new GenerateExtendedProperties(this).Fill(databaseSchema, ConnectionString, messages);
-                databaseSchema.BuildDependency();
-                return databaseSchema;
-            }
-            else
-                throw new SchemaException(error);
-        }
-
-        private void Tables_OnTableProgress(object sender, ProgressEventArgs e)
+                    error = ex.StackTrace;
+                }
+            });
+            t1.Start();
+            t2.Start();
+            t3.Start();
+            t1.Join();
+            t2.Join();
+            t3.Join();*/
+        if (string.IsNullOrEmpty(error))
         {
-            ProgressEventHandler.RaiseOnChange(e);
+            /*Las propiedades extendidas deben ir despues de haber capturado el resto de los objetos de la base*/
+            new GenerateExtendedProperties(this).Fill(databaseSchema, ConnectionString, messages);
+            databaseSchema.BuildDependency();
+            return databaseSchema;
         }
-
-        // TODO: Static because Compare method is static; static events are not my favorite
-        public static event ProgressEventHandler.ProgressHandler OnCompareProgress;
-
-        internal static void RaiseOnCompareProgress(string formatString, params object[] formatParams)
+        else
         {
-            OnCompareProgress?.Invoke(new ProgressEventArgs(string.Format(formatString, formatParams), -1));
+            throw new SchemaException(error);
         }
+    }
 
-        /// <summary>
-        /// Generates the differences to migrate a schema from origin to destination
-        /// </summary>
-        /// <param name="origin">The Origin schema is the schema before our generated actions are applied.</param>
-        /// <param name="destination">The Destination schema is the schema after our actions are applied.</param>
-        /// <returns></returns>
-        public static Database Compare(Database origin, Database destination)
-        {
-            Database merge = CompareDatabase.GenerateDifferences(origin, destination);
-            return merge;
-        }
+    private void Tables_OnTableProgress(object sender, ProgressEventArgs e) => ProgressEventHandler.RaiseOnChange(e);
+
+    // TODO: Static because Compare method is static; static events are not my favorite
+    public static event ProgressEventHandler.ProgressHandler OnCompareProgress;
+
+    internal static void RaiseOnCompareProgress(string formatString, params object[] formatParams) => OnCompareProgress?.Invoke(new ProgressEventArgs(string.Format(formatString, formatParams), -1));
+
+    /// <summary>
+    /// Generates the differences to migrate a schema from origin to destination
+    /// </summary>
+    /// <param name="origin">The Origin schema is the schema before our generated actions are applied.</param>
+    /// <param name="destination">The Destination schema is the schema after our actions are applied.</param>
+    /// <returns></returns>
+    public static Database Compare(Database origin, Database destination)
+    {
+        var merge = CompareDatabase.GenerateDifferences(origin, destination);
+        return merge;
     }
 }

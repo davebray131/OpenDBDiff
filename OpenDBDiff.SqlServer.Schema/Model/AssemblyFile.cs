@@ -1,68 +1,67 @@
 ﻿using OpenDBDiff.Abstractions.Schema;
 using OpenDBDiff.Abstractions.Schema.Model;
 
-namespace OpenDBDiff.SqlServer.Schema.Model
+namespace OpenDBDiff.SqlServer.Schema.Model;
+
+public class AssemblyFile : SQLServerSchemaBase
 {
-    public class AssemblyFile : SQLServerSchemaBase
+    public AssemblyFile(ISchemaBase parent, AssemblyFile assemblyFile, ObjectStatus status)
+        : base(parent, ObjectType.AssemblyFile)
     {
-        public AssemblyFile(ISchemaBase parent, AssemblyFile assemblyFile, ObjectStatus status)
-            : base(parent, ObjectType.AssemblyFile)
+        this.Name = assemblyFile.Name;
+        this.Content = assemblyFile.Content;
+        this.Status = status;
+    }
+
+    public AssemblyFile(ISchemaBase parent, string name, string content)
+        : base(parent, ObjectType.AssemblyFile)
+    {
+        this.Name = name;
+        this.Content = content;
+    }
+
+    public override string FullName => "[" + Name + "]";
+
+    public string Content { get; set; }
+
+    public override string ToSqlAdd()
+    {
+        var sql = "ALTER ASSEMBLY ";
+        sql += this.Parent.FullName + "\r\n";
+        sql += "ADD FILE FROM " + this.Content + "\r\n";
+        sql += "AS N'" + this.Name + "'\r\n";
+        return sql + "GO\r\n";
+    }
+
+    public override string ToSql() => ToSqlAdd();
+
+    public override string ToSqlDrop()
+    {
+        var sql = "ALTER ASSEMBLY ";
+        sql += this.Parent.FullName + "\r\n";
+        sql += "DROP FILE N'" + this.Name + "'\r\n";
+        return sql + "GO\r\n";
+    }
+
+    public override SQLScriptList ToSqlDiff(System.Collections.Generic.ICollection<ISchemaBase> schemas)
+    {
+        var listDiff = new SQLScriptList();
+
+        if (this.Status == ObjectStatus.Drop)
         {
-            this.Name = assemblyFile.Name;
-            this.Content = assemblyFile.Content;
-            this.Status = status;
+            listDiff.Add(ToSqlDrop(), 0, ScriptAction.DropAssemblyFile);
         }
 
-        public AssemblyFile(ISchemaBase parent, string name, string content)
-            : base(parent, ObjectType.AssemblyFile)
+        if (this.Status == ObjectStatus.Create)
         {
-            this.Name = name;
-            this.Content = content;
+            listDiff.Add(ToSqlAdd(), 0, ScriptAction.AddAssemblyFile);
         }
 
-        public override string FullName
+        if (this.HasState(ObjectStatus.Alter))
         {
-            get { return "[" + Name + "]"; }
+            listDiff.Add(ToSqlDrop(), 0, ScriptAction.DropAssemblyFile);
+            listDiff.Add(ToSqlAdd(), 0, ScriptAction.AddAssemblyFile);
         }
-
-        public string Content { get; set; }
-
-        public override string ToSqlAdd()
-        {
-            string sql = "ALTER ASSEMBLY ";
-            sql += this.Parent.FullName + "\r\n";
-            sql += "ADD FILE FROM " + this.Content + "\r\n";
-            sql += "AS N'" + this.Name + "'\r\n";
-            return sql + "GO\r\n";
-        }
-
-        public override string ToSql()
-        {
-            return ToSqlAdd();
-        }
-
-        public override string ToSqlDrop()
-        {
-            string sql = "ALTER ASSEMBLY ";
-            sql += this.Parent.FullName + "\r\n";
-            sql += "DROP FILE N'" + this.Name + "'\r\n";
-            return sql + "GO\r\n";
-        }
-
-        public override SQLScriptList ToSqlDiff(System.Collections.Generic.ICollection<ISchemaBase> schemas)
-        {
-            SQLScriptList listDiff = new SQLScriptList();
-
-            if (this.Status == ObjectStatus.Drop)
-                listDiff.Add(ToSqlDrop(), 0, ScriptAction.DropAssemblyFile);
-            if (this.Status == ObjectStatus.Create)
-                listDiff.Add(ToSqlAdd(), 0, ScriptAction.AddAssemblyFile);
-            if (this.HasState(ObjectStatus.Alter))
-            {
-                listDiff.Add(ToSqlDrop(), 0, ScriptAction.DropAssemblyFile);
-                listDiff.Add(ToSqlAdd(), 0, ScriptAction.AddAssemblyFile);
-            }
-            return listDiff;
-        }
+        return listDiff;
     }
 }

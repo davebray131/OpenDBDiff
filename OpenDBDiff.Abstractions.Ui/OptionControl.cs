@@ -1,25 +1,15 @@
 ﻿using System;
 using OpenDBDiff.Abstractions.Schema.Model;
 
-namespace OpenDBDiff.Abstractions.Ui
+namespace OpenDBDiff.Abstractions.Ui;
+
+public class OptionControl : System.Windows.Forms.UserControl
 {
-    public class OptionControl : System.Windows.Forms.UserControl
-    {
-        public event OptionEventHandler OptionSaved;
-        public delegate void OptionEventHandler(IOption option);
-        public new virtual void Load(IOption option)
-        {
-            throw new NotImplementedException("Load option not implemented");
-        }
+    public event OptionEventHandler OptionSaved;
+    public delegate void OptionEventHandler(IOption option);
+    public new virtual void Load(IOption option) => throw new NotImplementedException("Load option not implemented");
 
-        public virtual void Save()
-        {
-            throw new NotImplementedException("Save not implemented");
-        }
+    public virtual void Save() => throw new NotImplementedException("Save not implemented");
 
-        protected virtual void FireOptionChanged(IOption option)
-        {
-            OptionSaved?.Invoke(option);
-        }
-    }
+    protected virtual void FireOptionChanged(IOption option) => OptionSaved?.Invoke(option);
 }

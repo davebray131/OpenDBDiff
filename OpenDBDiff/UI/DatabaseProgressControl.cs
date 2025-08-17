@@ -1,47 +1,38 @@
 ﻿using System.Windows.Forms;
 
-namespace OpenDBDiff.UI
+namespace OpenDBDiff.UI;
+
+public partial class DatabaseProgressControl : UserControl
 {
-    public partial class DatabaseProgressControl : UserControl
+    public DatabaseProgressControl() => InitializeComponent();
+
+    public string DatabaseName
     {
-        public DatabaseProgressControl()
-        {
-            InitializeComponent();
-        }
+        get => lblDatabase.Text; set => lblDatabase.Text = value;
+    }
 
-        public string DatabaseName
+    public string Message
+    {
+        get => lblMessage.Text;
+        set
         {
-            get { return lblDatabase.Text; }
-            set { lblDatabase.Text = value; }
+            lblMessage.Text = value;
+            lblMessage.Refresh();
         }
+    }
 
-        public string Message
-        {
-            get
-            {
-                return lblMessage.Text;
-            }
-            set
-            {
-                lblMessage.Text = value;
-                lblMessage.Refresh();
-            }
-        }
+    public int Maximum
+    {
+        get => progressBar1.Maximum; set => progressBar1.Maximum = value;
+    }
 
-        public int Maximum
+    public int Value
+    {
+        get => progressBar1.Value;
+        set
         {
-            get { return progressBar1.Maximum; }
-            set { progressBar1.Maximum = value; }
-        }
-
-        public int Value
-        {
-            get { return progressBar1.Value; }
-            set
-            {
-                progressBar1.Value = value;
-                progressBar1.Refresh();
-            }
+            progressBar1.Value = value;
+            progressBar1.Refresh();
         }
     }
 }

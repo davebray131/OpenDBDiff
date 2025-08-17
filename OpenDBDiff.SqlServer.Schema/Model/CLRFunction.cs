@@ -2,55 +2,63 @@
 using OpenDBDiff.Abstractions.Schema;
 using OpenDBDiff.Abstractions.Schema.Model;
 
-namespace OpenDBDiff.SqlServer.Schema.Model
+namespace OpenDBDiff.SqlServer.Schema.Model;
+
+public class CLRFunction : CLRCode
 {
-    public class CLRFunction : CLRCode
+    public CLRFunction(ISchemaBase parent)
+        : base(parent, ObjectType.CLRFunction, ScriptAction.AddFunction, ScriptAction.DropFunction)
     {
-        public CLRFunction(ISchemaBase parent)
-            : base(parent, ObjectType.CLRFunction, ScriptAction.AddFunction, ScriptAction.DropFunction)
+        Parameters = [];
+        ReturnType = new Parameter();
+    }
+
+    public List<Parameter> Parameters { get; set; }
+
+    public Parameter ReturnType { get; private set; }
+
+    public override string ToSql()
+    {
+        var sql = "CREATE FUNCTION " + FullName + "";
+        var param = "";
+        Parameters.ForEach(item => param += item.ToSql() + ",");
+        if (!string.IsNullOrEmpty(param))
         {
-            Parameters = new List<Parameter>();
-            ReturnType = new Parameter();
+            param = param.Substring(0, param.Length - 1);
+            sql += " (" + param + ")\r\n";
+        }
+        else
+        {
+            sql += "()\r\n";
         }
 
-        public List<Parameter> Parameters { get; set; }
+        sql += "RETURNS " + ReturnType.ToSql() + " ";
+        sql += "WITH EXECUTE AS " + AssemblyExecuteAs + "\r\n";
+        sql += "AS\r\n";
+        sql += "EXTERNAL NAME [" + AssemblyName + "].[" + AssemblyClass + "].[" + AssemblyMethod + "]\r\n";
+        sql += "GO\r\n";
+        return sql;
+    }
 
-        public Parameter ReturnType { get; private set; }
+    public override SQLScriptList ToSqlDiff(System.Collections.Generic.ICollection<ISchemaBase> schemas)
+    {
+        var list = new SQLScriptList();
 
-        public override string ToSql()
+        if (this.HasState(ObjectStatus.Drop))
         {
-            string sql = "CREATE FUNCTION " + FullName + "";
-            string param = "";
-            Parameters.ForEach(item => param += item.ToSql() + ",");
-            if (!string.IsNullOrEmpty(param))
-            {
-                param = param.Substring(0, param.Length - 1);
-                sql += " (" + param + ")\r\n";
-            }
-            else
-                sql += "()\r\n";
-            sql += "RETURNS " + ReturnType.ToSql() + " ";
-            sql += "WITH EXECUTE AS " + AssemblyExecuteAs + "\r\n";
-            sql += "AS\r\n";
-            sql += "EXTERNAL NAME [" + AssemblyName + "].[" + AssemblyClass + "].[" + AssemblyMethod + "]\r\n";
-            sql += "GO\r\n";
-            return sql;
+            list.Add(Drop());
         }
 
-        public override SQLScriptList ToSqlDiff(System.Collections.Generic.ICollection<ISchemaBase> schemas)
+        if (this.HasState(ObjectStatus.Create))
         {
-            SQLScriptList list = new SQLScriptList();
-
-            if (this.HasState(ObjectStatus.Drop))
-                list.Add(Drop());
-            if (this.HasState(ObjectStatus.Create))
-                list.Add(Create());
-            if (this.Status == ObjectStatus.Alter)
-            {
-                list.AddRange(Rebuild());
-            }
-            list.AddRange(this.ExtendedProperties.ToSqlDiff());
-            return list;
+            list.Add(Create());
         }
+
+        if (this.Status == ObjectStatus.Alter)
+        {
+            list.AddRange(Rebuild());
+        }
+        list.AddRange(this.ExtendedProperties.ToSqlDiff());
+        return list;
     }
 }

@@ -12,26 +12,23 @@ namespace OpenDBDiff.Tests.Model.Tests
     {
         private readonly ResourceFileExtractor extractor;
 
-        public FormatCodeTests()
-        {
-            this.extractor = new ResourceFileExtractor(".SqlSnippets.Triggers.");
-        }
+        public FormatCodeTests() => this.extractor = new ResourceFileExtractor(".SqlSnippets.Triggers.");
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
         public void FindAndNormalizeCreate_BrokenThrowsException()
         {
             var triggerItemMock = new Mock<ISchemaBase>();
-            triggerItemMock.Setup(x => x.FullName).Returns("[dbo].[iutrgTriggerName]");
+            _ = triggerItemMock.Setup(x => x.FullName).Returns("[dbo].[iutrgTriggerName]");
 
-            FormatCode.FindAndNormalizeCreate(triggerItemMock.Object, extractor.ReadFileFromResource("broken.sql"));
+            _ = FormatCode.FindAndNormalizeCreate(triggerItemMock.Object, extractor.ReadFileFromResource("broken.sql"));
         }
 
         [TestMethod]
         public void FindAndNormalizeCreate_NoBracket_ShouldNormalize()
         {
             var triggerItemMock = new Mock<ISchemaBase>();
-            triggerItemMock.Setup(x => x.FullName).Returns("[dbo].[iutrgTriggerName]");
+            _ = triggerItemMock.Setup(x => x.FullName).Returns("[dbo].[iutrgTriggerName]");
 
             var a = FormatCode.FindAndNormalizeCreate(triggerItemMock.Object, extractor.ReadFileFromResource("no-brackets.sql"));
 
@@ -44,7 +41,7 @@ namespace OpenDBDiff.Tests.Model.Tests
         public void FindAndNormalizeCreate_NoOwner_ShouldNormalize()
         {
             var triggerItemMock = new Mock<ISchemaBase>();
-            triggerItemMock.Setup(x => x.FullName).Returns("[dbo].[iutrgTriggerName]");
+            _ = triggerItemMock.Setup(x => x.FullName).Returns("[dbo].[iutrgTriggerName]");
 
             var a = FormatCode.FindAndNormalizeCreate(triggerItemMock.Object, extractor.ReadFileFromResource("no-owner.sql"));
 
@@ -57,7 +54,7 @@ namespace OpenDBDiff.Tests.Model.Tests
         public void FindAndNormalizeCreate_NormalizedSql_ShouldKeepSourceText()
         {
             var triggerItemMock = new Mock<ISchemaBase>();
-            triggerItemMock.Setup(x => x.FullName).Returns("[dbo].[iutrgTriggerName]");
+            _ = triggerItemMock.Setup(x => x.FullName).Returns("[dbo].[iutrgTriggerName]");
 
             var normalized = extractor.ReadFileFromResource("normalized.sql");
             var a = FormatCode.FindAndNormalizeCreate(triggerItemMock.Object, normalized);
@@ -70,7 +67,7 @@ namespace OpenDBDiff.Tests.Model.Tests
         public void FindAndNormalizeCreate_WithComment_ShouldNormalize()
         {
             var triggerItemMock = new Mock<ISchemaBase>();
-            triggerItemMock.Setup(x => x.FullName).Returns("[dbo].[iutrgTriggerName]");
+            _ = triggerItemMock.Setup(x => x.FullName).Returns("[dbo].[iutrgTriggerName]");
 
             var a = FormatCode.FindAndNormalizeCreate(triggerItemMock.Object, extractor.ReadFileFromResource("with-comments.sql"));
 

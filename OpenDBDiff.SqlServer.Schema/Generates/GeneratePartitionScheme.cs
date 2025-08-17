@@ -1,54 +1,41 @@
 ﻿using Microsoft.Data.SqlClient;
 using OpenDBDiff.SqlServer.Schema.Model;
 
-namespace OpenDBDiff.SqlServer.Schema.Generates
+namespace OpenDBDiff.SqlServer.Schema.Generates;
+
+public class GeneratePartitionScheme
 {
-    public class GeneratePartitionScheme
+    private readonly Generate root;
+
+    public GeneratePartitionScheme(Generate root) => this.root = root;
+
+    private static string GetSQL() => SQLQueries.SQLQueryFactory.Get("GetPartitionSchemes");
+
+    public void Fill(Database database, string connectioString)
     {
-        private readonly Generate root;
-
-        public GeneratePartitionScheme(Generate root)
+        var lastObjectId = 0;
+        PartitionScheme item = null;
+        if (database.Options.Ignore.FilterPartitionScheme)
         {
-            this.root = root;
-        }
-
-        private static string GetSQL()
-        {
-            return SQLQueries.SQLQueryFactory.Get("GetPartitionSchemes");
-        }
-
-        public void Fill(Database database, string connectioString)
-        {
-            int lastObjectId = 0;
-            PartitionScheme item = null;
-            if (database.Options.Ignore.FilterPartitionScheme)
+            using var conn = new SqlConnection(connectioString);
+            using var command = new SqlCommand(GetSQL(), conn);
+            conn.Open();
+            command.CommandTimeout = 0;
+            using var reader = command.ExecuteReader();
+            while (reader.Read())
             {
-                using (SqlConnection conn = new SqlConnection(connectioString))
+                if (lastObjectId != (int)reader["ID"])
                 {
-                    using (SqlCommand command = new SqlCommand(GetSQL(), conn))
+                    lastObjectId = (int)reader["ID"];
+                    item = new PartitionScheme(database)
                     {
-                        conn.Open();
-                        command.CommandTimeout = 0;
-                        using (SqlDataReader reader = command.ExecuteReader())
-                        {
-                            while (reader.Read())
-                            {
-                                if (lastObjectId != (int)reader["ID"])
-                                {
-                                    lastObjectId = (int)reader["ID"];
-                                    item = new PartitionScheme(database)
-                                    {
-                                        Id = (int)reader["ID"],
-                                        Name = reader["name"].ToString(),
-                                        PartitionFunction = reader["FunctionName"].ToString()
-                                    };
-                                    database.PartitionSchemes.Add(item);
-                                }
-                                item.FileGroups.Add(reader["FileGroupName"].ToString());
-                            }
-                        }
-                    }
+                        Id = (int)reader["ID"],
+                        Name = reader["name"].ToString(),
+                        PartitionFunction = reader["FunctionName"].ToString()
+                    };
+                    database.PartitionSchemes.Add(item);
                 }
+                item.FileGroups.Add(reader["FileGroupName"].ToString());
             }
         }
     }

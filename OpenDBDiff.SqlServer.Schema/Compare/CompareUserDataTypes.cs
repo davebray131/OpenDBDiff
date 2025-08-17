@@ -1,52 +1,51 @@
-using System;
 using OpenDBDiff.Abstractions.Schema;
 using OpenDBDiff.Abstractions.Schema.Model;
 using OpenDBDiff.SqlServer.Schema.Model;
 
-namespace OpenDBDiff.SqlServer.Schema.Compare
+namespace OpenDBDiff.SqlServer.Schema.Compare;
+
+internal class CompareUserDataTypes : CompareBase<UserDataType>
 {
-    internal class CompareUserDataTypes : CompareBase<UserDataType>
+    protected override void DoNew<Root>(SchemaList<UserDataType, Root> originFields, UserDataType node)
     {
-        protected override void DoNew<Root>(SchemaList<UserDataType, Root> originFields, UserDataType node)
+        var newNode = (UserDataType)node.Clone(originFields.Parent);
+        newNode.Status = ObjectStatus.Create;
+        var HasAssembly = originFields.Exists(item => item.AssemblyFullName.Equals(node.AssemblyFullName) && item.IsAssembly);
+        if (HasAssembly)
         {
-            UserDataType newNode = (UserDataType)node.Clone(originFields.Parent);
-            newNode.Status = ObjectStatus.Create;
-            bool HasAssembly = originFields.Exists(item => item.AssemblyFullName.Equals(node.AssemblyFullName) && item.IsAssembly);
-            if (HasAssembly)
-                newNode.Status += (int)ObjectStatus.DropOlder;
-            originFields.Add(newNode);
+            newNode.Status += (int)ObjectStatus.DropOlder;
         }
 
-        protected override void DoUpdate<Root>(SchemaList<UserDataType, Root> originFields, UserDataType node)
-        {
-            if (!node.Compare(originFields[node.FullName]))
-            {
-                UserDataType newNode = (UserDataType)node.Clone(originFields.Parent);
-                newNode.Dependencies.AddRange(originFields[node.FullName].Dependencies);
+        originFields.Add(newNode);
+    }
 
-                if (!UserDataType.CompareDefault(node, originFields[node.FullName]))
+    protected override void DoUpdate<Root>(SchemaList<UserDataType, Root> originFields, UserDataType node)
+    {
+        if (!node.Compare(originFields[node.FullName]))
+        {
+            var newNode = (UserDataType)node.Clone(originFields.Parent);
+            newNode.Dependencies.AddRange(originFields[node.FullName].Dependencies);
+
+            if (!UserDataType.CompareDefault(node, originFields[node.FullName]))
+            {
+                newNode.Default.Status = !string.IsNullOrEmpty(node.Default.Name) ? ObjectStatus.Create : ObjectStatus.Drop;
+
+                newNode.Status = ObjectStatus.Alter;
+            }
+            else
+            {
+                if (!UserDataType.CompareRule(node, originFields[node.FullName]))
                 {
-                    if (!string.IsNullOrEmpty(node.Default.Name))
-                        newNode.Default.Status = ObjectStatus.Create;
-                    else
-                        newNode.Default.Status = ObjectStatus.Drop;
+                    newNode.Rule.Status = !string.IsNullOrEmpty(node.Rule.Name) ? ObjectStatus.Create : ObjectStatus.Drop;
+
                     newNode.Status = ObjectStatus.Alter;
                 }
                 else
                 {
-                    if (!UserDataType.CompareRule(node, originFields[node.FullName]))
-                    {
-                        if (!string.IsNullOrEmpty(node.Rule.Name))
-                            newNode.Rule.Status = ObjectStatus.Create;
-                        else
-                            newNode.Rule.Status = ObjectStatus.Drop;
-                        newNode.Status = ObjectStatus.Alter;
-                    }
-                    else
-                        newNode.Status = ObjectStatus.Rebuild;
+                    newNode.Status = ObjectStatus.Rebuild;
                 }
-                originFields[node.FullName] = newNode;
             }
+            originFields[node.FullName] = newNode;
         }
     }
 }

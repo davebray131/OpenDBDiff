@@ -1,9 +1,8 @@
 ﻿using OpenDBDiff.Abstractions.Schema.Model;
 
-namespace OpenDBDiff.SqlServer.Schema.Model
+namespace OpenDBDiff.SqlServer.Schema.Model;
+
+public interface ISQLServerSchemaBase
 {
-    public interface ISQLServerSchemaBase
-    {
-        SchemaList<ExtendedProperty, ISchemaBase> ExtendedProperties { get; }
-    }
+    SchemaList<ExtendedProperty, ISchemaBase> ExtendedProperties { get; }
 }

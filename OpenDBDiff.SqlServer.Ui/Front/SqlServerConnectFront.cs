@@ -33,45 +33,39 @@ namespace OpenDBDiff.SqlServer.Ui
 
         public bool UseWindowsAuthentication
         {
-            get { return cboAuthentication.SelectedIndex == 0; }
-            set { cboAuthentication.SelectedIndex = value ? 0 : 1; }
+            get => cboAuthentication.SelectedIndex == 0; set => cboAuthentication.SelectedIndex = value ? 0 : 1;
         }
 
         public string DatabaseName
         {
-            get { return cboDatabase.Text; }
-            set { cboDatabase.Text = value; }
+            get => cboDatabase.Text; set => cboDatabase.Text = value;
         }
 
         public string UserName
         {
-            get { return txtUsername.Text; }
-            set { txtUsername.Text = value; }
+            get => txtUsername.Text; set => txtUsername.Text = value;
         }
 
         public string Password
         {
-            get { return txtPassword.Text; }
-            set { txtPassword.Text = value; }
+            get => txtPassword.Text; set => txtPassword.Text = value;
         }
 
         public override string Text
         {
-            get { return lblName.Text; }
-            set { lblName.Text = value; }
+            get => lblName.Text; set => lblName.Text = value;
         }
 
         public string ServerName
         {
-            get { return cboServer.Text; }
-            set { cboServer.Text = value; }
+            get => cboServer.Text; set => cboServer.Text = value;
         }
 
         public bool TestConnection()
         {
             try
             {
-                using (SqlConnection connection = new SqlConnection())
+                using (var connection = new SqlConnection())
                 {
                     connection.ConnectionString = this.ConnectionString;
                     connection.Open();
@@ -88,14 +82,16 @@ namespace OpenDBDiff.SqlServer.Ui
 
         private string BuildConnectionString(string server, string database)
         {
-            SqlConnectionStringBuilder builder = new SqlConnectionStringBuilder
+            var builder = new SqlConnectionStringBuilder
             {
                 DataSource = server.Trim()
             };
 
             // if database is ommitted the connection will be established to the default database for the user
             if (!string.IsNullOrEmpty(database))
+            {
                 builder.InitialCatalog = database.Trim();
+            }
 
             builder.IntegratedSecurity = true;
             builder.TrustServerCertificate = true;
@@ -104,7 +100,7 @@ namespace OpenDBDiff.SqlServer.Ui
 
         private string BuildConnectionString(string server, string database, string username, string password)
         {
-            SqlConnectionStringBuilder builder = new SqlConnectionStringBuilder(BuildConnectionString(server, database))
+            var builder = new SqlConnectionStringBuilder(BuildConnectionString(server, database))
             {
                 IntegratedSecurity = false,
                 UserID = username,
@@ -113,37 +109,19 @@ namespace OpenDBDiff.SqlServer.Ui
             return builder.ConnectionString;
         }
 
-        public string ConnectionStringToDefaultDatabase
-        {
-            get
-            {
-                if (cboAuthentication.SelectedIndex == 1)
-                    return BuildConnectionString(cboServer.Text, null, txtUsername.Text, txtPassword.Text);
-                else
-                    return BuildConnectionString(cboServer.Text, null);
-            }
-        }
+        public string ConnectionStringToDefaultDatabase => cboAuthentication.SelectedIndex == 1
+                    ? BuildConnectionString(cboServer.Text, null, txtUsername.Text, txtPassword.Text)
+                    : BuildConnectionString(cboServer.Text, null);
 
-        public string ConnectionStringToMasterDatabase
-        {
-            get
-            {
-                if (cboAuthentication.SelectedIndex == 1)
-                    return BuildConnectionString(cboServer.Text, "master", txtUsername.Text, txtPassword.Text);
-                else
-                    return BuildConnectionString(cboServer.Text, "master");
-            }
-        }
+        public string ConnectionStringToMasterDatabase => cboAuthentication.SelectedIndex == 1
+                    ? BuildConnectionString(cboServer.Text, "master", txtUsername.Text, txtPassword.Text)
+                    : BuildConnectionString(cboServer.Text, "master");
 
         public string ConnectionString
         {
-            get
-            {
-                if (cboAuthentication.SelectedIndex == 1)
-                    return BuildConnectionString(cboServer.Text, cboDatabase.Text, txtUsername.Text, txtPassword.Text);
-                else
-                    return BuildConnectionString(cboServer.Text, cboDatabase.Text);
-            }
+            get => cboAuthentication.SelectedIndex == 1
+                    ? BuildConnectionString(cboServer.Text, cboDatabase.Text, txtUsername.Text, txtPassword.Text)
+                    : BuildConnectionString(cboServer.Text, cboDatabase.Text);
             set
             {
                 if (!string.IsNullOrWhiteSpace(value))
@@ -175,41 +153,38 @@ namespace OpenDBDiff.SqlServer.Ui
             }
         }
 
-        public Control Control
-        {
-            get
-            {
-                return this;
-            }
-        }
+        public Control Control => this;
 
         private void BtnTest_Click(object sender, EventArgs e)
         {
-            if (TestConnection())
-                MessageBox.Show(this, "Test successful!", "Test", MessageBoxButtons.OK, MessageBoxIcon.Information);
-            else
-                MessageBox.Show(this, "Test failed!\r\n" + ErrorConnection, "Test", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            _ = TestConnection()
+                ? MessageBox.Show(this, "Test successful!", "Test", MessageBoxButtons.OK, MessageBoxIcon.Information)
+                : MessageBox.Show(this, "Test failed!\r\n" + ErrorConnection, "Test", MessageBoxButtons.OK, MessageBoxIcon.Error);
         }
 
         private void AddComboItem(string item)
         {
             if (!InvokeRequired)
-                cboDatabase.Items.Add(item);
+            {
+                _ = cboDatabase.Items.Add(item);
+            }
             else
             {
-                addCombo add = new addCombo(AddComboItem);
-                Invoke(add, new string[] { item });
+                var add = new addCombo(AddComboItem);
+                _ = Invoke(add, new string[] { item });
             }
         }
 
         private void ClearDatabase()
         {
             if (!InvokeRequired)
+            {
                 cboDatabase.Items.Clear();
+            }
             else
             {
-                clearCombo clear = new clearCombo(ClearDatabase);
-                Invoke(clear);
+                var clear = new clearCombo(ClearDatabase);
+                _ = Invoke(clear);
             }
         }
 
@@ -217,14 +192,14 @@ namespace OpenDBDiff.SqlServer.Ui
         {
             if (!isDatabaseFilled)
             {
-                string connectionString = ConnectionStringToDefaultDatabase;
+                var connectionString = ConnectionStringToDefaultDatabase;
                 ClearDatabase();
-                using (SqlConnection conn = new SqlConnection(connectionString))
+                using (var conn = new SqlConnection(connectionString))
                 {
                     conn.Open();
-                    using (SqlCommand command = new SqlCommand("SELECT name,database_id FROM sys.databases ORDER BY Name", conn))
+                    using (var command = new SqlCommand("SELECT name,database_id FROM sys.databases ORDER BY Name", conn))
                     {
-                        using (SqlDataReader reader = command.ExecuteReader())
+                        using (var reader = command.ExecuteReader())
                         {
                             while (reader.Read())
                             {
@@ -237,10 +212,7 @@ namespace OpenDBDiff.SqlServer.Ui
             }
         }
 
-        private void CboServer_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            isDatabaseFilled = false;
-        }
+        private void CboServer_SelectedIndexChanged(object sender, EventArgs e) => isDatabaseFilled = false;
 
         private void TxtUsername_TextChanged(object sender, EventArgs e)
         {
@@ -267,7 +239,7 @@ namespace OpenDBDiff.SqlServer.Ui
             }
             catch (Exception ex)
             {
-                MessageBox.Show(this, ex.Message, "ERROR", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                _ = MessageBox.Show(this, ex.Message, "ERROR", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
             finally
             {
@@ -286,7 +258,7 @@ namespace OpenDBDiff.SqlServer.Ui
             {
                 this.Cursor = Cursors.Default;
                 cboDatabase.Items.Clear();
-                MessageBox.Show(this, ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                _ = MessageBox.Show(this, ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
             finally
             {
@@ -294,15 +266,9 @@ namespace OpenDBDiff.SqlServer.Ui
             }
         }
 
-        private void CboServer_TextChanged(object sender, EventArgs e)
-        {
-            isDatabaseFilled = false;
-        }
+        private void CboServer_TextChanged(object sender, EventArgs e) => isDatabaseFilled = false;
 
-        public override string ToString()
-        {
-            return string.Format($"Server: {ServerName}, Database: {DatabaseName}");
-        }
+        public override string ToString() => string.Format($"Server: {ServerName}, Database: {DatabaseName}");
 
         public object Clone()
         {

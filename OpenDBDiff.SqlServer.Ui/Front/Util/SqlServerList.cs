@@ -8,10 +8,10 @@ namespace OpenDBDiff.SqlServer.Ui.Util
     {
         public static List<string> Get()
         {
-            SqlDataSourceEnumerator sqlSource = SqlDataSourceEnumerator.Instance;
-            DataTable dt = sqlSource.GetDataSources();
+            var sqlSource = SqlDataSourceEnumerator.Instance;
+            var dt = sqlSource.GetDataSources();
 
-            List<string> serverList = new List<string>();
+            var serverList = new List<string>();
             string serverName;
             string instanceName;
 
@@ -21,9 +21,13 @@ namespace OpenDBDiff.SqlServer.Ui.Util
                 instanceName = dr["InstanceName"]?.ToString();
 
                 if (string.IsNullOrEmpty(instanceName))
+                {
                     serverList.Add(serverName);
+                }
                 else
+                {
                     serverList.Add(string.Format("{0}\\{1}", serverName, instanceName));
+                }
             }
 
             return serverList;

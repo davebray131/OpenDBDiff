@@ -2,33 +2,32 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace OpenDBDiff.Front.Extensions
+namespace OpenDBDiff.Front.Extensions;
+
+public static class ExceptionExtensions
 {
-    public static class ExceptionExtensions
+    public static IEnumerable<Exception> FlattenHierarchy(this Exception ex)
     {
-        public static IEnumerable<Exception> FlattenHierarchy(this Exception ex)
+        if (ex == null)
         {
-            if (ex == null)
-            {
-                throw new ArgumentNullException("ex");
-            }
-
-            var innerException = ex;
-            do
-            {
-                yield return innerException;
-                innerException = innerException.InnerException;
-            }
-            while (innerException != null);
+            throw new ArgumentNullException("ex");
         }
 
-        public static string GetAllMessages(this Exception exception)
+        var innerException = ex;
+        do
         {
-            var messages = exception
-                .FromHierarchy(ex => ex.InnerException)
-                .Select(ex => ex.Message);
-
-            return string.Join(Environment.NewLine, messages);
+            yield return innerException;
+            innerException = innerException.InnerException;
         }
+        while (innerException != null);
+    }
+
+    public static string GetAllMessages(this Exception exception)
+    {
+        var messages = exception
+            .FromHierarchy(ex => ex.InnerException)
+            .Select(ex => ex.Message);
+
+        return string.Join(Environment.NewLine, messages);
     }
 }

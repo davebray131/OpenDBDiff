@@ -2,125 +2,165 @@
 using OpenDBDiff.Abstractions.Schema;
 using OpenDBDiff.Abstractions.Schema.Model;
 
-namespace OpenDBDiff.SqlServer.Schema.Model
+namespace OpenDBDiff.SqlServer.Schema.Model;
+
+public class FullText : SQLServerSchemaBase
 {
-    public class FullText : SQLServerSchemaBase
+    public FullText(ISchemaBase parent)
+        : base(parent, ObjectType.FullText)
     {
-        public FullText(ISchemaBase parent)
-            : base(parent, ObjectType.FullText)
-        {
 
+    }
+
+    public override string FullName => "[" + Name + "]";
+
+    public string Path { get; set; }
+
+    public bool IsDefault { get; set; }
+
+    public bool IsAccentSensity { get; set; }
+
+    public string FileGroupName { get; set; }
+
+    public override string ToSql()
+    {
+        var database = (Database)this.Parent;
+
+        var sql = "CREATE FULLTEXT CATALOG " + FullName + " ";
+        if (!IsAccentSensity)
+        {
+            sql += "WITH ACCENT_SENSITIVITY = OFF\r\n";
+        }
+        else
+        {
+            sql += "WITH ACCENT_SENSITIVITY = ON\r\n";
         }
 
-        public override string FullName
+        if (!string.IsNullOrEmpty(this.Path))
         {
-            get { return "[" + Name + "]"; }
-        }
-
-        public string Path { get; set; }
-
-        public bool IsDefault { get; set; }
-
-        public bool IsAccentSensity { get; set; }
-
-        public string FileGroupName { get; set; }
-
-        public override string ToSql()
-        {
-            Database database = (Database)this.Parent;
-
-            string sql = "CREATE FULLTEXT CATALOG " + FullName + " ";
-            if (!IsAccentSensity)
-                sql += "WITH ACCENT_SENSITIVITY = OFF\r\n";
-            else
-                sql += "WITH ACCENT_SENSITIVITY = ON\r\n";
-            if (!string.IsNullOrEmpty(this.Path))
+            if (!database.Options.Ignore.FilterFullTextPath)
             {
-                if (!database.Options.Ignore.FilterFullTextPath)
-                    sql += "--";
-                sql += "IN PATH N'" + Path + "'\r\n";
+                sql += "--";
             }
-            if (IsDefault)
-                sql += "AS DEFAULT\r\n";
-            sql += "AUTHORIZATION [" + Owner + "]\r\n";
-            return sql + "GO\r\n";
+
+            sql += "IN PATH N'" + Path + "'\r\n";
+        }
+        if (IsDefault)
+        {
+            sql += "AS DEFAULT\r\n";
         }
 
-        private string ToSqlAlterDefault()
-        {
-            if (IsDefault)
-            {
-                string sql = "ALTER FULLTEXT CATALOG " + FullName + "\r\n";
-                sql += "AS DEFAULT";
-                sql += "\r\nGO\r\n";
-                return sql;
-            }
-            else return "";
+        sql += "AUTHORIZATION [" + Owner + "]\r\n";
+        return sql + "GO\r\n";
+    }
 
-        }
-
-        private string ToSqlAlterOwner()
+    private string ToSqlAlterDefault()
+    {
+        if (IsDefault)
         {
-            string sql = "ALTER AUTHORIZATION ON FULLTEXT CATALOG::" + FullName + "\r\n";
-            sql += "TO [" + Owner + "]\r\nGO\r\n";
-            return sql;
-        }
-
-        private string ToSqlAlter()
-        {
-            string sql = "ALTER FULLTEXT CATALOG " + FullName + "\r\n";
-            sql += "REBUILD WITH ACCENT_SENSITIVITY = ";
-            if (IsAccentSensity) sql += "ON"; else sql += "OFF";
+            var sql = "ALTER FULLTEXT CATALOG " + FullName + "\r\n";
+            sql += "AS DEFAULT";
             sql += "\r\nGO\r\n";
             return sql;
         }
-
-        public override string ToSqlDrop() => $"DROP FULLTEXT CATALOG {FullName}\r\nGO\r\n";
-
-        public override string ToSqlAdd() => ToSql();
-
-        public override SQLScriptList ToSqlDiff(System.Collections.Generic.ICollection<ISchemaBase> schemas)
+        else
         {
-            SQLScriptList listDiff = new SQLScriptList();
+            return "";
+        }
+    }
 
-            if (this.Status == ObjectStatus.Drop)
-            {
-                listDiff.Add(ToSqlDrop(), 0, ScriptAction.DropFullText);
-            }
-            if (this.Status == ObjectStatus.Create)
-            {
-                listDiff.Add(ToSql(), 0, ScriptAction.AddFullText);
-            }
-            if (this.HasState(ObjectStatus.Alter))
-            {
-                listDiff.Add(ToSqlAlter(), 0, ScriptAction.AddFullText);
-            }
-            if (this.HasState(ObjectStatus.Disabled))
-            {
-                listDiff.Add(ToSqlAlterDefault(), 0, ScriptAction.AddFullText);
-            }
-            if (this.HasState(ObjectStatus.ChangeOwner))
-            {
-                listDiff.Add(ToSqlAlterOwner(), 0, ScriptAction.AddFullText);
-            }
-            return listDiff;
+    private string ToSqlAlterOwner()
+    {
+        var sql = "ALTER AUTHORIZATION ON FULLTEXT CATALOG::" + FullName + "\r\n";
+        sql += "TO [" + Owner + "]\r\nGO\r\n";
+        return sql;
+    }
+
+    private string ToSqlAlter()
+    {
+        var sql = "ALTER FULLTEXT CATALOG " + FullName + "\r\n";
+        sql += "REBUILD WITH ACCENT_SENSITIVITY = ";
+        if (IsAccentSensity)
+        {
+            sql += "ON";
+        }
+        else
+        {
+            sql += "OFF";
         }
 
-        /// <summary>
-        /// Compara dos Synonyms y devuelve true si son iguales, caso contrario, devuelve false.
-        /// </summary>
-        public bool Compare(FullText destination)
+        sql += "\r\nGO\r\n";
+        return sql;
+    }
+
+    public override string ToSqlDrop() => $"DROP FULLTEXT CATALOG {FullName}\r\nGO\r\n";
+
+    public override string ToSqlAdd() => ToSql();
+
+    public override SQLScriptList ToSqlDiff(System.Collections.Generic.ICollection<ISchemaBase> schemas)
+    {
+        var listDiff = new SQLScriptList();
+
+        if (this.Status == ObjectStatus.Drop)
         {
-            Database database = (Database)this.Parent;
-            if (destination == null) throw new ArgumentNullException("destination");
-            if (!this.IsAccentSensity.Equals(destination.IsAccentSensity)) return false;
-            if (!this.IsDefault.Equals(destination.IsDefault)) return false;
-            if ((!string.IsNullOrEmpty(this.FileGroupName)) && (!string.IsNullOrEmpty(destination.FileGroupName)))
-                if (!this.FileGroupName.Equals(destination.FileGroupName)) return false;
-            if (database.Options.Ignore.FilterFullTextPath)
-                if ((!string.IsNullOrEmpty(this.Path)) && (!string.IsNullOrEmpty(destination.Path)))
-                    return this.Path.Equals(destination.Path, StringComparison.CurrentCultureIgnoreCase);
-            return true;
+            listDiff.Add(ToSqlDrop(), 0, ScriptAction.DropFullText);
         }
+        if (this.Status == ObjectStatus.Create)
+        {
+            listDiff.Add(ToSql(), 0, ScriptAction.AddFullText);
+        }
+        if (this.HasState(ObjectStatus.Alter))
+        {
+            listDiff.Add(ToSqlAlter(), 0, ScriptAction.AddFullText);
+        }
+        if (this.HasState(ObjectStatus.Disabled))
+        {
+            listDiff.Add(ToSqlAlterDefault(), 0, ScriptAction.AddFullText);
+        }
+        if (this.HasState(ObjectStatus.ChangeOwner))
+        {
+            listDiff.Add(ToSqlAlterOwner(), 0, ScriptAction.AddFullText);
+        }
+        return listDiff;
+    }
+
+    /// <summary>
+    /// Compara dos Synonyms y devuelve true si son iguales, caso contrario, devuelve false.
+    /// </summary>
+    public bool Compare(FullText destination)
+    {
+        var database = (Database)this.Parent;
+        if (destination == null)
+        {
+            throw new ArgumentNullException("destination");
+        }
+
+        if (!this.IsAccentSensity.Equals(destination.IsAccentSensity))
+        {
+            return false;
+        }
+
+        if (!this.IsDefault.Equals(destination.IsDefault))
+        {
+            return false;
+        }
+
+        if ((!string.IsNullOrEmpty(this.FileGroupName)) && (!string.IsNullOrEmpty(destination.FileGroupName)))
+        {
+            if (!this.FileGroupName.Equals(destination.FileGroupName))
+            {
+                return false;
+            }
+        }
+
+        if (database.Options.Ignore.FilterFullTextPath)
+        {
+            if ((!string.IsNullOrEmpty(this.Path)) && (!string.IsNullOrEmpty(destination.Path)))
+            {
+                return this.Path.Equals(destination.Path, StringComparison.CurrentCultureIgnoreCase);
+            }
+        }
+
+        return true;
     }
 }

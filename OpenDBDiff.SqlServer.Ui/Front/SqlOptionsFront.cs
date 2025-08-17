@@ -16,19 +16,16 @@ namespace OpenDBDiff.SqlServer.Ui
             HandlerHelper.OnChange += new HandlerHelper.SaveFilterHandler(HandlerHelper_OnChange);
         }
 
-        public void HandlerHelper_OnChange()
-        {
-            LoadFilters();
-        }
+        public void HandlerHelper_OnChange() => LoadFilters();
 
         private void LoadFilters()
         {
             lstFilters.Items.Clear();
-            foreach (SqlOptionFilterItem item in SQLOption.Filters.Items)
+            foreach (var item in SQLOption.Filters.Items)
             {
                 var lview = new ListViewItem(item.FilterPattern);
-                lview.SubItems.Add(item.ObjectType.ToString());
-                lstFilters.Items.Add(lview);
+                _ = lview.SubItems.Add(item.ObjectType.ToString());
+                _ = lstFilters.Items.Add(lview);
             }
             ;
         }
@@ -92,21 +89,38 @@ namespace OpenDBDiff.SqlServer.Ui
             IncludeSynonymsCheckBox.Checked = SQLOption.Ignore.FilterSynonyms;
 
             if (SQLOption.Script.AlterObjectOnSchemaBinding)
+            {
                 optScriptSchemaBindingAlter.Checked = true;
+            }
             else
+            {
                 optScriptSchemaDrop.Checked = true;
+            }
 
             if (SQLOption.Comparison.CaseSensityType == SqlOptionComparison.CaseSensityOptions.Automatic)
+            {
                 rdoCaseAutomatic.Checked = true;
+            }
+
             if (SQLOption.Comparison.CaseSensityType == SqlOptionComparison.CaseSensityOptions.CaseInsensity)
+            {
                 rdoCaseInsensitive.Checked = true;
+            }
+
             if (SQLOption.Comparison.CaseSensityType == SqlOptionComparison.CaseSensityOptions.CaseSensity)
+            {
                 rdoCaseSensitive.Checked = true;
+            }
 
             if (SQLOption.Comparison.CaseSensityInCode == SqlOptionComparison.CaseSensityOptions.CaseInsensity)
+            {
                 rdoCaseInsensityInCode.Checked = true;
+            }
+
             if (SQLOption.Comparison.CaseSensityInCode == SqlOptionComparison.CaseSensityOptions.CaseSensity)
+            {
                 rdoCaseSensityInCode.Checked = true;
+            }
 
             chkIgnoreWhiteSpaceInCode.Checked = SQLOption.Comparison.IgnoreWhiteSpacesInCode;
 
@@ -175,26 +189,36 @@ namespace OpenDBDiff.SqlServer.Ui
             SQLOption.Script.AlterObjectOnSchemaBinding = optScriptSchemaBindingAlter.Checked;
 
             if (rdoCaseAutomatic.Checked)
+            {
                 SQLOption.Comparison.CaseSensityType = SqlOptionComparison.CaseSensityOptions.Automatic;
+            }
+
             if (rdoCaseInsensitive.Checked)
+            {
                 SQLOption.Comparison.CaseSensityType = SqlOptionComparison.CaseSensityOptions.CaseInsensity;
+            }
+
             if (rdoCaseSensitive.Checked)
+            {
                 SQLOption.Comparison.CaseSensityType = SqlOptionComparison.CaseSensityOptions.CaseSensity;
+            }
 
             if (rdoCaseInsensityInCode.Checked)
+            {
                 SQLOption.Comparison.CaseSensityInCode = SqlOptionComparison.CaseSensityOptions.CaseInsensity;
+            }
+
             if (rdoCaseSensityInCode.Checked)
+            {
                 SQLOption.Comparison.CaseSensityInCode = SqlOptionComparison.CaseSensityOptions.CaseSensity;
+            }
 
             SQLOption.Comparison.IgnoreWhiteSpacesInCode = chkIgnoreWhiteSpaceInCode.Checked;
             SQLOption.Comparison.ReloadComparisonOnUpdate = chkReloadDB.Checked;
 
             FireOptionChanged(SQLOption);
         }
-        public Abstractions.Schema.Model.IOption GetOption()
-        {
-            return SQLOption;
-        }
+        public Abstractions.Schema.Model.IOption GetOption() => SQLOption;
 
         private void ChkCompIndices_CheckedChanged(object sender, EventArgs e)
         {
@@ -218,15 +242,15 @@ namespace OpenDBDiff.SqlServer.Ui
         {
             if (lstFilters.SelectedItems.Count > 0)
             {
-                AddExclusionPatternForm itemForm = new AddExclusionPatternForm(SQLOption, lstFilters.SelectedItems[0].Index);
-                itemForm.ShowDialog(this);
+                var itemForm = new AddExclusionPatternForm(SQLOption, lstFilters.SelectedItems[0].Index);
+                _ = itemForm.ShowDialog(this);
             }
         }
 
         private void BtnAdd_Click(object sender, EventArgs e)
         {
-            AddExclusionPatternForm itemForm = new AddExclusionPatternForm(SQLOption);
-            itemForm.ShowDialog(this);
+            var itemForm = new AddExclusionPatternForm(SQLOption);
+            _ = itemForm.ShowDialog(this);
         }
 
         private void ChkConstraints_CheckedChanged(object sender, EventArgs e)
@@ -237,10 +261,7 @@ namespace OpenDBDiff.SqlServer.Ui
             chkConstraintsCheck.Enabled = chkConstraints.Checked;
         }
 
-        private void ChkFullText_CheckedChanged(object sender, EventArgs e)
-        {
-            chkFullTextPath.Enabled = chkFullText.Checked;
-        }
+        private void ChkFullText_CheckedChanged(object sender, EventArgs e) => chkFullTextPath.Enabled = chkFullText.Checked;
 
         private void chkCompAssemblys_CheckedChanged(object sender, EventArgs e)
         {
@@ -261,7 +282,9 @@ namespace OpenDBDiff.SqlServer.Ui
                         var type = (ObjectType)Enum.Parse(typeof(ObjectType), item.SubItems[1].Text);
                         var fi = new SqlOptionFilterItem(type, item.Text);
                         if (SQLOption.Filters.Items.Contains(fi))
-                            SQLOption.Filters.Items.Remove(fi);
+                        {
+                            _ = SQLOption.Filters.Items.Remove(fi);
+                        }
                     }
                 }
                 LoadFilters();
@@ -272,8 +295,8 @@ namespace OpenDBDiff.SqlServer.Ui
         {
             if (lstFilters.SelectedItems.Count > 0)
             {
-                AddExclusionPatternForm itemForm = new AddExclusionPatternForm(SQLOption, lstFilters.SelectedItems[0].Index);
-                itemForm.ShowDialog(this);
+                var itemForm = new AddExclusionPatternForm(SQLOption, lstFilters.SelectedItems[0].Index);
+                _ = itemForm.ShowDialog(this);
             }
         }
     }

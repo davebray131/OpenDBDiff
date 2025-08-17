@@ -1,47 +1,34 @@
 using Microsoft.Data.SqlClient;
 using OpenDBDiff.SqlServer.Schema.Model;
 
-namespace OpenDBDiff.SqlServer.Schema.Generates
+namespace OpenDBDiff.SqlServer.Schema.Generates;
+
+public class GenerateSchemas
 {
-    public class GenerateSchemas
+    private readonly Generate root;
+
+    public GenerateSchemas(Generate root) => this.root = root;
+
+    private static string GetSQL() => SQLQueries.SQLQueryFactory.Get("GetSchemas");
+
+    public void Fill(Database database, string connectioString)
     {
-        private readonly Generate root;
-
-        public GenerateSchemas(Generate root)
+        if (database.Options.Ignore.FilterSchema)
         {
-            this.root = root;
-        }
-
-        private static string GetSQL()
-        {
-            return SQLQueries.SQLQueryFactory.Get("GetSchemas");
-        }
-
-        public void Fill(Database database, string connectioString)
-        {
-            if (database.Options.Ignore.FilterSchema)
+            using var conn = new SqlConnection(connectioString);
+            using var command = new SqlCommand(GetSQL(), conn);
+            conn.Open();
+            command.CommandTimeout = 0;
+            using var reader = command.ExecuteReader();
+            while (reader.Read())
             {
-                using (SqlConnection conn = new SqlConnection(connectioString))
+                var item = new Model.Schema(database)
                 {
-                    using (SqlCommand command = new SqlCommand(GetSQL(), conn))
-                    {
-                        conn.Open();
-                        command.CommandTimeout = 0;
-                        using (SqlDataReader reader = command.ExecuteReader())
-                        {
-                            while (reader.Read())
-                            {
-                                Model.Schema item = new Model.Schema(database)
-                                {
-                                    Id = (int)reader["schema_id"],
-                                    Name = reader["name"].ToString(),
-                                    Owner = reader["owner"].ToString()
-                                };
-                                database.Schemas.Add(item);
-                            }
-                        }
-                    }
-                }
+                    Id = (int)reader["schema_id"],
+                    Name = reader["name"].ToString(),
+                    Owner = reader["owner"].ToString()
+                };
+                database.Schemas.Add(item);
             }
         }
     }

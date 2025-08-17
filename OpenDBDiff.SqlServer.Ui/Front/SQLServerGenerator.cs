@@ -26,14 +26,8 @@ namespace OpenDBDiff.SqlServer.Ui
 
         }
 
-        public int GetMaxValue()
-        {
-            return Generate.MaxValue;
-        }
+        public int GetMaxValue() => Generate.MaxValue;
 
-        public IDatabase Process()
-        {
-            return this.Generate.Process();
-        }
+        public IDatabase Process() => this.Generate.Process();
     }
 }

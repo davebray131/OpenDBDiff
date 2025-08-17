@@ -1,31 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using OpenDBDiff.Abstractions.Schema.Model;
 
-namespace OpenDBDiff.SqlServer.Schema.Options
+namespace OpenDBDiff.SqlServer.Schema.Options;
+
+public class SqlOptionScript : IOptionsContainer<bool>
 {
-    public class SqlOptionScript : IOptionsContainer<bool>
+    public SqlOptionScript()
     {
-        private bool alterObjectOnSchemaBinding = true;
-
-        public SqlOptionScript()
-        {
-        }
-
-        public SqlOptionScript(IOptionsContainer<bool> optionsContainer)
-        {
-            AlterObjectOnSchemaBinding = optionsContainer.GetOptions()["AlterObjectOnSchemaBinding"];
-        }
-
-        public bool AlterObjectOnSchemaBinding
-        {
-            get { return alterObjectOnSchemaBinding; }
-            set { alterObjectOnSchemaBinding = value; }
-        }
-
-        public IDictionary<string, bool> GetOptions()
-        {
-            return new Dictionary<string, bool>() { { "AlterObjectOnSchemaBinding", AlterObjectOnSchemaBinding } };
-        }
     }
+
+    public SqlOptionScript(IOptionsContainer<bool> optionsContainer) => AlterObjectOnSchemaBinding = optionsContainer.GetOptions()["AlterObjectOnSchemaBinding"];
+
+    public bool AlterObjectOnSchemaBinding { get; set; } = true;
+
+    public IDictionary<string, bool> GetOptions() => new Dictionary<string, bool>() { { "AlterObjectOnSchemaBinding", AlterObjectOnSchemaBinding } };
 }

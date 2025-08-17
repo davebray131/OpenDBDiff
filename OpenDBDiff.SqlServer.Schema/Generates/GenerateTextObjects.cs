@@ -6,115 +6,127 @@ using OpenDBDiff.SqlServer.Schema.Generates.Util;
 using OpenDBDiff.SqlServer.Schema.Model;
 using OpenDBDiff.SqlServer.Schema.Options;
 
-namespace OpenDBDiff.SqlServer.Schema.Generates
+namespace OpenDBDiff.SqlServer.Schema.Generates;
+
+public class GenerateTextObjects
 {
-    public class GenerateTextObjects
+    private readonly Generate root;
+
+    public GenerateTextObjects(Generate root) => this.root = root;
+
+    private static string GetSQL(SqlOption options)
     {
-        private readonly Generate root;
-
-        public GenerateTextObjects(Generate root)
+        var filterQuery = SQLQueries.SQLQueryFactory.Get("GetTextObjectsQuery");
+        var filter = "";
+        if (options.Ignore.FilterStoredProcedure)
         {
-            this.root = root;
+            filter += "O.type = 'P' OR ";
         }
 
-        private static string GetSQL(SqlOption options)
+        if (options.Ignore.FilterView)
         {
-            var filterQuery = SQLQueries.SQLQueryFactory.Get("GetTextObjectsQuery");
-            string filter = "";
-            if (options.Ignore.FilterStoredProcedure)
-                filter += "O.type = 'P' OR ";
-            if (options.Ignore.FilterView)
-                filter += "O.type = 'V' OR ";
-            if (options.Ignore.FilterTrigger)
-                filter += "O.type = 'TR' OR ";
-            if (options.Ignore.FilterFunction)
-                filter += "O.type IN ('IF','FN','TF') OR ";
-            filter = filter.Substring(0, filter.Length - 4);
-            return filterQuery.Replace("{FILTER}", filter);
+            filter += "O.type = 'V' OR ";
         }
 
-        public void Fill(Database database, string connectionString)
+        if (options.Ignore.FilterTrigger)
         {
-            ICode code;
-            try
+            filter += "O.type = 'TR' OR ";
+        }
+
+        if (options.Ignore.FilterFunction)
+        {
+            filter += "O.type IN ('IF','FN','TF') OR ";
+        }
+
+        filter = filter.Substring(0, filter.Length - 4);
+        return filterQuery.Replace("{FILTER}", filter);
+    }
+
+    public void Fill(Database database, string connectionString)
+    {
+        ICode code;
+        try
+        {
+            if (database.Options.Ignore.FilterStoredProcedure || database.Options.Ignore.FilterView || database.Options.Ignore.FilterFunction || database.Options.Ignore.FilterTrigger)
             {
-                if (database.Options.Ignore.FilterStoredProcedure || database.Options.Ignore.FilterView || database.Options.Ignore.FilterFunction || database.Options.Ignore.FilterTrigger)
+                root.RaiseOnReading(new ProgressEventArgs("Reading Text Objects...", Constants.READING_TEXTOBJECTS));
+                using var conn = new SqlConnection(connectionString);
+                using var command = new SqlCommand(GetSQL(database.Options), conn);
+                conn.Open();
+                command.CommandTimeout = 0;
+                using var reader = command.ExecuteReader();
+                while (reader.Read())
                 {
-                    root.RaiseOnReading(new ProgressEventArgs("Reading Text Objects...", Constants.READING_TEXTOBJECTS));
-                    using (SqlConnection conn = new SqlConnection(connectionString))
+                    code = null;
+                    root.RaiseOnReadingOne(reader["name"]);
+                    var type = reader["Type"].ToString().Trim();
+                    var name = reader["name"].ToString();
+                    var definition = reader["Text"].ToString();
+                    var id = (int)reader["object_id"];
+                    if (type.Equals("V"))
                     {
-                        using (SqlCommand command = new SqlCommand(GetSQL(database.Options), conn))
+                        code = database.Views.Find(id);
+                    }
+
+                    if (type.Equals("TR"))
+                    {
+                        code = (ICode)database.Find(id);
+                    }
+
+                    if (type.Equals("P"))
+                    {
+                        var procedure = database.Procedures.Find(id);
+                        if (procedure != null)
                         {
-                            conn.Open();
-                            command.CommandTimeout = 0;
-                            using (SqlDataReader reader = command.ExecuteReader())
-                            {
-                                while (reader.Read())
-                                {
-                                    code = null;
-                                    root.RaiseOnReadingOne(reader["name"]);
-                                    string type = reader["Type"].ToString().Trim();
-                                    string name = reader["name"].ToString();
-                                    string definition = reader["Text"].ToString();
-                                    int id = (int)reader["object_id"];
-                                    if (type.Equals("V"))
-                                        code = database.Views.Find(id);
-
-                                    if (type.Equals("TR"))
-                                        code = (ICode)database.Find(id);
-
-                                    if (type.Equals("P"))
-                                    {
-                                        var procedure = database.Procedures.Find(id);
-                                        if (procedure != null)
-                                            ((ICode)procedure).Text = GetObjectDefinition(type, name, definition);
-                                    }
-
-                                    if (type.Equals("IF") || type.Equals("FN") || type.Equals("TF"))
-                                        code = database.Functions.Find(id);
-
-                                    if (code != null)
-                                        code.Text = reader["Text"].ToString();
-                                }
-                            }
+                            ((ICode)procedure).Text = GetObjectDefinition(type, name, definition);
                         }
+                    }
+
+                    if (type.Equals("IF") || type.Equals("FN") || type.Equals("TF"))
+                    {
+                        code = database.Functions.Find(id);
+                    }
+
+                    if (code != null)
+                    {
+                        code.Text = reader["Text"].ToString();
                     }
                 }
             }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
         }
-
-        private string GetObjectDefinition(string type, string name, string definition)
+        catch (Exception ex)
         {
-            string rv = definition;
-
-            string sqlDelimiters = @"(\r|\n|\s)+?";
-            RegexOptions options = RegexOptions.IgnoreCase | RegexOptions.Multiline;
-            Regex re = new Regex(@"CREATE" + sqlDelimiters + @"PROC(EDURE)?" + sqlDelimiters + @"(\w+\.|\[\w+\]\.)?\[?(?<spname>\w+)\]?" + sqlDelimiters, options);
-            switch (type)
-            {
-                case "P":
-                    Match match = re.Match(definition);
-                    if (match != null && match.Success)
-                    {
-                        // Try to replace the name saved in the definition when the object was created by the one used for the object in sys.object
-                        string oldName = match.Groups["spname"].Value;
-                        //if (string.IsNullOrEmpty(oldName)) System.Diagnostics.Debugger.Break();
-                        if (string.Compare(oldName, name) != 0)
-                        {
-                            rv = rv.Replace(oldName, name);
-                        }
-                    }
-                    break;
-                default:
-                    //TODO : Add the logic used for other objects than procedures
-                    break;
-            }
-
-            return rv;
+            throw ex;
         }
+    }
+
+    private string GetObjectDefinition(string type, string name, string definition)
+    {
+        var rv = definition;
+
+        var sqlDelimiters = @"(\r|\n|\s)+?";
+        var options = RegexOptions.IgnoreCase | RegexOptions.Multiline;
+        var re = new Regex(@"CREATE" + sqlDelimiters + @"PROC(EDURE)?" + sqlDelimiters + @"(\w+\.|\[\w+\]\.)?\[?(?<spname>\w+)\]?" + sqlDelimiters, options);
+        switch (type)
+        {
+            case "P":
+                var match = re.Match(definition);
+                if (match != null && match.Success)
+                {
+                    // Try to replace the name saved in the definition when the object was created by the one used for the object in sys.object
+                    var oldName = match.Groups["spname"].Value;
+                    //if (string.IsNullOrEmpty(oldName)) System.Diagnostics.Debugger.Break();
+                    if (string.Compare(oldName, name) != 0)
+                    {
+                        rv = rv.Replace(oldName, name);
+                    }
+                }
+                break;
+            default:
+                //TODO : Add the logic used for other objects than procedures
+                break;
+        }
+
+        return rv;
     }
 }

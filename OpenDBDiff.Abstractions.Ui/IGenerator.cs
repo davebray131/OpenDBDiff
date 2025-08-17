@@ -1,13 +1,12 @@
 ﻿using OpenDBDiff.Abstractions.Schema.Model;
 
-namespace OpenDBDiff.Abstractions.Ui
+namespace OpenDBDiff.Abstractions.Ui;
+
+
+public interface IGenerator
 {
+    event Schema.Events.ProgressEventHandler.ProgressHandler OnProgress;
 
-    public interface IGenerator
-    {
-        event Schema.Events.ProgressEventHandler.ProgressHandler OnProgress;
-
-        int GetMaxValue();
-        IDatabase Process();
-    }
+    int GetMaxValue();
+    IDatabase Process();
 }

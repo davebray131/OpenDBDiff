@@ -1,8 +1,7 @@
 ﻿using OpenDBDiff.SqlServer.Schema.Model;
 
-namespace OpenDBDiff.SqlServer.Schema.Compare
+namespace OpenDBDiff.SqlServer.Schema.Compare;
+
+internal class CompareUsers : CompareBase<User>
 {
-    internal class CompareUsers : CompareBase<User>
-    {
-    }
 }

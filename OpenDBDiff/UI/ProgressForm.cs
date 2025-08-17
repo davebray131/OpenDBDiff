@@ -5,122 +5,121 @@ using OpenDBDiff.Abstractions.Schema.Events;
 using OpenDBDiff.Abstractions.Schema.Model;
 using OpenDBDiff.Abstractions.Ui;
 
-namespace OpenDBDiff.UI
+namespace OpenDBDiff.UI;
+
+public partial class ProgressForm : Form
 {
-    public partial class ProgressForm : Form
+    private readonly IGenerator OriginGenerator;
+    private readonly IGenerator DestinationGenerator;
+    private bool IsProcessing = false;
+    private IDatabase originClone = null;
+    private readonly IDatabaseComparer Comparer;
+
+    // TODO: thread-safe error reporting
+
+    public ProgressForm(KeyValuePair<string, IGenerator> originDatabase, KeyValuePair<string, IGenerator> destinationDatabase, IDatabaseComparer comparer)
     {
-        private readonly IGenerator OriginGenerator;
-        private readonly IGenerator DestinationGenerator;
-        private bool IsProcessing = false;
-        private IDatabase originClone = null;
-        private readonly IDatabaseComparer Comparer;
+        InitializeComponent();
 
-        // TODO: thread-safe error reporting
+        Origin = null;
+        Destination = null;
+        originProgressControl.Maximum = originDatabase.Value.GetMaxValue();
+        originProgressControl.DatabaseName = originDatabase.Key;
+        this.OriginGenerator = originDatabase.Value;
 
-        public ProgressForm(KeyValuePair<string, IGenerator> originDatabase, KeyValuePair<string, IGenerator> destinationDatabase, IDatabaseComparer comparer)
+        destinationProgressControl.Maximum = destinationDatabase.Value.GetMaxValue();
+        destinationProgressControl.DatabaseName = destinationDatabase.Key;
+        this.DestinationGenerator = destinationDatabase.Value;
+
+        this.Comparer = comparer;
+    }
+
+    public Abstractions.Schema.Model.IDatabase Origin { get; private set; }
+
+    public Abstractions.Schema.Model.IDatabase Destination { get; private set; }
+
+    public string ErrorLocation { get; private set; }
+
+    public string ErrorMostRecentProgress { get; private set; }
+
+    public Exception Error { get; private set; }
+
+    private void BtnOK_Click(object sender, EventArgs e)
+    {
+        this.Cursor = Cursors.WaitCursor;
+        this.Close();
+        this.Cursor = Cursors.Default;
+    }
+
+    private void ProgressForm_Activated(object sender, EventArgs e)
+    {
+        var handler = new ProgressEventHandler.ProgressHandler(GenData2_OnProgress);
+        try
         {
-            InitializeComponent();
+            if (!IsProcessing)
+            {
+                this.Refresh();
+                IsProcessing = false;
+                OriginGenerator.OnProgress += new ProgressEventHandler.ProgressHandler(GenData1_OnProgress);
+                DestinationGenerator.OnProgress += handler;
 
-            Origin = null;
-            Destination = null;
-            originProgressControl.Maximum = originDatabase.Value.GetMaxValue();
-            originProgressControl.DatabaseName = originDatabase.Key;
-            this.OriginGenerator = originDatabase.Value;
+                this.ErrorLocation = "Loading " + destinationProgressControl.DatabaseName;
+                Origin = OriginGenerator.Process();
+                originProgressControl.Message = "Complete";
+                originProgressControl.Value = OriginGenerator.GetMaxValue();
 
-            destinationProgressControl.Maximum = destinationDatabase.Value.GetMaxValue();
-            destinationProgressControl.DatabaseName = destinationDatabase.Key;
-            this.DestinationGenerator = destinationDatabase.Value;
+                this.ErrorLocation = "Loading " + originProgressControl.DatabaseName;
+                Destination = DestinationGenerator.Process();
 
-            this.Comparer = comparer;
+                originClone = (IDatabase)Origin.Clone(null);
+
+                this.ErrorLocation = "Comparing Databases";
+                Destination = Comparer.Compare(Origin, Destination);
+                Origin = originClone;
+
+                destinationProgressControl.Message = "Complete";
+                destinationProgressControl.Value = DestinationGenerator.GetMaxValue();
+            }
         }
-
-        public Abstractions.Schema.Model.IDatabase Origin { get; private set; }
-
-        public Abstractions.Schema.Model.IDatabase Destination { get; private set; }
-
-        public string ErrorLocation { get; private set; }
-
-        public string ErrorMostRecentProgress { get; private set; }
-
-        public Exception Error { get; private set; }
-
-        private void BtnOK_Click(object sender, EventArgs e)
+        catch (Exception err)
         {
-            this.Cursor = Cursors.WaitCursor;
+            this.Error = err;
+        }
+        finally
+        {
+            OriginGenerator.OnProgress -= handler;
+            DestinationGenerator.OnProgress -= handler;
             this.Close();
-            this.Cursor = Cursors.Default;
         }
+    }
 
-        private void ProgressForm_Activated(object sender, EventArgs e)
+    private void GenData2_OnProgress(ProgressEventArgs e)
+    {
+        if (e.Progress > -1 && destinationProgressControl.Value != e.Progress)
         {
-            var handler = new ProgressEventHandler.ProgressHandler(GenData2_OnProgress);
-            try
-            {
-                if (!IsProcessing)
-                {
-                    this.Refresh();
-                    IsProcessing = false;
-                    OriginGenerator.OnProgress += new ProgressEventHandler.ProgressHandler(GenData1_OnProgress);
-                    DestinationGenerator.OnProgress += handler;
-
-                    this.ErrorLocation = "Loading " + destinationProgressControl.DatabaseName;
-                    Origin = OriginGenerator.Process();
-                    originProgressControl.Message = "Complete";
-                    originProgressControl.Value = OriginGenerator.GetMaxValue();
-
-                    this.ErrorLocation = "Loading " + originProgressControl.DatabaseName;
-                    Destination = DestinationGenerator.Process();
-
-                    originClone = (IDatabase)Origin.Clone(null);
-
-                    this.ErrorLocation = "Comparing Databases";
-                    Destination = Comparer.Compare(Origin, Destination);
-                    Origin = originClone;
-
-                    destinationProgressControl.Message = "Complete";
-                    destinationProgressControl.Value = DestinationGenerator.GetMaxValue();
-                }
-            }
-            catch (Exception err)
-            {
-                this.Error = err;
-            }
-            finally
-            {
-                OriginGenerator.OnProgress -= handler;
-                DestinationGenerator.OnProgress -= handler;
-                this.Close();
-            }
+            destinationProgressControl.Value = e.Progress;
         }
 
-        private void GenData2_OnProgress(ProgressEventArgs e)
+        if (string.Compare(destinationProgressControl.Message, e.Message) != 0)
         {
-            if (e.Progress > -1 && destinationProgressControl.Value != e.Progress)
-            {
-                destinationProgressControl.Value = e.Progress;
-            }
-
-            if (string.Compare(destinationProgressControl.Message, e.Message) != 0)
-            {
-                destinationProgressControl.Message = e.Message;
-            }
-
-            this.ErrorMostRecentProgress = e.Message;
+            destinationProgressControl.Message = e.Message;
         }
 
-        private void GenData1_OnProgress(ProgressEventArgs e)
+        this.ErrorMostRecentProgress = e.Message;
+    }
+
+    private void GenData1_OnProgress(ProgressEventArgs e)
+    {
+        if (e.Progress > -1 && originProgressControl.Value != e.Progress)
         {
-            if (e.Progress > -1 && originProgressControl.Value != e.Progress)
-            {
-                originProgressControl.Value = e.Progress;
-            }
-
-            if (string.Compare(originProgressControl.Message, e.Message) != 0)
-            {
-                originProgressControl.Message = e.Message;
-            }
-
-            this.ErrorMostRecentProgress = e.Message;
+            originProgressControl.Value = e.Progress;
         }
+
+        if (string.Compare(originProgressControl.Message, e.Message) != 0)
+        {
+            originProgressControl.Message = e.Message;
+        }
+
+        this.ErrorMostRecentProgress = e.Message;
     }
 }

@@ -7,71 +7,69 @@ using OpenDBDiff.SqlServer.Schema.Generates.SQLCommands;
 using OpenDBDiff.SqlServer.Schema.Generates.Util;
 using OpenDBDiff.SqlServer.Schema.Model;
 
-namespace OpenDBDiff.SqlServer.Schema.Generates
+namespace OpenDBDiff.SqlServer.Schema.Generates;
+
+public class GenerateViews
 {
-    public class GenerateViews
+    private readonly Generate root;
+
+    public GenerateViews(Generate root) => this.root = root;
+
+    public void Fill(Database database, string connectionString, List<MessageLog> messages)
     {
-        private readonly Generate root;
-
-        public GenerateViews(Generate root)
+        try
         {
-            this.root = root;
-        }
-
-        public void Fill(Database database, string connectionString, List<MessageLog> messages)
-        {
-            try
+            root.RaiseOnReading(new ProgressEventArgs("Reading views...", Constants.READING_VIEWS));
+            if (database.Options.Ignore.FilterView)
             {
-                root.RaiseOnReading(new ProgressEventArgs("Reading views...", Constants.READING_VIEWS));
-                if (database.Options.Ignore.FilterView)
+                FillView(database, connectionString);
+            }
+        }
+        catch (Exception ex)
+        {
+            messages.Add(new MessageLog(ex.Message, ex.StackTrace, MessageLog.LogType.Error));
+        }
+    }
+
+    private void FillView(Database database, string connectionString)
+    {
+        var lastViewId = 0;
+        using var conn = new SqlConnection(connectionString);
+        using var command = new SqlCommand(ViewSQLCommand.GetView(database.Info.Version, database.Info.Edition), conn);
+        conn.Open();
+        command.CommandTimeout = 0;
+        using var reader = command.ExecuteReader();
+        View item = null;
+        while (reader.Read())
+        {
+            root.RaiseOnReadingOne(reader["name"]);
+            if (lastViewId != (int)reader["object_id"])
+            {
+                item = new View(database)
                 {
-                    FillView(database, connectionString);
+                    Id = (int)reader["object_id"],
+                    Name = reader["name"].ToString(),
+                    Owner = reader["owner"].ToString(),
+                    IsSchemaBinding = reader["IsSchemaBound"].ToString().Equals("1")
+                };
+                database.Views.Add(item);
+                lastViewId = item.Id;
+            }
+            if (item.IsSchemaBinding)
+            {
+                if (!reader.IsDBNull(reader.GetOrdinal("referenced_major_id")))
+                {
+                    database.Dependencies.Add(database, (int)reader["referenced_major_id"], item);
                 }
-            }
-            catch (Exception ex)
-            {
-                messages.Add(new MessageLog(ex.Message, ex.StackTrace, MessageLog.LogType.Error));
-            }
-        }
 
-        private void FillView(Database database, string connectionString)
-        {
-            int lastViewId = 0;
-            using (SqlConnection conn = new SqlConnection(connectionString))
-            {
-                using (SqlCommand command = new SqlCommand(ViewSQLCommand.GetView(database.Info.Version, database.Info.Edition), conn))
+                if (!string.IsNullOrEmpty(reader["TableName"].ToString()))
                 {
-                    conn.Open();
-                    command.CommandTimeout = 0;
-                    using (SqlDataReader reader = command.ExecuteReader())
-                    {
-                        View item = null;
-                        while (reader.Read())
-                        {
-                            root.RaiseOnReadingOne(reader["name"]);
-                            if (lastViewId != (int)reader["object_id"])
-                            {
-                                item = new View(database)
-                                {
-                                    Id = (int)reader["object_id"],
-                                    Name = reader["name"].ToString(),
-                                    Owner = reader["owner"].ToString(),
-                                    IsSchemaBinding = reader["IsSchemaBound"].ToString().Equals("1")
-                                };
-                                database.Views.Add(item);
-                                lastViewId = item.Id;
-                            }
-                            if (item.IsSchemaBinding)
-                            {
-                                if (!reader.IsDBNull(reader.GetOrdinal("referenced_major_id")))
-                                    database.Dependencies.Add(database, (int)reader["referenced_major_id"], item);
-                                if (!string.IsNullOrEmpty(reader["TableName"].ToString()))
-                                    item.DependenciesIn.Add(reader["TableName"].ToString());
-                                if (!string.IsNullOrEmpty(reader["DependOut"].ToString()))
-                                    item.DependenciesOut.Add(reader["DependOut"].ToString());
-                            }
-                        }
-                    }
+                    item.DependenciesIn.Add(reader["TableName"].ToString());
+                }
+
+                if (!string.IsNullOrEmpty(reader["DependOut"].ToString()))
+                {
+                    item.DependenciesOut.Add(reader["DependOut"].ToString());
                 }
             }
         }

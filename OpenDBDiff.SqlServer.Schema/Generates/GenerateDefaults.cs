@@ -1,47 +1,34 @@
 ﻿using Microsoft.Data.SqlClient;
 using OpenDBDiff.SqlServer.Schema.Model;
 
-namespace OpenDBDiff.SqlServer.Schema.Generates
+namespace OpenDBDiff.SqlServer.Schema.Generates;
+
+public class GenerateDefaults
 {
-    public class GenerateDefaults
+    private readonly Generate root;
+
+    public GenerateDefaults(Generate root) => this.root = root;
+
+    private static string GetSQL() => SQLQueries.SQLQueryFactory.Get("GetDefaults");
+
+    public void Fill(Database database, string connectionString)
     {
-        private readonly Generate root;
-
-        public GenerateDefaults(Generate root)
+        if (database.Options.Ignore.FilterRules)
         {
-            this.root = root;
-        }
-
-        private static string GetSQL()
-        {
-            return SQLQueries.SQLQueryFactory.Get("GetDefaults");
-        }
-
-        public void Fill(Database database, string connectionString)
-        {
-            if (database.Options.Ignore.FilterRules)
+            using var conn = new SqlConnection(connectionString);
+            using var command = new SqlCommand(GetSQL(), conn);
+            conn.Open();
+            using var reader = command.ExecuteReader();
+            while (reader.Read())
             {
-                using (SqlConnection conn = new SqlConnection(connectionString))
+                var item = new Default(database)
                 {
-                    using (SqlCommand command = new SqlCommand(GetSQL(), conn))
-                    {
-                        conn.Open();
-                        using (SqlDataReader reader = command.ExecuteReader())
-                        {
-                            while (reader.Read())
-                            {
-                                Default item = new Default(database)
-                                {
-                                    Id = (int)reader["object_id"],
-                                    Name = reader["Name"].ToString(),
-                                    Owner = reader["Owner"].ToString(),
-                                    Value = reader["Definition"].ToString()
-                                };
-                                database.Defaults.Add(item);
-                            }
-                        }
-                    }
-                }
+                    Id = (int)reader["object_id"],
+                    Name = reader["Name"].ToString(),
+                    Owner = reader["Owner"].ToString(),
+                    Value = reader["Definition"].ToString()
+                };
+                database.Defaults.Add(item);
             }
         }
     }

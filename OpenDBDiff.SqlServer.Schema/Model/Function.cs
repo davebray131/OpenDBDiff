@@ -2,75 +2,80 @@
 using OpenDBDiff.Abstractions.Schema.Model;
 using OpenDBDiff.SqlServer.Schema.Model.Util;
 
-namespace OpenDBDiff.SqlServer.Schema.Model
+namespace OpenDBDiff.SqlServer.Schema.Model;
+
+public class Function : Code
 {
-    public class Function : Code
+    public Function(ISchemaBase parent)
+        : base(parent, ObjectType.Function, ScriptAction.AddFunction, ScriptAction.DropFunction)
     {
-        public Function(ISchemaBase parent)
-            : base(parent, ObjectType.Function, ScriptAction.AddFunction, ScriptAction.DropFunction)
+    }
+
+    /// <summary>
+    /// Clona el objeto en una nueva instancia.
+    /// </summary>
+    public override ISchemaBase Clone(ISchemaBase parent)
+    {
+        var item = new Function(parent)
         {
+            Text = this.Text,
+            Status = this.Status,
+            Name = this.Name,
+            Id = this.Id,
+            Owner = this.Owner,
+            Guid = this.Guid,
+            IsSchemaBinding = this.IsSchemaBinding
+        };
+        this.DependenciesIn.ForEach(dep => item.DependenciesIn.Add(dep));
+        this.DependenciesOut.ForEach(dep => item.DependenciesOut.Add(dep));
+        return item;
+    }
+
+    public override bool IsCodeType => true;
+
+    public string ToSQLAlter() => ToSQLAlter(false);
+
+    public string ToSQLAlter(bool quitSchemaBinding) => FormatCode.FormatAlter("FUNCTION", ToSql(), this, quitSchemaBinding);
+
+    public override SQLScriptList ToSqlDiff(System.Collections.Generic.ICollection<ISchemaBase> schemas)
+    {
+        var list = new SQLScriptList();
+        if (this.Status != ObjectStatus.Original)
+        {
+            RootParent.ActionMessage.Add(this);
         }
 
-        /// <summary>
-        /// Clona el objeto en una nueva instancia.
-        /// </summary>
-        public override ISchemaBase Clone(ISchemaBase parent)
+        if (this.HasState(ObjectStatus.Drop))
         {
-            Function item = new Function(parent)
+            list.Add(Drop());
+        }
+
+        if (this.HasState(ObjectStatus.Create))
+        {
+            list.Add(Create());
+        }
+
+        if (this.HasState(ObjectStatus.Alter))
+        {
+            if (this.HasState(ObjectStatus.RebuildDependencies))
             {
-                Text = this.Text,
-                Status = this.Status,
-                Name = this.Name,
-                Id = this.Id,
-                Owner = this.Owner,
-                Guid = this.Guid,
-                IsSchemaBinding = this.IsSchemaBinding
-            };
-            this.DependenciesIn.ForEach(dep => item.DependenciesIn.Add(dep));
-            this.DependenciesOut.ForEach(dep => item.DependenciesOut.Add(dep));
-            return item;
-        }
+                list.AddRange(RebuildDependencies());
+            }
 
-        public override bool IsCodeType
-        {
-            get => true;
-        }
-
-        public string ToSQLAlter() => ToSQLAlter(false);
-
-        public string ToSQLAlter(bool quitSchemaBinding) =>
-            FormatCode.FormatAlter("FUNCTION", ToSql(), this, quitSchemaBinding);
-
-        public override SQLScriptList ToSqlDiff(System.Collections.Generic.ICollection<ISchemaBase> schemas)
-        {
-            SQLScriptList list = new SQLScriptList();
-            if (this.Status != ObjectStatus.Original)
-                RootParent.ActionMessage.Add(this);
-
-            if (this.HasState(ObjectStatus.Drop))
-                list.Add(Drop());
-            if (this.HasState(ObjectStatus.Create))
-                list.Add(Create());
-            if (this.HasState(ObjectStatus.Alter))
+            if (!this.GetWasInsertInDiffList(ScriptAction.DropFunction))
             {
-                if (this.HasState(ObjectStatus.RebuildDependencies))
-                    list.AddRange(RebuildDependencies());
-
-                if (!this.GetWasInsertInDiffList(ScriptAction.DropFunction))
+                if (this.HasState(ObjectStatus.Rebuild))
                 {
-                    if (this.HasState(ObjectStatus.Rebuild))
-                    {
-                        list.Add(Drop());
-                        list.Add(Create());
-                    }
-                    if (this.HasState(ObjectStatus.AlterBody))
-                    {
-                        int iCount = DependenciesCount;
-                        list.Add(ToSQLAlter(), iCount, ScriptAction.AlterFunction);
-                    }
+                    list.Add(Drop());
+                    list.Add(Create());
+                }
+                if (this.HasState(ObjectStatus.AlterBody))
+                {
+                    var iCount = DependenciesCount;
+                    list.Add(ToSQLAlter(), iCount, ScriptAction.AlterFunction);
                 }
             }
-            return list;
         }
+        return list;
     }
 }

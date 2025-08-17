@@ -4,120 +4,118 @@ using System.IO;
 using CommandLine;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
-using OpenDBDiff.Abstractions.Schema.Model;
 using OpenDBDiff.SqlServer.Schema.Generates;
 using OpenDBDiff.SqlServer.Schema.Model;
 using OpenDBDiff.SqlServer.Schema.Options;
 
-namespace OpenDBDiff.CLI
+namespace OpenDBDiff.CLI;
+
+public class Program
 {
-    public class Program
+    private static readonly SqlOption SqlFilter = new();
+
+    protected Program()
     {
-        private static readonly SqlOption SqlFilter = new SqlOption();
+    }
 
-        protected Program()
-        {
-        }
+    private static int Main(string[] args)
+    {
+        var completedSuccessfully = false;
 
-        private static int Main(string[] args)
-        {
-            bool completedSuccessfully = false;
-
-            Parser.Default.ParseArguments<CommandlineOptions>(args)
-                .WithParsed(options =>
+        _ = Parser.Default.ParseArguments<CommandlineOptions>(args)
+            .WithParsed(options =>
+            {
+                try
                 {
-                    try
-                    {
-                        completedSuccessfully = Work(options);
-                    }
-                    catch (Exception ex)
-                    {
-                        Console.WriteLine(ex.Message);
-                    }
-                });
+                    completedSuccessfully = Work(options);
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex.Message);
+                }
+            });
 
-            if (Debugger.IsAttached)
-            {
-                Console.WriteLine("Press any key to continue...");
-                Console.ReadKey(false);
-            }
-
-            return completedSuccessfully ? 0 : 1;
+        if (Debugger.IsAttached)
+        {
+            Console.WriteLine("Press any key to continue...");
+            _ = Console.ReadKey(false);
         }
 
-        private static bool TestConnection(string connectionString1)
+        return completedSuccessfully ? 0 : 1;
+    }
+
+    private static bool TestConnection(string connectionString1)
+    {
+        using var connection = new SqlConnection();
+        connection.ConnectionString = connectionString1;
+        connection.Open();
+        connection.Close();
+        return true;
+    }
+
+    private static bool Work(CommandlineOptions options)
+    {
+        try
         {
-            using (var connection = new SqlConnection())
+            Database origin;
+            Database destination;
+            if (TestConnection(options.Before)
+                && TestConnection(options.After))
             {
-                connection.ConnectionString = connectionString1;
-                connection.Open();
-                connection.Close();
+                var sql = new Generate
+                {
+                    ConnectionString = options.Before
+                };
+                Console.WriteLine("Reading first database...");
+                sql.Options = SqlFilter;
+                origin = sql.Process();
+
+                sql.ConnectionString = options.After;
+                Console.WriteLine("Reading second database...");
+                destination = sql.Process();
+                Console.WriteLine("Comparing databases schemas...");
+                origin = Generate.Compare(origin, destination);
+                // temporary work-around: run twice just like GUI
+                _ = origin.ToSqlDiff([]);
+
+                Console.WriteLine("Generating SQL file...");
+                var script = origin.ToSqlDiff([]).ToSQL();
+                if (!string.IsNullOrWhiteSpace(options.OutputFile))
+                {
+                    Console.WriteLine("Writing action script to {0}", options.OutputFile);
+                    SaveFile(options.OutputFile, script);
+                }
+                else
+                {
+                    Console.WriteLine();
+                    Console.WriteLine(script);
+                    Console.WriteLine();
+                }
                 return true;
             }
         }
-
-        private static bool Work(CommandlineOptions options)
+        catch (Exception ex)
         {
-            try
+            var newIssueUri = ConfigurationFactory.Instance?.GetValue<string>("OpenDBDiff:NewIssueUri");
+            if (string.IsNullOrWhiteSpace(newIssueUri))
             {
-                Database origin;
-                Database destination;
-                if (TestConnection(options.Before)
-                    && TestConnection(options.After))
-                {
-                    Generate sql = new Generate
-                    {
-                        ConnectionString = options.Before
-                    };
-                    Console.WriteLine("Reading first database...");
-                    sql.Options = SqlFilter;
-                    origin = sql.Process();
-
-                    sql.ConnectionString = options.After;
-                    Console.WriteLine("Reading second database...");
-                    destination = sql.Process();
-                    Console.WriteLine("Comparing databases schemas...");
-                    origin = Generate.Compare(origin, destination);
-                    // temporary work-around: run twice just like GUI
-                    origin.ToSqlDiff(new System.Collections.Generic.List<ISchemaBase>());
-
-                    Console.WriteLine("Generating SQL file...");
-                    var script = origin.ToSqlDiff(new System.Collections.Generic.List<ISchemaBase>()).ToSQL();
-                    if (!string.IsNullOrWhiteSpace(options.OutputFile))
-                    {
-                        Console.WriteLine("Writing action script to {0}", options.OutputFile);
-                        SaveFile(options.OutputFile, script);
-                    }
-                    else
-                    {
-                        Console.WriteLine();
-                        Console.WriteLine(script);
-                        Console.WriteLine();
-                    }
-                    return true;
-                }
-            }
-            catch (Exception ex)
-            {
-                string newIssueUri = ConfigurationFactory.Instance?.GetValue<string>("OpenDBDiff:NewIssueUri");
-                if (string.IsNullOrWhiteSpace(newIssueUri))
-                    newIssueUri = "https://github.com/OpenDBDiff/OpenDBDiff/issues/new";
-
-                Console.WriteLine($"{ex.Message}\r\n{ex.StackTrace}\r\n\r\nPlease report this issue at {newIssueUri}.");
-                Console.WriteLine();
+                newIssueUri = "https://github.com/OpenDBDiff/OpenDBDiff/issues/new";
             }
 
-            return false;
+            Console.WriteLine($"{ex.Message}\r\n{ex.StackTrace}\r\n\r\nPlease report this issue at {newIssueUri}.");
+            Console.WriteLine();
         }
 
-        private static void SaveFile(string filenmame, string sql)
+        return false;
+    }
+
+    private static void SaveFile(string filenmame, string sql)
+    {
+        if (!string.IsNullOrWhiteSpace(filenmame))
         {
-            if (!string.IsNullOrWhiteSpace(filenmame))
-            {
-                using (var fs = new FileStream(filenmame, FileMode.Create))
-                using (var writer = new StreamWriter(fs))
-                    writer.Write(sql);
-            }
+            using var fs = new FileStream(filenmame, FileMode.Create);
+            using var writer = new StreamWriter(fs);
+            writer.Write(sql);
         }
     }
 }

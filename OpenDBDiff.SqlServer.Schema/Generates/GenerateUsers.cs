@@ -1,65 +1,52 @@
-﻿using System;
-using Microsoft.Data.SqlClient;
+﻿using Microsoft.Data.SqlClient;
 using OpenDBDiff.SqlServer.Schema.Generates.SQLCommands;
 using OpenDBDiff.SqlServer.Schema.Model;
 
-namespace OpenDBDiff.SqlServer.Schema.Generates
+namespace OpenDBDiff.SqlServer.Schema.Generates;
+
+public class GenerateUsers
 {
-    public class GenerateUsers
+    private readonly Generate root;
+
+    public GenerateUsers(Generate root) => this.root = root;
+
+    public void Fill(Database database, string connectioString)
     {
-        private readonly Generate root;
-
-        public GenerateUsers(Generate root)
+        string type;
+        if (database.Options.Ignore.FilterUsers || database.Options.Ignore.FilterRoles)
         {
-            this.root = root;
-        }
-
-        public void Fill(Database database, string connectioString)
-        {
-            string type;
-            if (database.Options.Ignore.FilterUsers || database.Options.Ignore.FilterRoles)
+            using var conn = new SqlConnection(connectioString);
+            using var command = new SqlCommand(UserSQLCommand.Get(database.Info.Version, database.Info.Edition), conn);
+            conn.Open();
+            command.CommandTimeout = 0;
+            using var reader = command.ExecuteReader();
+            while (reader.Read())
             {
-                using (SqlConnection conn = new SqlConnection(connectioString))
+                type = reader["type"].ToString();
+                if (database.Options.Ignore.FilterUsers && (type.Equals("S") || type.Equals("U")))
                 {
-                    using (SqlCommand command = new SqlCommand(UserSQLCommand.Get(database.Info.Version, database.Info.Edition), conn))
+                    var item = new User(database)
                     {
-                        conn.Open();
-                        command.CommandTimeout = 0;
-                        using (SqlDataReader reader = command.ExecuteReader())
-                        {
-                            while (reader.Read())
-                            {
-                                type = reader["type"].ToString();
-                                if (database.Options.Ignore.FilterUsers && (type.Equals("S") || type.Equals("U")))
-                                {
-                                    User item = new User(database)
-                                    {
-                                        Id = (int)reader["principal_id"],
-                                        Name = reader["name"].ToString(),
-                                        Login = reader["Login"].ToString(),
-                                        Owner = reader["default_schema_name"].ToString()
-                                    };
-                                    database.Users.Add(item);
-                                }
-                                if (database.Options.Ignore.FilterRoles && (type.Equals("A") || type.Equals("R")))
-                                {
-                                    Role item = new Role(database)
-                                    {
-                                        Id = (int)reader["principal_id"],
-                                        Name = reader["name"].ToString(),
-                                        Owner = reader["default_schema_name"].ToString(),
-                                        Password = "",
-                                        IsSystem = (bool)reader["is_fixed_role"]
-                                    };
-                                    if (type.Equals("A"))
-                                        item.Type = Role.RoleTypeEnum.ApplicationRole;
-                                    else
-                                        item.Type = Role.RoleTypeEnum.DatabaseRole;
-                                    database.Roles.Add(item);
-                                }
-                            }
-                        }
-                    }
+                        Id = (int)reader["principal_id"],
+                        Name = reader["name"].ToString(),
+                        Login = reader["Login"].ToString(),
+                        Owner = reader["default_schema_name"].ToString()
+                    };
+                    database.Users.Add(item);
+                }
+                if (database.Options.Ignore.FilterRoles && (type.Equals("A") || type.Equals("R")))
+                {
+                    var item = new Role(database)
+                    {
+                        Id = (int)reader["principal_id"],
+                        Name = reader["name"].ToString(),
+                        Owner = reader["default_schema_name"].ToString(),
+                        Password = "",
+                        IsSystem = (bool)reader["is_fixed_role"],
+                        Type = type.Equals("A") ? Role.RoleTypeEnum.ApplicationRole : Role.RoleTypeEnum.DatabaseRole
+                    };
+
+                    database.Roles.Add(item);
                 }
             }
         }

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.ComponentModel;
 using System.Linq;
-using System.Reflection;
 using System.Windows.Forms;
 using OpenDBDiff.Abstractions.Schema;
 using OpenDBDiff.SqlServer.Schema.Options;
@@ -34,18 +33,17 @@ namespace OpenDBDiff.SqlServer.Ui
 
         private string GetEnumDescription(Enum value)
         {
-            FieldInfo fi = value.GetType().GetField(value.ToString());
+            var fi = value.GetType().GetField(value.ToString());
 
-            DescriptionAttribute[] attributes =
+            var attributes =
                 (DescriptionAttribute[])fi.GetCustomAttributes(
                 typeof(DescriptionAttribute),
                 false);
 
-            if (attributes != null &&
-                attributes.Length > 0)
-                return attributes[0].Description;
-            else
-                return value.ToString();
+            return attributes != null &&
+                attributes.Length > 0
+                ? attributes[0].Description
+                : value.ToString();
         }
 
         private void PopulateObjectTypeDropDownList()
@@ -60,16 +58,13 @@ namespace OpenDBDiff.SqlServer.Ui
             cboObjects.ValueMember = "ObjectType";
         }
 
-        private void CancelFormButton_Click(object sender, EventArgs e)
-        {
-            this.Close();
-        }
+        private void CancelFormButton_Click(object sender, EventArgs e) => this.Close();
 
         private void ApplyButton_Click(object sender, EventArgs e)
         {
             if (cboObjects.SelectedItem == null)
             {
-                MessageBox.Show(this, "All fields are required.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                _ = MessageBox.Show(this, "All fields are required.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
 
@@ -77,12 +72,14 @@ namespace OpenDBDiff.SqlServer.Ui
 
             if (sqlOption.Filters.Items.Contains(fi))
             {
-                MessageBox.Show(this, string.Format("The list of name filters already includes an entry for text '{0}' of type '{1}'", fi.FilterPattern, fi.ObjectType.ToString()), "Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                _ = MessageBox.Show(this, string.Format("The list of name filters already includes an entry for text '{0}' of type '{1}'", fi.FilterPattern, fi.ObjectType.ToString()), "Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                 return;
             }
 
             if (indexFilter == -1)
+            {
                 sqlOption.Filters.Items.Add(fi);
+            }
             else
             {
                 sqlOption.Filters.Items[indexFilter].FilterPattern = fi.FilterPattern;

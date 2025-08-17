@@ -4,150 +4,156 @@ using System.Linq;
 using OpenDBDiff.Abstractions.Schema;
 using OpenDBDiff.Abstractions.Schema.Model;
 
-namespace OpenDBDiff.SqlServer.Schema.Model
+namespace OpenDBDiff.SqlServer.Schema.Model;
+
+internal class Dependencies : List<Dependency>
 {
-    internal class Dependencies : List<Dependency>
+    public Database Database { get; private set; }
+
+    public void Add(Database database, int tableId, int columnId, int ownerTableId, int typeId, ISchemaBase constraint)
     {
-        public Database Database { get; private set; }
-
-        public void Add(Database database, int tableId, int columnId, int ownerTableId, int typeId, ISchemaBase constraint)
+        var dependency = new Dependency
         {
-            Dependency dependency = new Dependency
-            {
-                SubObjectId = columnId,
-                ObjectId = tableId,
-                OwnerTableId = ownerTableId,
+            SubObjectId = columnId,
+            ObjectId = tableId,
+            OwnerTableId = ownerTableId,
 
-                FullName = constraint.FullName,
-                Type = constraint.ObjectType,
-                DataTypeId = typeId
-            };
-            this.Database = database;
-            base.Add(dependency);
-        }
+            FullName = constraint.FullName,
+            Type = constraint.ObjectType,
+            DataTypeId = typeId
+        };
+        this.Database = database;
+        base.Add(dependency);
+    }
 
-        public void Add(Database database, int objectId, ISchemaBase objectSchema)
+    public void Add(Database database, int objectId, ISchemaBase objectSchema)
+    {
+        var dependency = new Dependency
         {
-            Dependency dependency = new Dependency
-            {
-                ObjectId = objectId,
-                FullName = objectSchema.FullName,
-                Type = objectSchema.ObjectType
-            };
-            this.Database = database;
-            base.Add(dependency);
-        }
+            ObjectId = objectId,
+            FullName = objectSchema.FullName,
+            Type = objectSchema.ObjectType
+        };
+        this.Database = database;
+        base.Add(dependency);
+    }
 
-        /// <summary>
-        /// Devuelve todos las constraints dependientes de una tabla.
-        /// </summary>
-        public List<ISchemaBase> FindNotOwner(int tableId, ObjectType type)
+    /// <summary>
+    /// Devuelve todos las constraints dependientes de una tabla.
+    /// </summary>
+    public List<ISchemaBase> FindNotOwner(int tableId, ObjectType type)
+    {
+        try
         {
-            try
+            List<ISchemaBase> cons = [];
+            this.ForEach(dependency =>
             {
-                List<ISchemaBase> cons = new List<ISchemaBase>();
-                this.ForEach(dependency =>
+                if (dependency.Type == type)
                 {
-                    if (dependency.Type == type)
+                    var item = Database.Find(dependency.FullName);
+                    if (dependency.Type == ObjectType.Constraint)
                     {
-                        ISchemaBase item = Database.Find(dependency.FullName);
-                        if (dependency.Type == ObjectType.Constraint)
+                        if ((dependency.ObjectId == tableId) && (((Constraint)item).Type == Constraint.ConstraintType.ForeignKey))
                         {
-                            if ((dependency.ObjectId == tableId) && (((Constraint)item).Type == Constraint.ConstraintType.ForeignKey))
-                                cons.Add(item);
-                        }
-                        else
-                            if (dependency.ObjectId == tableId)
                             cons.Add(item);
+                        }
                     }
+                    else
+                        if (dependency.ObjectId == tableId)
+                    {
+                        cons.Add(item);
+                    }
+                }
 
-                });
-                return cons;
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
-        }
-
-
-        /// <summary>
-        /// Devuelve todos las constraints dependientes de una tabla.
-        /// </summary>
-        /*public void Set(int tableId, Constraint constraint)
-        {
-            this.ForEach(item =>
-            {
-                if (item.Type == ObjectType.Constraint)
-                    if ((item.ObjectId == tableId) && (item.ObjectSchema.Name.Equals(constraint.Name)))
-                        item.ObjectSchema = constraint;
             });
-        }*/
-
-        /// <summary>
-        /// Devuelve todos las constraints dependientes de una tabla.
-        /// </summary>
-        public List<ISchemaBase> Find(int tableId) => Find(tableId, 0, 0);
-
-        public int DependenciesCount(int objectId, ObjectType type)
-        {
-            Dictionary<int, bool> depencyTracker = new Dictionary<int, bool>();
-            return DependenciesCount(objectId, type, depencyTracker);
+            return cons;
         }
-
-        private int DependenciesCount(int tableId, ObjectType type, Dictionary<int, bool> depencyTracker)
+        catch (Exception ex)
         {
-            int count = 0;
-            bool putItem = false;
-            int relationalTableId;
-            List<ISchemaBase> constraints = this.FindNotOwner(tableId, type);
-            for (int index = 0; index < constraints.Count; index++)
+            throw ex;
+        }
+    }
+
+
+    /// <summary>
+    /// Devuelve todos las constraints dependientes de una tabla.
+    /// </summary>
+    /*public void Set(int tableId, Constraint constraint)
+    {
+        this.ForEach(item =>
+        {
+            if (item.Type == ObjectType.Constraint)
+                if ((item.ObjectId == tableId) && (item.ObjectSchema.Name.Equals(constraint.Name)))
+                    item.ObjectSchema = constraint;
+        });
+    }*/
+
+    /// <summary>
+    /// Devuelve todos las constraints dependientes de una tabla.
+    /// </summary>
+    public List<ISchemaBase> Find(int tableId) => Find(tableId, 0, 0);
+
+    public int DependenciesCount(int objectId, ObjectType type)
+    {
+        Dictionary<int, bool> depencyTracker = [];
+        return DependenciesCount(objectId, type, depencyTracker);
+    }
+
+    private int DependenciesCount(int tableId, ObjectType type, Dictionary<int, bool> depencyTracker)
+    {
+        var count = 0;
+        var putItem = false;
+        int relationalTableId;
+        var constraints = this.FindNotOwner(tableId, type);
+        for (var index = 0; index < constraints.Count; index++)
+        {
+            var cons = constraints[index];
+            if (cons.ObjectType == type)
             {
-                ISchemaBase cons = constraints[index];
-                if (cons.ObjectType == type)
+                if (type == ObjectType.Constraint)
                 {
-                    if (type == ObjectType.Constraint)
-                    {
-                        relationalTableId = ((Constraint)cons).RelationalTableId;
-                        putItem = relationalTableId == tableId;
-                    }
-                }
-                if (putItem)
-                {
-                    if (!depencyTracker.ContainsKey(tableId))
-                    {
-                        depencyTracker.Add(tableId, true);
-                        count += 1 + DependenciesCount(cons.Parent.Id, type, depencyTracker);
-                    }
+                    relationalTableId = ((Constraint)cons).RelationalTableId;
+                    putItem = relationalTableId == tableId;
                 }
             }
-            return count;
-        }
-
-        /// <summary>
-        /// Devuelve todos las constraints dependientes de una tabla y una columna.
-        /// </summary>
-        public List<ISchemaBase> Find(int tableId, int columnId, int dataTypeId)
-        {
-            List<string> cons = new List<string>();
-            List<ISchemaBase> real = new List<ISchemaBase>();
-
-            cons = (from depends in this
-                    where (depends.Type == ObjectType.Constraint || depends.Type == ObjectType.Index) &&
-                    (depends.DataTypeId == dataTypeId || dataTypeId == 0) && (depends.SubObjectId == columnId || columnId == 0) && (depends.ObjectId == tableId)
-                    select depends.FullName)
-                        .Concat(from depends in this
-                                where (depends.Type == ObjectType.View || depends.Type == ObjectType.Function) &&
-                                (depends.ObjectId == tableId)
-                                select depends.FullName).ToList();
-
-            cons.ForEach(item =>
+            if (putItem)
+            {
+                if (!depencyTracker.ContainsKey(tableId))
                 {
-                    ISchemaBase schema = Database.Find(item);
-                    if (schema != null) real.Add(schema);
+                    depencyTracker.Add(tableId, true);
+                    count += 1 + DependenciesCount(cons.Parent.Id, type, depencyTracker);
                 }
-            );
-            return real;
+            }
         }
+        return count;
+    }
+
+    /// <summary>
+    /// Devuelve todos las constraints dependientes de una tabla y una columna.
+    /// </summary>
+    public List<ISchemaBase> Find(int tableId, int columnId, int dataTypeId)
+    {
+        List<string> cons = [];
+        List<ISchemaBase> real = [];
+
+        cons = (from depends in this
+                where (depends.Type == ObjectType.Constraint || depends.Type == ObjectType.Index) &&
+                (depends.DataTypeId == dataTypeId || dataTypeId == 0) && (depends.SubObjectId == columnId || columnId == 0) && (depends.ObjectId == tableId)
+                select depends.FullName)
+                    .Concat(from depends in this
+                            where (depends.Type == ObjectType.View || depends.Type == ObjectType.Function) &&
+                            (depends.ObjectId == tableId)
+                            select depends.FullName).ToList();
+
+        cons.ForEach(item =>
+            {
+                var schema = Database.Find(item);
+                if (schema != null)
+                {
+                    real.Add(schema);
+                }
+            }
+        );
+        return real;
     }
 }

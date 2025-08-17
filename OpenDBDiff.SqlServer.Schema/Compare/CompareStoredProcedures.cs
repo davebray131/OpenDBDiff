@@ -2,27 +2,19 @@ using OpenDBDiff.Abstractions.Schema;
 using OpenDBDiff.Abstractions.Schema.Model;
 using OpenDBDiff.SqlServer.Schema.Model;
 
-namespace OpenDBDiff.SqlServer.Schema.Compare
+namespace OpenDBDiff.SqlServer.Schema.Compare;
+
+internal class CompareStoredProcedures : CompareBase<StoredProcedure>
 {
-    internal class CompareStoredProcedures : CompareBase<StoredProcedure>
+    protected override void DoUpdate<Root>(SchemaList<StoredProcedure, Root> originFields, StoredProcedure node)
     {
-        protected override void DoUpdate<Root>(SchemaList<StoredProcedure, Root> originFields, StoredProcedure node)
+        if (!node.Compare(originFields[node.FullName]))
         {
-            if (!node.Compare(originFields[node.FullName]))
-            {
-                StoredProcedure newNode = node; //.Clone(originFields.Parent);
+            var newNode = node; //.Clone(originFields.Parent);
 
-                if (node.CompareExceptWhitespace(originFields[node.FullName]))
-                {
-                    newNode.Status = ObjectStatus.AlterWhitespace;
-                }
-                else
-                {
-                    newNode.Status = ObjectStatus.Alter;
-                }
+            newNode.Status = node.CompareExceptWhitespace(originFields[node.FullName]) ? ObjectStatus.AlterWhitespace : ObjectStatus.Alter;
 
-                originFields[node.FullName] = newNode;
-            }
+            originFields[node.FullName] = newNode;
         }
     }
 }

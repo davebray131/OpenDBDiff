@@ -4,369 +4,454 @@ using System.Text;
 using OpenDBDiff.Abstractions.Schema;
 using OpenDBDiff.Abstractions.Schema.Model;
 
-namespace OpenDBDiff.SqlServer.Schema.Model
+namespace OpenDBDiff.SqlServer.Schema.Model;
+
+public class Constraint : SQLServerSchemaBase
 {
-    public class Constraint : SQLServerSchemaBase
+    public enum ConstraintType
     {
-        public enum ConstraintType
+        None = 0,
+        PrimaryKey = 1,
+        ForeignKey = 2,
+        Default = 3,
+        Unique = 4,
+        Check = 5
+    }
+
+    public Constraint(ISchemaBase parent)
+        : this(parent, false)
+    {
+    }
+
+    public Constraint(ISchemaBase parent, bool hasIndex)
+        : base(parent, ObjectType.Constraint)
+    {
+        this.Columns = new ConstraintColumns(this);
+        if (hasIndex)
         {
-            None = 0,
-            PrimaryKey = 1,
-            ForeignKey = 2,
-            Default = 3,
-            Unique = 4,
-            Check = 5
+            this.Index = new Index(parent);
+        }
+    }
+
+    /// <summary>
+    /// Clona el objeto Column en una nueva instancia.
+    /// </summary>
+    public override ISchemaBase Clone(ISchemaBase parent)
+    {
+        var col = new Constraint(parent)
+        {
+            Id = this.Id,
+            Name = this.Name,
+            NotForReplication = this.NotForReplication,
+            RelationalTableFullName = this.RelationalTableFullName,
+            Status = this.Status,
+            Type = this.Type,
+            WithNoCheck = this.WithNoCheck,
+            OnDeleteCascade = this.OnDeleteCascade,
+            OnUpdateCascade = this.OnUpdateCascade,
+            Owner = this.Owner,
+            Columns = this.Columns.Clone(),
+            Index = (Index)this.Index?.Clone(parent),
+            IsDisabled = this.IsDisabled,
+            Definition = this.Definition,
+            Guid = this.Guid
+        };
+        return col;
+    }
+
+    /// <summary>
+    /// Informacion sobre le indice asociado al Constraint.
+    /// </summary>
+    public Index Index { get; set; }
+
+    /// <summary>
+    /// Coleccion de columnas de la constraint.
+    /// </summary>
+    public ConstraintColumns Columns { get; set; }
+
+    /// <summary>
+    /// Indica si la constraint tiene asociada un indice Clustered.
+    /// </summary>
+    public bool HasClusteredIndex => Index != null && Index.Type == Index.IndexTypeEnum.Clustered;
+
+    /// <summary>
+    /// Gets or sets a value indicating whether this constraint is disabled.
+    /// </summary>
+    /// <value>
+    /// 	<c>true</c> if this constraint is disabled; otherwise, <c>false</c>.
+    /// </value>
+    public bool IsDisabled { get; set; }
+
+    /// <summary>
+    /// Gets or sets the on delete cascade (only for FK).
+    /// </summary>
+    /// <value>The on delete cascade.</value>
+    public int OnDeleteCascade { get; set; }
+
+    /// <summary>
+    /// Gets or sets the on update cascade (only for FK).
+    /// </summary>
+    /// <value>The on update cascade.</value>
+    public int OnUpdateCascade { get; set; }
+
+    /// <summary>
+    /// Valor de la constraint (se usa para los Check Constraint).
+    /// </summary>
+    public string Definition { get; set; }
+
+    /// <summary>
+    /// Indica si la constraint va a ser usada en replicacion.
+    /// </summary>
+    public bool NotForReplication { get; set; }
+
+    /// <summary>
+    /// Gets or sets a value indicating whether [with no check].
+    /// </summary>
+    /// <value><c>true</c> if [with no check]; otherwise, <c>false</c>.</value>
+    public bool WithNoCheck { get; set; }
+
+    /// <summary>
+    /// Indica el tipo de constraint (PrimaryKey, ForeignKey, Unique o Default).
+    /// </summary>
+    public ConstraintType Type { get; set; }
+
+    /// <summary>
+    /// ID de la tabla relacionada a la que hace referencia (solo aplica a FK)
+    /// </summary>
+    public int RelationalTableId { get; set; }
+
+    /// <summary>
+    /// Nombre de la tabla relacionada a la que hace referencia (solo aplica a FK)
+    /// </summary>
+    public string RelationalTableFullName { get; set; }
+
+    /// <summary>
+    /// Compara dos campos y devuelve true si son iguales, caso contrario, devuelve false.
+    /// </summary>
+    public static bool Compare(Constraint origin, Constraint destination)
+    {
+        if (destination == null)
+        {
+            throw new ArgumentNullException("destination");
         }
 
-        public Constraint(ISchemaBase parent)
-            : this(parent, false)
+        if (origin == null)
         {
+            throw new ArgumentNullException("origin");
         }
 
-        public Constraint(ISchemaBase parent, bool hasIndex)
-            : base(parent, ObjectType.Constraint)
+        if (origin.NotForReplication != destination.NotForReplication)
         {
-            this.Columns = new ConstraintColumns(this);
-            if (hasIndex)
-                this.Index = new Index(parent);
+            return false;
         }
 
-        /// <summary>
-        /// Clona el objeto Column en una nueva instancia.
-        /// </summary>
-        public override ISchemaBase Clone(ISchemaBase parent)
+        if ((origin.RelationalTableFullName == null) && (destination.RelationalTableFullName != null))
         {
-            Constraint col = new Constraint(parent)
+            return false;
+        }
+
+        if (origin.RelationalTableFullName != null)
+        {
+            if (!origin.RelationalTableFullName.Equals(destination.RelationalTableFullName, StringComparison.CurrentCultureIgnoreCase))
             {
-                Id = this.Id,
-                Name = this.Name,
-                NotForReplication = this.NotForReplication,
-                RelationalTableFullName = this.RelationalTableFullName,
-                Status = this.Status,
-                Type = this.Type,
-                WithNoCheck = this.WithNoCheck,
-                OnDeleteCascade = this.OnDeleteCascade,
-                OnUpdateCascade = this.OnUpdateCascade,
-                Owner = this.Owner,
-                Columns = this.Columns.Clone(),
-                Index = (Index)this.Index?.Clone(parent),
-                IsDisabled = this.IsDisabled,
-                Definition = this.Definition,
-                Guid = this.Guid
-            };
-            return col;
-        }
-
-        /// <summary>
-        /// Informacion sobre le indice asociado al Constraint.
-        /// </summary>
-        public Index Index { get; set; }
-
-        /// <summary>
-        /// Coleccion de columnas de la constraint.
-        /// </summary>
-        public ConstraintColumns Columns { get; set; }
-
-        /// <summary>
-        /// Indica si la constraint tiene asociada un indice Clustered.
-        /// </summary>
-        public bool HasClusteredIndex
-        {
-            get
-            {
-                if (Index != null)
-                    return Index.Type == Index.IndexTypeEnum.Clustered;
                 return false;
             }
         }
 
-        /// <summary>
-        /// Gets or sets a value indicating whether this constraint is disabled.
-        /// </summary>
-        /// <value>
-        /// 	<c>true</c> if this constraint is disabled; otherwise, <c>false</c>.
-        /// </value>
-        public bool IsDisabled { get; set; }
-
-        /// <summary>
-        /// Gets or sets the on delete cascade (only for FK).
-        /// </summary>
-        /// <value>The on delete cascade.</value>
-        public int OnDeleteCascade { get; set; }
-
-        /// <summary>
-        /// Gets or sets the on update cascade (only for FK).
-        /// </summary>
-        /// <value>The on update cascade.</value>
-        public int OnUpdateCascade { get; set; }
-
-        /// <summary>
-        /// Valor de la constraint (se usa para los Check Constraint).
-        /// </summary>
-        public string Definition { get; set; }
-
-        /// <summary>
-        /// Indica si la constraint va a ser usada en replicacion.
-        /// </summary>
-        public bool NotForReplication { get; set; }
-
-        /// <summary>
-        /// Gets or sets a value indicating whether [with no check].
-        /// </summary>
-        /// <value><c>true</c> if [with no check]; otherwise, <c>false</c>.</value>
-        public bool WithNoCheck { get; set; }
-
-        /// <summary>
-        /// Indica el tipo de constraint (PrimaryKey, ForeignKey, Unique o Default).
-        /// </summary>
-        public ConstraintType Type { get; set; }
-
-        /// <summary>
-        /// ID de la tabla relacionada a la que hace referencia (solo aplica a FK)
-        /// </summary>
-        public int RelationalTableId { get; set; }
-
-        /// <summary>
-        /// Nombre de la tabla relacionada a la que hace referencia (solo aplica a FK)
-        /// </summary>
-        public string RelationalTableFullName { get; set; }
-
-        /// <summary>
-        /// Compara dos campos y devuelve true si son iguales, caso contrario, devuelve false.
-        /// </summary>
-        public static bool Compare(Constraint origin, Constraint destination)
+        if ((origin.Definition == null) && (destination.Definition != null))
         {
-            if (destination == null) throw new ArgumentNullException("destination");
-            if (origin == null) throw new ArgumentNullException("origin");
-            if (origin.NotForReplication != destination.NotForReplication) return false;
-            if ((origin.RelationalTableFullName == null) && (destination.RelationalTableFullName != null)) return false;
-            if (origin.RelationalTableFullName != null)
-                if (!origin.RelationalTableFullName.Equals(destination.RelationalTableFullName, StringComparison.CurrentCultureIgnoreCase)) return false;
-            if ((origin.Definition == null) && (destination.Definition != null)) return false;
-            if (origin.Definition != null)
-                if ((!origin.Definition.Equals(destination.Definition)) && (!origin.Definition.Equals("(" + destination.Definition + ")"))) return false;
-            /*Solo si la constraint esta habilitada, se chequea el is_trusted*/
-            if (!destination.IsDisabled)
-                if (origin.WithNoCheck != destination.WithNoCheck) return false;
-            if (origin.OnUpdateCascade != destination.OnUpdateCascade) return false;
-            if (origin.OnDeleteCascade != destination.OnDeleteCascade) return false;
-            if (!ConstraintColumns.Compare(origin.Columns, destination.Columns)) return false;
-            if ((origin.Index != null) && (destination.Index != null))
-                return Index.Compare(origin.Index, destination.Index);
-            return true;
+            return false;
         }
 
-        private string ToSQLGeneric(ConstraintType consType)
+        if (origin.Definition != null)
         {
-            Database database = null;
-            ISchemaBase current = this;
-            while (database == null && current.Parent != null)
+            if ((!origin.Definition.Equals(destination.Definition)) && (!origin.Definition.Equals("(" + destination.Definition + ")")))
             {
-                database = current.Parent as Database;
-                current = current.Parent;
+                return false;
             }
-            var isAzure10 = database.Info.Version == DatabaseInfo.SQLServerVersion.SQLServerAzure10;
-            //string typeConstraint = "";
-            StringBuilder sql = new StringBuilder();
-            if (Parent.ObjectType != ObjectType.TableType)
-                sql.Append("CONSTRAINT [" + Name + "] ");
+        }
+        /*Solo si la constraint esta habilitada, se chequea el is_trusted*/
+        if (!destination.IsDisabled)
+        {
+            if (origin.WithNoCheck != destination.WithNoCheck)
+            {
+                return false;
+            }
+        }
+
+        return origin.OnUpdateCascade == destination.OnUpdateCascade && origin.OnDeleteCascade == destination.OnDeleteCascade && ConstraintColumns.Compare(origin.Columns, destination.Columns) && (origin.Index == null || destination.Index == null || Index.Compare(origin.Index, destination.Index));
+    }
+
+    private string ToSQLGeneric(ConstraintType consType)
+    {
+        Database database = null;
+        ISchemaBase current = this;
+        while (database == null && current.Parent != null)
+        {
+            database = current.Parent as Database;
+            current = current.Parent;
+        }
+        var isAzure10 = database.Info.Version == DatabaseInfo.SQLServerVersion.SQLServerAzure10;
+        //string typeConstraint = "";
+        var sql = new StringBuilder();
+        _ = Parent.ObjectType != ObjectType.TableType ? sql.Append("CONSTRAINT [" + Name + "] ") : sql.Append("\t");
+
+        _ = consType == ConstraintType.PrimaryKey ? sql.Append("PRIMARY KEY") : sql.Append("UNIQUE");
+
+        if (Index != null)
+        {
+            _ = sql.Append(" ");
+            _ = sql.Append(Index.Type.ToString().ToUpperInvariant());
+        }
+
+        _ = sql.Append("\r\n\t(\r\n");
+
+        this.Columns.Sort();
+
+        for (var j = 0; j < this.Columns.Count; j++)
+        {
+            _ = sql.Append("\t\t[" + this.Columns[j].Name + "]");
+            _ = Columns[j].Order ? sql.Append(" DESC") : sql.Append(" ASC");
+
+            if (j != this.Columns.Count - 1)
+            {
+                _ = sql.Append(",");
+            }
+
+            _ = sql.AppendLine();
+        }
+        _ = sql.Append("\t)");
+
+        if (Index != null)
+        {
+            _ = sql.Append(" WITH (");
+            if (Parent.ObjectType == ObjectType.TableType)
+            {
+                _ = Index.IgnoreDupKey ? sql.Append("IGNORE_DUP_KEY = ON") : sql.Append("IGNORE_DUP_KEY  = OFF");
+            }
             else
-                sql.Append("\t");
-
-            if (consType == ConstraintType.PrimaryKey)
-                sql.Append("PRIMARY KEY");
-            else
-                sql.Append("UNIQUE");
-
-            if (Index != null)
             {
-                sql.Append(" ");
-                sql.Append(Index.Type.ToString().ToUpperInvariant());
-            }
-
-            sql.Append("\r\n\t(\r\n");
-
-            this.Columns.Sort();
-
-            for (int j = 0; j < this.Columns.Count; j++)
-            {
-                sql.Append("\t\t[" + this.Columns[j].Name + "]");
-                if (this.Columns[j].Order) sql.Append(" DESC"); else sql.Append(" ASC");
-                if (j != this.Columns.Count - 1) sql.Append(",");
-                sql.AppendLine();
-            }
-            sql.Append("\t)");
-
-            if (Index != null)
-            {
-                sql.Append(" WITH (");
-                if (Parent.ObjectType == ObjectType.TableType)
-                    if (Index.IgnoreDupKey) sql.Append("IGNORE_DUP_KEY = ON"); else sql.Append("IGNORE_DUP_KEY  = OFF");
-                else
-                {
-                    if (!isAzure10)
-                    {
-                        if (Index.IsPadded) sql.Append("PAD_INDEX = ON, "); else sql.Append("PAD_INDEX  = OFF, ");
-                    }
-                    if (Index.IsAutoStatistics) sql.Append("STATISTICS_NORECOMPUTE = ON"); else sql.Append("STATISTICS_NORECOMPUTE  = OFF");
-                    if (Index.IgnoreDupKey) sql.Append(", IGNORE_DUP_KEY = ON"); else sql.Append(", IGNORE_DUP_KEY  = OFF");
-                    if (!isAzure10)
-                    {
-                        if (Index.AllowRowLocks) sql.Append(", ALLOW_ROW_LOCKS = ON"); else sql.Append(", ALLOW_ROW_LOCKS  = OFF");
-                        if (Index.AllowPageLocks) sql.Append(", ALLOW_PAGE_LOCKS = ON"); else sql.Append(", ALLOW_PAGE_LOCKS  = OFF");
-                        if (Index.FillFactor != 0) sql.Append(", FILLFACTOR = " + Index.FillFactor.ToString(CultureInfo.InvariantCulture));
-                    }
-                }
-                sql.Append(")");
                 if (!isAzure10)
                 {
-                    if (!string.IsNullOrEmpty(Index.FileGroup)) sql.Append(" ON [" + Index.FileGroup + "]");
+                    _ = Index.IsPadded ? sql.Append("PAD_INDEX = ON, ") : sql.Append("PAD_INDEX  = OFF, ");
+                }
+                _ = Index.IsAutoStatistics ? sql.Append("STATISTICS_NORECOMPUTE = ON") : sql.Append("STATISTICS_NORECOMPUTE  = OFF");
+
+                _ = Index.IgnoreDupKey ? sql.Append(", IGNORE_DUP_KEY = ON") : sql.Append(", IGNORE_DUP_KEY  = OFF");
+
+                if (!isAzure10)
+                {
+                    _ = Index.AllowRowLocks ? sql.Append(", ALLOW_ROW_LOCKS = ON") : sql.Append(", ALLOW_ROW_LOCKS  = OFF");
+
+                    _ = Index.AllowPageLocks ? sql.Append(", ALLOW_PAGE_LOCKS = ON") : sql.Append(", ALLOW_PAGE_LOCKS  = OFF");
+
+                    if (Index.FillFactor != 0)
+                    {
+                        _ = sql.Append(", FILLFACTOR = " + Index.FillFactor.ToString(CultureInfo.InvariantCulture));
+                    }
                 }
             }
+            _ = sql.Append(")");
+            if (!isAzure10)
+            {
+                if (!string.IsNullOrEmpty(Index.FileGroup))
+                {
+                    _ = sql.Append(" ON [" + Index.FileGroup + "]");
+                }
+            }
+        }
 
+        return sql.ToString();
+    }
+
+    /// <summary>
+    /// Devuelve el schema de la tabla en formato SQL.
+    /// </summary>
+    public override string ToSql()
+    {
+        if (this.Type == ConstraintType.PrimaryKey)
+        {
+            return ToSQLGeneric(ConstraintType.PrimaryKey);
+        }
+        if (this.Type == ConstraintType.ForeignKey)
+        {
+            var sql = new StringBuilder();
+            var sqlReference = new StringBuilder();
+            var indexc = 0;
+
+            this.Columns.Sort();
+            _ = sql.Append("CONSTRAINT [" + Name + "] FOREIGN KEY\r\n\t(\r\n");
+            foreach (var column in this.Columns)
+            {
+                _ = sql.Append("\t\t[" + column.Name + "]");
+                _ = sqlReference.Append("\t\t[" + column.ColumnRelationalName + "]");
+                if (indexc != this.Columns.Count - 1)
+                {
+                    _ = sql.Append(",");
+                    _ = sqlReference.Append(",");
+                }
+                _ = sql.AppendLine();
+                _ = sqlReference.AppendLine();
+                indexc++;
+            }
+            _ = sql.Append("\t)\r\n");
+            _ = sql.Append("\tREFERENCES " + this.RelationalTableFullName + "\r\n\t(\r\n");
+            _ = sql.Append(sqlReference + "\t)");
+            if (OnUpdateCascade == 1)
+            {
+                _ = sql.Append(" ON UPDATE CASCADE");
+            }
+
+            if (OnDeleteCascade == 1)
+            {
+                _ = sql.Append(" ON DELETE CASCADE");
+            }
+
+            if (OnUpdateCascade == 2)
+            {
+                _ = sql.Append(" ON UPDATE SET NULL");
+            }
+
+            if (OnDeleteCascade == 2)
+            {
+                _ = sql.Append(" ON DELETE SET NULL");
+            }
+
+            if (OnUpdateCascade == 3)
+            {
+                _ = sql.Append(" ON UPDATE SET DEFAULT");
+            }
+
+            if (OnDeleteCascade == 3)
+            {
+                _ = sql.Append(" ON DELETE SET DEFAULT");
+            }
+
+            _ = sql.Append(NotForReplication ? " NOT FOR REPLICATION" : "");
             return sql.ToString();
         }
-
-        /// <summary>
-        /// Devuelve el schema de la tabla en formato SQL.
-        /// </summary>
-        public override string ToSql()
+        if (this.Type == ConstraintType.Unique)
         {
-            if (this.Type == ConstraintType.PrimaryKey)
+            return ToSQLGeneric(ConstraintType.Unique);
+        }
+        if (this.Type == ConstraintType.Check)
+        {
+            var sqlcheck = "";
+            if (Parent.ObjectType != ObjectType.TableType)
             {
-                return ToSQLGeneric(ConstraintType.PrimaryKey);
+                sqlcheck = $"CONSTRAINT [{Name}] ";
             }
-            if (this.Type == ConstraintType.ForeignKey)
-            {
-                StringBuilder sql = new StringBuilder();
-                StringBuilder sqlReference = new StringBuilder();
-                int indexc = 0;
 
-                this.Columns.Sort();
-                sql.Append("CONSTRAINT [" + Name + "] FOREIGN KEY\r\n\t(\r\n");
-                foreach (ConstraintColumn column in this.Columns)
-                {
-                    sql.Append("\t\t[" + column.Name + "]");
-                    sqlReference.Append("\t\t[" + column.ColumnRelationalName + "]");
-                    if (indexc != this.Columns.Count - 1)
-                    {
-                        sql.Append(",");
-                        sqlReference.Append(",");
-                    }
-                    sql.AppendLine();
-                    sqlReference.AppendLine();
-                    indexc++;
-                }
-                sql.Append("\t)\r\n");
-                sql.Append("\tREFERENCES " + this.RelationalTableFullName + "\r\n\t(\r\n");
-                sql.Append(sqlReference + "\t)");
-                if (OnUpdateCascade == 1) sql.Append(" ON UPDATE CASCADE");
-                if (OnDeleteCascade == 1) sql.Append(" ON DELETE CASCADE");
-                if (OnUpdateCascade == 2) sql.Append(" ON UPDATE SET NULL");
-                if (OnDeleteCascade == 2) sql.Append(" ON DELETE SET NULL");
-                if (OnUpdateCascade == 3) sql.Append(" ON UPDATE SET DEFAULT");
-                if (OnDeleteCascade == 3) sql.Append(" ON DELETE SET DEFAULT");
-                sql.Append(NotForReplication ? " NOT FOR REPLICATION" : "");
-                return sql.ToString();
-            }
-            if (this.Type == ConstraintType.Unique)
-            {
-                return ToSQLGeneric(ConstraintType.Unique);
-            }
-            if (this.Type == ConstraintType.Check)
-            {
-                string sqlcheck = "";
-                if (Parent.ObjectType != ObjectType.TableType)
-                    sqlcheck = $"CONSTRAINT [{Name}] ";
+            return sqlcheck + "CHECK " + (NotForReplication ? "NOT FOR REPLICATION" : "") + " (" + Definition + ")";
+        }
+        return "";
+    }
 
-                return sqlcheck + "CHECK " + (NotForReplication ? "NOT FOR REPLICATION" : "") + " (" + Definition + ")";
-            }
-            return "";
+    public override string ToSqlAdd() => $"ALTER TABLE " + Parent.FullName + (WithNoCheck ? " WITH NOCHECK" : "") + " ADD " + ToSql() + "\r\nGO\r\n";
+
+    public override string ToSqlDrop() => ToSqlDrop(null);
+
+    public override SQLScript Create()
+    {
+        var action = ScriptAction.AddConstraint;
+        if (this.Type == ConstraintType.ForeignKey)
+        {
+            action = ScriptAction.AddConstraintFK;
         }
 
-        public override string ToSqlAdd() =>
-            $"ALTER TABLE " + Parent.FullName + (WithNoCheck ? " WITH NOCHECK" : "") + " ADD " + ToSql() + "\r\nGO\r\n";
-
-        public override string ToSqlDrop() => ToSqlDrop(null);
-
-        public override SQLScript Create()
+        if (this.Type == ConstraintType.PrimaryKey)
         {
-            ScriptAction action = ScriptAction.AddConstraint;
-            if (this.Type == ConstraintType.ForeignKey)
-                action = ScriptAction.AddConstraintFK;
-            if (this.Type == ConstraintType.PrimaryKey)
-                action = ScriptAction.AddConstraintPK;
-            if (!GetWasInsertInDiffList(action))
-            {
-                SetWasInsertInDiffList(action);
-                return new SQLScript(this.ToSqlAdd(), ((Table)Parent).DependenciesCount, action);
-            }
-            else
-                return null;
+            action = ScriptAction.AddConstraintPK;
         }
 
-        public override SQLScript Drop()
+        if (!GetWasInsertInDiffList(action))
         {
-            ScriptAction action = ScriptAction.DropConstraint;
-            if (this.Type == ConstraintType.ForeignKey)
-                action = ScriptAction.DropConstraintFK;
-            if (this.Type == ConstraintType.PrimaryKey)
-                action = ScriptAction.DropConstraintPK;
-            if (!GetWasInsertInDiffList(action))
-            {
-                SetWasInsertInDiffList(action);
-                return new SQLScript(this.ToSqlDrop(), ((Table)Parent).DependenciesCount, action);
-            }
-            else
-                return null;
+            SetWasInsertInDiffList(action);
+            return new SQLScript(this.ToSqlAdd(), ((Table)Parent).DependenciesCount, action);
+        }
+        else
+        {
+            return null;
+        }
+    }
+
+    public override SQLScript Drop()
+    {
+        var action = ScriptAction.DropConstraint;
+        if (this.Type == ConstraintType.ForeignKey)
+        {
+            action = ScriptAction.DropConstraintFK;
         }
 
-        public string ToSqlDrop(string FileGroupName)
+        if (this.Type == ConstraintType.PrimaryKey)
         {
-            string sql = $"ALTER TABLE {((Table)Parent).FullName} DROP CONSTRAINT [{Name}]";
-            if (!string.IsNullOrEmpty(FileGroupName)) sql += $" WITH (MOVE TO [{FileGroupName}])";
-            sql += "\r\nGO\r\n";
-            return sql;
+            action = ScriptAction.DropConstraintPK;
         }
 
-        public string ToSQLEnabledDisabled()
+        if (!GetWasInsertInDiffList(action))
         {
-            if (this.IsDisabled)
-                return $"ALTER TABLE {Parent.FullName} NOCHECK CONSTRAINT [{Name}\r\nGO\r\n";
-            else
-            {
-                return $"ALTER TABLE {Parent.FullName} CHECK CONSTRAINT [{Name}]\r\nGO\r\n";
-            }
+            SetWasInsertInDiffList(action);
+            return new SQLScript(this.ToSqlDrop(), ((Table)Parent).DependenciesCount, action);
+        }
+        else
+        {
+            return null;
+        }
+    }
+
+    public string ToSqlDrop(string FileGroupName)
+    {
+        var sql = $"ALTER TABLE {((Table)Parent).FullName} DROP CONSTRAINT [{Name}]";
+        if (!string.IsNullOrEmpty(FileGroupName))
+        {
+            sql += $" WITH (MOVE TO [{FileGroupName}])";
         }
 
-        public override SQLScriptList ToSqlDiff(System.Collections.Generic.ICollection<ISchemaBase> schemas)
-        {
-            SQLScriptList list = new SQLScriptList();
-            if (this.Status != ObjectStatus.Original)
-                RootParent.ActionMessage[Parent.FullName].Add(this);
+        sql += "\r\nGO\r\n";
+        return sql;
+    }
 
-            if (this.HasState(ObjectStatus.Drop))
-            {
-                if (this.Parent.Status != ObjectStatus.Rebuild)
-                    list.Add(Drop());
-            }
-            if (this.HasState(ObjectStatus.Create))
-                list.Add(Create());
-            if (this.HasState(ObjectStatus.Alter))
+    public string ToSQLEnabledDisabled()
+    {
+        return this.IsDisabled
+            ? $"ALTER TABLE {Parent.FullName} NOCHECK CONSTRAINT [{Name}\r\nGO\r\n"
+            : $"ALTER TABLE {Parent.FullName} CHECK CONSTRAINT [{Name}]\r\nGO\r\n";
+    }
+
+    public override SQLScriptList ToSqlDiff(System.Collections.Generic.ICollection<ISchemaBase> schemas)
+    {
+        var list = new SQLScriptList();
+        if (this.Status != ObjectStatus.Original)
+        {
+            RootParent.ActionMessage[Parent.FullName].Add(this);
+        }
+
+        if (this.HasState(ObjectStatus.Drop))
+        {
+            if (this.Parent.Status != ObjectStatus.Rebuild)
             {
                 list.Add(Drop());
-                list.Add(Create());
             }
-            if (this.HasState(ObjectStatus.Disabled))
-            {
-                list.Add(this.ToSQLEnabledDisabled(), ((Table)Parent).DependenciesCount, ScriptAction.AlterConstraint);
-            }
-            /*if (this.Status == StatusEnum.ObjectStatusType.ChangeFileGroup)
-            {
-                list.Add(this.ToSQLDrop(this.Index.FileGroup), ((Table)Parent).DependenciesCount, actionDrop);
-                list.Add(this.ToSQLAdd(), ((Table)Parent).DependenciesCount, actionAdd);
-            }*/
-            return list;
         }
+        if (this.HasState(ObjectStatus.Create))
+        {
+            list.Add(Create());
+        }
+
+        if (this.HasState(ObjectStatus.Alter))
+        {
+            list.Add(Drop());
+            list.Add(Create());
+        }
+        if (this.HasState(ObjectStatus.Disabled))
+        {
+            list.Add(this.ToSQLEnabledDisabled(), ((Table)Parent).DependenciesCount, ScriptAction.AlterConstraint);
+        }
+        /*if (this.Status == StatusEnum.ObjectStatusType.ChangeFileGroup)
+        {
+            list.Add(this.ToSQLDrop(this.Index.FileGroup), ((Table)Parent).DependenciesCount, actionDrop);
+            list.Add(this.ToSQLAdd(), ((Table)Parent).DependenciesCount, actionAdd);
+        }*/
+        return list;
     }
 }

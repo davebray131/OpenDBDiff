@@ -1,9 +1,8 @@
 ﻿using OpenDBDiff.Abstractions.Schema.Model;
 
-namespace OpenDBDiff.Abstractions.Ui
+namespace OpenDBDiff.Abstractions.Ui;
+
+public interface IDatabaseComparer
 {
-    public interface IDatabaseComparer
-    {
-        IDatabase Compare(IDatabase origin, IDatabase destination);
-    }
+    IDatabase Compare(IDatabase origin, IDatabase destination);
 }

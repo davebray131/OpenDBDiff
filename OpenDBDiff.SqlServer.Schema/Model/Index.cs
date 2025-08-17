@@ -3,289 +3,440 @@ using System.Text;
 using OpenDBDiff.Abstractions.Schema;
 using OpenDBDiff.Abstractions.Schema.Model;
 
-namespace OpenDBDiff.SqlServer.Schema.Model
+namespace OpenDBDiff.SqlServer.Schema.Model;
+
+public class Index : SQLServerSchemaBase
 {
-    public class Index : SQLServerSchemaBase
+    public enum IndexTypeEnum
     {
-        public enum IndexTypeEnum
+        Heap = 0,
+        Clustered = 1,
+        Nonclustered = 2,
+        XML = 3,
+        GEO = 4
+    }
+
+    public Index(ISchemaBase parent)
+        : base(parent, ObjectType.Index)
+    {
+        FilterDefintion = "";
+        Columns = new IndexColumns(parent);
+    }
+
+    public override ISchemaBase Clone(ISchemaBase parent)
+    {
+        var index = new Index(parent)
         {
-            Heap = 0,
-            Clustered = 1,
-            Nonclustered = 2,
-            XML = 3,
-            GEO = 4
+            AllowPageLocks = this.AllowPageLocks,
+            AllowRowLocks = this.AllowRowLocks,
+            Columns = this.Columns.Clone(),
+            FillFactor = this.FillFactor,
+            FileGroup = this.FileGroup,
+            Id = this.Id,
+            IgnoreDupKey = this.IgnoreDupKey,
+            IsAutoStatistics = this.IsAutoStatistics,
+            IsDisabled = this.IsDisabled,
+            IsPadded = this.IsPadded,
+            IsPrimaryKey = this.IsPrimaryKey,
+            IsUniqueKey = this.IsUniqueKey,
+            Name = this.Name,
+            SortInTempDb = this.SortInTempDb,
+            Status = this.Status,
+            Type = this.Type,
+            Owner = this.Owner,
+            FilterDefintion = this.FilterDefintion
+        };
+        ExtendedProperties.ForEach(item => index.ExtendedProperties.Add(item));
+        return index;
+    }
+
+    public string FileGroup { get; set; }
+
+    public bool SortInTempDb { get; set; }
+
+    public string FilterDefintion { get; set; }
+
+    public IndexColumns Columns { get; set; }
+
+    public bool IsAutoStatistics { get; set; }
+
+    public bool IsUniqueKey { get; set; }
+
+    public bool IsPrimaryKey { get; set; }
+
+    public IndexTypeEnum Type { get; set; }
+
+    public short FillFactor { get; set; }
+
+    public bool IsDisabled { get; set; }
+
+    public bool IsPadded { get; set; }
+
+    public bool IgnoreDupKey { get; set; }
+
+    public bool AllowPageLocks { get; set; }
+
+    public bool AllowRowLocks { get; set; }
+
+    public override string FullName => $"{Parent.FullName}.[{Name}]";
+
+    /// <summary>
+    /// Compara dos indices y devuelve true si son iguales, caso contrario, devuelve false.
+    /// </summary>
+    public static bool Compare(Index origin, Index destination)
+    {
+        if (destination == null)
+        {
+            throw new ArgumentNullException("destination");
         }
 
-        public Index(ISchemaBase parent)
-            : base(parent, ObjectType.Index)
+        if (origin == null)
         {
-            FilterDefintion = "";
-            Columns = new IndexColumns(parent);
+            throw new ArgumentNullException("origin");
         }
 
-        public override ISchemaBase Clone(ISchemaBase parent)
+        if (origin.AllowPageLocks != destination.AllowPageLocks)
         {
-            Index index = new Index(parent)
+            return false;
+        }
+
+        if (origin.AllowRowLocks != destination.AllowRowLocks)
+        {
+            return false;
+        }
+
+        if (origin.FillFactor != destination.FillFactor)
+        {
+            return false;
+        }
+
+        if (origin.IgnoreDupKey != destination.IgnoreDupKey)
+        {
+            return false;
+        }
+
+        if (origin.IsAutoStatistics != destination.IsAutoStatistics)
+        {
+            return false;
+        }
+
+        if (origin.IsDisabled != destination.IsDisabled)
+        {
+            return false;
+        }
+
+        if (origin.IsPadded != destination.IsPadded)
+        {
+            return false;
+        }
+
+        return origin.IsPrimaryKey == destination.IsPrimaryKey && origin.IsUniqueKey == destination.IsUniqueKey && origin.Type == destination.Type && origin.SortInTempDb == destination.SortInTempDb && origin.FilterDefintion.Equals(destination.FilterDefintion) && IndexColumns.Compare(origin.Columns, destination.Columns) && CompareFileGroup(origin, destination);
+    }
+
+    public static bool CompareExceptIsDisabled(Index origin, Index destination)
+    {
+        if (destination == null)
+        {
+            throw new ArgumentNullException("destination");
+        }
+
+        if (origin == null)
+        {
+            throw new ArgumentNullException("origin");
+        }
+
+        if (origin.AllowPageLocks != destination.AllowPageLocks)
+        {
+            return false;
+        }
+
+        if (origin.AllowRowLocks != destination.AllowRowLocks)
+        {
+            return false;
+        }
+
+        if (origin.FillFactor != destination.FillFactor)
+        {
+            return false;
+        }
+
+        if (origin.IgnoreDupKey != destination.IgnoreDupKey)
+        {
+            return false;
+        }
+
+        if (origin.IsAutoStatistics != destination.IsAutoStatistics)
+        {
+            return false;
+        }
+
+        if (origin.IsPadded != destination.IsPadded)
+        {
+            return false;
+        }
+
+        if (origin.IsPrimaryKey != destination.IsPrimaryKey)
+        {
+            return false;
+        }
+
+        if (origin.IsUniqueKey != destination.IsUniqueKey)
+        {
+            return false;
+        }
+
+        if (origin.Type != destination.Type)
+        {
+            return false;
+        }
+
+        if (origin.SortInTempDb != destination.SortInTempDb)
+        {
+            return false;
+        }
+
+        if (!origin.FilterDefintion.Equals(destination.FilterDefintion))
+        {
+            return false;
+        }
+
+        if (!IndexColumns.Compare(origin.Columns, destination.Columns))
+        {
+            return false;
+        }
+        //return true;
+        return CompareFileGroup(origin, destination);
+    }
+
+    private static bool CompareFileGroup(Index origin, Index destination)
+    {
+        if (destination == null)
+        {
+            throw new ArgumentNullException("destination");
+        }
+
+        if (origin == null)
+        {
+            throw new ArgumentNullException("origin");
+        }
+
+        if (origin.FileGroup != null)
+        {
+            if (!origin.FileGroup.Equals(destination.FileGroup))
             {
-                AllowPageLocks = this.AllowPageLocks,
-                AllowRowLocks = this.AllowRowLocks,
-                Columns = this.Columns.Clone(),
-                FillFactor = this.FillFactor,
-                FileGroup = this.FileGroup,
-                Id = this.Id,
-                IgnoreDupKey = this.IgnoreDupKey,
-                IsAutoStatistics = this.IsAutoStatistics,
-                IsDisabled = this.IsDisabled,
-                IsPadded = this.IsPadded,
-                IsPrimaryKey = this.IsPrimaryKey,
-                IsUniqueKey = this.IsUniqueKey,
-                Name = this.Name,
-                SortInTempDb = this.SortInTempDb,
-                Status = this.Status,
-                Type = this.Type,
-                Owner = this.Owner,
-                FilterDefintion = this.FilterDefintion
-            };
-            ExtendedProperties.ForEach(item => index.ExtendedProperties.Add(item));
-            return index;
-        }
-
-        public string FileGroup { get; set; }
-
-        public bool SortInTempDb { get; set; }
-
-        public string FilterDefintion { get; set; }
-
-        public IndexColumns Columns { get; set; }
-
-        public bool IsAutoStatistics { get; set; }
-
-        public bool IsUniqueKey { get; set; }
-
-        public bool IsPrimaryKey { get; set; }
-
-        public IndexTypeEnum Type { get; set; }
-
-        public short FillFactor { get; set; }
-
-        public bool IsDisabled { get; set; }
-
-        public bool IsPadded { get; set; }
-
-        public bool IgnoreDupKey { get; set; }
-
-        public bool AllowPageLocks { get; set; }
-
-        public bool AllowRowLocks { get; set; }
-
-        public override string FullName
-        {
-            get => $"{Parent.FullName}.[{Name}]";
-        }
-
-        /// <summary>
-        /// Compara dos indices y devuelve true si son iguales, caso contrario, devuelve false.
-        /// </summary>
-        public static bool Compare(Index origin, Index destination)
-        {
-            if (destination == null) throw new ArgumentNullException("destination");
-            if (origin == null) throw new ArgumentNullException("origin");
-            if (origin.AllowPageLocks != destination.AllowPageLocks) return false;
-            if (origin.AllowRowLocks != destination.AllowRowLocks) return false;
-            if (origin.FillFactor != destination.FillFactor) return false;
-            if (origin.IgnoreDupKey != destination.IgnoreDupKey) return false;
-            if (origin.IsAutoStatistics != destination.IsAutoStatistics) return false;
-            if (origin.IsDisabled != destination.IsDisabled) return false;
-            if (origin.IsPadded != destination.IsPadded) return false;
-            if (origin.IsPrimaryKey != destination.IsPrimaryKey) return false;
-            if (origin.IsUniqueKey != destination.IsUniqueKey) return false;
-            if (origin.Type != destination.Type) return false;
-            if (origin.SortInTempDb != destination.SortInTempDb) return false;
-            if (!origin.FilterDefintion.Equals(destination.FilterDefintion)) return false;
-            if (!IndexColumns.Compare(origin.Columns, destination.Columns)) return false;
-            return CompareFileGroup(origin, destination);
-        }
-
-        public static bool CompareExceptIsDisabled(Index origin, Index destination)
-        {
-            if (destination == null) throw new ArgumentNullException("destination");
-            if (origin == null) throw new ArgumentNullException("origin");
-            if (origin.AllowPageLocks != destination.AllowPageLocks) return false;
-            if (origin.AllowRowLocks != destination.AllowRowLocks) return false;
-            if (origin.FillFactor != destination.FillFactor) return false;
-            if (origin.IgnoreDupKey != destination.IgnoreDupKey) return false;
-            if (origin.IsAutoStatistics != destination.IsAutoStatistics) return false;
-            if (origin.IsPadded != destination.IsPadded) return false;
-            if (origin.IsPrimaryKey != destination.IsPrimaryKey) return false;
-            if (origin.IsUniqueKey != destination.IsUniqueKey) return false;
-            if (origin.Type != destination.Type) return false;
-            if (origin.SortInTempDb != destination.SortInTempDb) return false;
-            if (!origin.FilterDefintion.Equals(destination.FilterDefintion)) return false;
-            if (!IndexColumns.Compare(origin.Columns, destination.Columns)) return false;
-            //return true;
-            return CompareFileGroup(origin, destination);
-        }
-
-        private static bool CompareFileGroup(Index origin, Index destination)
-        {
-            if (destination == null) throw new ArgumentNullException("destination");
-            if (origin == null) throw new ArgumentNullException("origin");
-            if (origin.FileGroup != null)
-            {
-                if (!origin.FileGroup.Equals(destination.FileGroup)) return false;
+                return false;
             }
-            return true;
+        }
+        return true;
+    }
+
+    public override string ToSql()
+    {
+        Database database = null;
+        ISchemaBase current = this;
+        while (database == null && current.Parent != null)
+        {
+            database = current.Parent as Database;
+            current = current.Parent;
+        }
+        var isAzure10 = database.Info.Version == DatabaseInfo.SQLServerVersion.SQLServerAzure10;
+
+        var sql = new StringBuilder();
+        var includes = "";
+        if ((Type == IndexTypeEnum.Clustered) && IsUniqueKey)
+        {
+            _ = sql.Append("CREATE UNIQUE CLUSTERED ");
         }
 
-        public override string ToSql()
+        if ((Type == IndexTypeEnum.Clustered) && (!IsUniqueKey))
         {
-            Database database = null;
-            ISchemaBase current = this;
-            while (database == null && current.Parent != null)
-            {
-                database = current.Parent as Database;
-                current = current.Parent;
-            }
-            var isAzure10 = database.Info.Version == DatabaseInfo.SQLServerVersion.SQLServerAzure10;
+            _ = sql.Append("CREATE CLUSTERED ");
+        }
 
-            StringBuilder sql = new StringBuilder();
-            string includes = "";
-            if ((Type == IndexTypeEnum.Clustered) && IsUniqueKey) sql.Append("CREATE UNIQUE CLUSTERED ");
-            if ((Type == IndexTypeEnum.Clustered) && (!IsUniqueKey)) sql.Append("CREATE CLUSTERED ");
-            if ((Type == IndexTypeEnum.Nonclustered) && IsUniqueKey) sql.Append("CREATE UNIQUE NONCLUSTERED ");
-            if ((Type == IndexTypeEnum.Nonclustered) && (!IsUniqueKey)) sql.Append("CREATE NONCLUSTERED ");
-            if (Type == IndexTypeEnum.XML) sql.Append("CREATE PRIMARY XML ");
-            sql.AppendLine("INDEX [" + Name + "] ON " + Parent.FullName + "\r\n(");
-            /*Ordena la coleccion de campos del Indice en funcion de la propieda IsIncluded*/
-            Columns.Sort();
-            for (int j = 0; j < Columns.Count; j++)
+        if ((Type == IndexTypeEnum.Nonclustered) && IsUniqueKey)
+        {
+            _ = sql.Append("CREATE UNIQUE NONCLUSTERED ");
+        }
+
+        if ((Type == IndexTypeEnum.Nonclustered) && (!IsUniqueKey))
+        {
+            _ = sql.Append("CREATE NONCLUSTERED ");
+        }
+
+        if (Type == IndexTypeEnum.XML)
+        {
+            _ = sql.Append("CREATE PRIMARY XML ");
+        }
+
+        _ = sql.AppendLine("INDEX [" + Name + "] ON " + Parent.FullName + "\r\n(");
+        /*Ordena la coleccion de campos del Indice en funcion de la propieda IsIncluded*/
+        Columns.Sort();
+        for (var j = 0; j < Columns.Count; j++)
+        {
+            if (!Columns[j].IsIncluded)
             {
-                if (!Columns[j].IsIncluded)
+                _ = sql.Append("\t[" + Columns[j].Name + "]");
+                if (Type != IndexTypeEnum.XML)
                 {
-                    sql.Append("\t[" + Columns[j].Name + "]");
-                    if (Type != IndexTypeEnum.XML)
-                    {
-                        if (Columns[j].Order) sql.Append(" DESC"); else sql.Append(" ASC");
-                    }
-                    if (j < Columns.Count - 1) sql.Append(",");
-                    sql.AppendLine();
+                    _ = Columns[j].Order ? sql.Append(" DESC") : sql.Append(" ASC");
                 }
-                else
+                if (j < Columns.Count - 1)
                 {
-                    if (string.IsNullOrEmpty(includes)) includes = ") INCLUDE (";
-                    includes += "[" + Columns[j].Name + "],";
+                    _ = sql.Append(",");
                 }
-            }
-            if (!string.IsNullOrEmpty(includes)) includes = includes.Substring(0, includes.Length - 1);
-            sql.Append(includes);
-            sql.Append(")");
-            if (!string.IsNullOrEmpty(FilterDefintion)) sql.AppendLine("\r\n WHERE " + FilterDefintion);
-            sql.Append(" WITH (");
-            if (Parent.ObjectType == ObjectType.TableType)
-            {
-                if (IgnoreDupKey && IsUniqueKey) sql.Append("IGNORE_DUP_KEY = ON "); else sql.Append("IGNORE_DUP_KEY  = OFF ");
+
+                _ = sql.AppendLine();
             }
             else
             {
-                if (!isAzure10)
+                if (string.IsNullOrEmpty(includes))
                 {
-                    if (IsPadded) sql.Append("PAD_INDEX = ON, "); else sql.Append("PAD_INDEX  = OFF, ");
+                    includes = ") INCLUDE (";
                 }
 
-                if (IsAutoStatistics) sql.Append("STATISTICS_NORECOMPUTE = ON"); else sql.Append("STATISTICS_NORECOMPUTE  = OFF");
-                if (Type != IndexTypeEnum.XML)
-                    if (IgnoreDupKey && IsUniqueKey) sql.Append("IGNORE_DUP_KEY = ON, "); else sql.Append(", IGNORE_DUP_KEY  = OFF");
-
-                if (!isAzure10)
-                {
-                    if (AllowRowLocks) sql.Append(", ALLOW_ROW_LOCKS = ON"); else sql.Append(", ALLOW_ROW_LOCKS  = OFF");
-                    if (AllowPageLocks) sql.Append(", ALLOW_PAGE_LOCKS = ON"); else sql.Append(", ALLOW_PAGE_LOCKS  = OFF");
-                    if (FillFactor != 0) sql.Append(", FILLFACTOR = " + FillFactor.ToString());
-                }
+                includes += "[" + Columns[j].Name + "],";
             }
-            sql.Append(")");
+        }
+        if (!string.IsNullOrEmpty(includes))
+        {
+            includes = includes.Substring(0, includes.Length - 1);
+        }
+
+        _ = sql.Append(includes);
+        _ = sql.Append(")");
+        if (!string.IsNullOrEmpty(FilterDefintion))
+        {
+            _ = sql.AppendLine("\r\n WHERE " + FilterDefintion);
+        }
+
+        _ = sql.Append(" WITH (");
+        if (Parent.ObjectType == ObjectType.TableType)
+        {
+            _ = IgnoreDupKey && IsUniqueKey ? sql.Append("IGNORE_DUP_KEY = ON ") : sql.Append("IGNORE_DUP_KEY  = OFF ");
+        }
+        else
+        {
             if (!isAzure10)
             {
-                if (!string.IsNullOrEmpty(FileGroup)) sql.Append(" ON [" + FileGroup + "]");
+                _ = IsPadded ? sql.Append("PAD_INDEX = ON, ") : sql.Append("PAD_INDEX  = OFF, ");
             }
-            sql.AppendLine("\r\nGO");
-            if (IsDisabled)
-                sql.AppendLine("ALTER INDEX [" + Name + "] ON " + ((Table)Parent).FullName + " DISABLE\r\nGO");
 
-            sql.Append(ExtendedProperties.ToSql());
-            return sql.ToString();
+            _ = IsAutoStatistics ? sql.Append("STATISTICS_NORECOMPUTE = ON") : sql.Append("STATISTICS_NORECOMPUTE  = OFF");
+
+            if (Type != IndexTypeEnum.XML)
+            {
+                _ = IgnoreDupKey && IsUniqueKey ? sql.Append("IGNORE_DUP_KEY = ON, ") : sql.Append(", IGNORE_DUP_KEY  = OFF");
+            }
+
+            if (!isAzure10)
+            {
+                _ = AllowRowLocks ? sql.Append(", ALLOW_ROW_LOCKS = ON") : sql.Append(", ALLOW_ROW_LOCKS  = OFF");
+
+                _ = AllowPageLocks ? sql.Append(", ALLOW_PAGE_LOCKS = ON") : sql.Append(", ALLOW_PAGE_LOCKS  = OFF");
+
+                if (FillFactor != 0)
+                {
+                    _ = sql.Append(", FILLFACTOR = " + FillFactor.ToString());
+                }
+            }
         }
-
-        public override string ToSqlAdd() => ToSql();
-
-        public override string ToSqlDrop() => ToSqlDrop(null);
-
-        private string ToSqlDrop(string FileGroupName)
+        _ = sql.Append(")");
+        if (!isAzure10)
         {
-            var sql = new StringBuilder("DROP INDEX [" + Name + "] ON " + Parent.FullName);
-            if (!string.IsNullOrEmpty(FileGroupName)) sql.Append(" WITH (MOVE TO [" + FileGroupName + "])");
-            sql.AppendLine("\r\nGO");
-            return sql.ToString();
+            if (!string.IsNullOrEmpty(FileGroup))
+            {
+                _ = sql.Append(" ON [" + FileGroup + "]");
+            }
         }
-
-        public override SQLScript Create()
+        _ = sql.AppendLine("\r\nGO");
+        if (IsDisabled)
         {
-            ScriptAction action = ScriptAction.AddIndex;
-            if (!GetWasInsertInDiffList(action))
-            {
-                SetWasInsertInDiffList(action);
-                return new SQLScript(ToSqlAdd(), Parent.DependenciesCount, action);
-            }
-            return null;
+            _ = sql.AppendLine("ALTER INDEX [" + Name + "] ON " + ((Table)Parent).FullName + " DISABLE\r\nGO");
         }
 
-        public override SQLScript Drop()
+        _ = sql.Append(ExtendedProperties.ToSql());
+        return sql.ToString();
+    }
+
+    public override string ToSqlAdd() => ToSql();
+
+    public override string ToSqlDrop() => ToSqlDrop(null);
+
+    private string ToSqlDrop(string FileGroupName)
+    {
+        var sql = new StringBuilder("DROP INDEX [" + Name + "] ON " + Parent.FullName);
+        if (!string.IsNullOrEmpty(FileGroupName))
         {
-            ScriptAction action = ScriptAction.DropIndex;
-            if (!GetWasInsertInDiffList(action))
-            {
-                SetWasInsertInDiffList(action);
-                return new SQLScript(ToSqlDrop(), Parent.DependenciesCount, action);
-            }
-            return null;
+            _ = sql.Append(" WITH (MOVE TO [" + FileGroupName + "])");
         }
 
-        private string ToSqlEnabled()
+        _ = sql.AppendLine("\r\nGO");
+        return sql.ToString();
+    }
+
+    public override SQLScript Create()
+    {
+        var action = ScriptAction.AddIndex;
+        if (!GetWasInsertInDiffList(action))
         {
-            if (IsDisabled)
-                return "ALTER INDEX [" + Name + "] ON " + Parent.FullName + " DISABLE\r\nGO\r\n";
-            return "ALTER INDEX [" + Name + "] ON " + Parent.FullName + " REBUILD\r\nGO\r\n";
+            SetWasInsertInDiffList(action);
+            return new SQLScript(ToSqlAdd(), Parent.DependenciesCount, action);
         }
+        return null;
+    }
 
-        public override SQLScriptList ToSqlDiff(System.Collections.Generic.ICollection<ISchemaBase> schemas)
+    public override SQLScript Drop()
+    {
+        var action = ScriptAction.DropIndex;
+        if (!GetWasInsertInDiffList(action))
         {
-            SQLScriptList list = new SQLScriptList();
-            if (Status != ObjectStatus.Original)
-            {
-                var actionMessage = RootParent.ActionMessage[Parent.FullName];
-                actionMessage?.Add(this);
-            }
-
-            if (HasState(ObjectStatus.Drop))
-                list.Add(Drop());
-            if (HasState(ObjectStatus.Create))
-                list.Add(Create());
-            if (HasState(ObjectStatus.Alter))
-            {
-                list.Add(Drop());
-                list.Add(Create());
-            }
-            if (Status == ObjectStatus.Disabled)
-            {
-                list.Add(ToSqlEnabled(), Parent.DependenciesCount, ScriptAction.AlterIndex);
-            }
-            /*if (this.Status == StatusEnum.ObjectStatusType.ChangeFileGroup)
-            {
-                listDiff.Add(this.ToSQLDrop(this.FileGroup), ((Table)Parent).DependenciesCount, StatusEnum.ScripActionType.DropIndex);
-                listDiff.Add(this.ToSQLAdd(), ((Table)Parent).DependenciesCount, StatusEnum.ScripActionType.AddIndex);
-            }*/
-            list.AddRange(ExtendedProperties.ToSqlDiff());
-            return list;
+            SetWasInsertInDiffList(action);
+            return new SQLScript(ToSqlDrop(), Parent.DependenciesCount, action);
         }
+        return null;
+    }
+
+    private string ToSqlEnabled()
+    {
+        return IsDisabled
+            ? "ALTER INDEX [" + Name + "] ON " + Parent.FullName + " DISABLE\r\nGO\r\n"
+            : "ALTER INDEX [" + Name + "] ON " + Parent.FullName + " REBUILD\r\nGO\r\n";
+    }
+
+    public override SQLScriptList ToSqlDiff(System.Collections.Generic.ICollection<ISchemaBase> schemas)
+    {
+        var list = new SQLScriptList();
+        if (Status != ObjectStatus.Original)
+        {
+            var actionMessage = RootParent.ActionMessage[Parent.FullName];
+            actionMessage?.Add(this);
+        }
+
+        if (HasState(ObjectStatus.Drop))
+        {
+            list.Add(Drop());
+        }
+
+        if (HasState(ObjectStatus.Create))
+        {
+            list.Add(Create());
+        }
+
+        if (HasState(ObjectStatus.Alter))
+        {
+            list.Add(Drop());
+            list.Add(Create());
+        }
+        if (Status == ObjectStatus.Disabled)
+        {
+            list.Add(ToSqlEnabled(), Parent.DependenciesCount, ScriptAction.AlterIndex);
+        }
+        /*if (this.Status == StatusEnum.ObjectStatusType.ChangeFileGroup)
+        {
+            listDiff.Add(this.ToSQLDrop(this.FileGroup), ((Table)Parent).DependenciesCount, StatusEnum.ScripActionType.DropIndex);
+            listDiff.Add(this.ToSQLAdd(), ((Table)Parent).DependenciesCount, StatusEnum.ScripActionType.AddIndex);
+        }*/
+        list.AddRange(ExtendedProperties.ToSqlDiff());
+        return list;
     }
 }

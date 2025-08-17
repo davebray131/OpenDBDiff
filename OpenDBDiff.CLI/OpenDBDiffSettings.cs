@@ -1,10 +1,9 @@
-﻿namespace OpenDBDiff.CLI
+﻿namespace OpenDBDiff.CLI;
+
+public class OpenDBDiffSettings
 {
-    public class OpenDBDiffSettings
-    {
-        /// <summary>
-        /// Uri for submitting a new issue.
-        /// </summary>
-        public string NewIssueUri { get; set; }
-    }
+    /// <summary>
+    /// Uri for submitting a new issue.
+    /// </summary>
+    public string NewIssueUri { get; set; }
 }
