@@ -119,7 +119,7 @@ namespace OpenDBDiff.SqlServer.Schema.Model
             return true;
         }
 
-        public override Boolean IsCodeType
+        public override bool IsCodeType
         {
             get { return true; }
         }

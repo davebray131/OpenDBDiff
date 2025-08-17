@@ -21,8 +21,8 @@ namespace OpenDBDiff.SqlServer.Schema.Model
         public Code(ISchemaBase parent, ObjectType type, ScriptAction addAction, ScriptAction dropAction)
             : base(parent, type)
         {
-            DependenciesIn = new List<String>();
-            DependenciesOut = new List<String>();
+            DependenciesIn = new List<string>();
+            DependenciesOut = new List<string>();
             typeName = GetObjectTypeName(ObjectType);
             /*Por el momento, solo los Assemblys manejan deep de dependencias*/
             if (this.ObjectType == ObjectType.Assembly)

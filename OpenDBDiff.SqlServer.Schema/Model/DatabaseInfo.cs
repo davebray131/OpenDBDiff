@@ -17,6 +17,8 @@ namespace OpenDBDiff.SqlServer.Schema.Model
             SQLServer2014,
             SQLServer2016,
             SQLServer2017,
+            SQLServer2019,
+            SQLServer2022
         }
 
         public enum SQLServerEdition
@@ -76,6 +78,8 @@ namespace OpenDBDiff.SqlServer.Schema.Model
                 if (versionNumber >= 12.0) version = SQLServerVersion.SQLServer2014;
                 if (versionNumber >= 13.0) version = SQLServerVersion.SQLServer2016;
                 if (versionNumber >= 14.0) version = SQLServerVersion.SQLServer2017;
+                if (versionNumber >= 15.0) version = SQLServerVersion.SQLServer2019;
+                if (versionNumber >= 16.0) version = SQLServerVersion.SQLServer2022;
 
                 this.Version = version;
             }

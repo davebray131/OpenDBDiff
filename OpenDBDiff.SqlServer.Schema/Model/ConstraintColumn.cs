@@ -45,31 +45,22 @@ namespace OpenDBDiff.SqlServer.Schema.Model
         /// <value>
         /// 	<c>true</c> if this column is included; otherwise, <c>false</c>.
         /// </value>
-        public Boolean IsIncluded { get; set; }
+        public bool IsIncluded { get; set; }
 
         /// <summary>
         /// Orden de la columna (Ascendente o Descendente). Se usa solo en Primary Keys.
         /// </summary>
-        public Boolean Order { get; set; }
+        public bool Order { get; set; }
 
         public string ColumnRelationalName { get; set; }
 
-        public override string ToSqlDrop()
-        {
-            return "";
-        }
+        public override string ToSqlDrop() => string.Empty;
 
-        public override string ToSqlAdd()
-        {
-            return "";
-        }
+        public override string ToSqlAdd() => string.Empty;
 
-        public override string ToSql()
-        {
-            return "";
-        }
+        public override string ToSql() => string.Empty;
 
-        public static Boolean Compare(ConstraintColumn origin, ConstraintColumn destination)
+        public static bool Compare(ConstraintColumn origin, ConstraintColumn destination)
         {
             if (destination == null) throw new ArgumentNullException("destination");
             if (origin == null) throw new ArgumentNullException("origin");

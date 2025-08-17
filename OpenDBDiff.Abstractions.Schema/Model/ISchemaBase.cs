@@ -8,14 +8,14 @@ namespace OpenDBDiff.Abstractions.Schema.Model
         int DependenciesCount { get; }
         string FullName { get; }
         int Id { get; set; }
-        Boolean HasState(ObjectStatus statusFind);
+        bool HasState(ObjectStatus statusFind);
         string Name { get; set; }
         string Owner { get; set; }
         ISchemaBase Parent { get; set; }
         ObjectStatus Status { get; set; }
-        Boolean IsSystem { get; set; }
+        bool IsSystem { get; set; }
         ObjectType ObjectType { get; set; }
-        Boolean GetWasInsertInDiffList(ScriptAction action);
+        bool GetWasInsertInDiffList(ScriptAction action);
         void SetWasInsertInDiffList(ScriptAction action);
         void ResetWasInsertInDiffList();
         string ToSqlDrop();
@@ -25,7 +25,7 @@ namespace OpenDBDiff.Abstractions.Schema.Model
         SQLScript Create();
         SQLScript Drop();
         int CompareFullNameTo(string name, string myName);
-        Boolean IsCodeType { get; }
+        bool IsCodeType { get; }
         IDatabase RootParent { get; }
     }
 }

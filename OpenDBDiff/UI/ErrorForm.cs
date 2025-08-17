@@ -101,7 +101,7 @@ namespace OpenDBDiff.UI
         {
             var searchableErrorBytes = Encoding.UTF8.GetBytes(queryString);
             searchableErrorBytes = new System.Security.Cryptography.MD5CryptoServiceProvider().ComputeHash(searchableErrorBytes);
-            var searchHash = BitConverter.ToString(searchableErrorBytes).Replace("-", String.Empty);
+            var searchHash = BitConverter.ToString(searchableErrorBytes).Replace("-", string.Empty);
             return searchHash;
         }
 

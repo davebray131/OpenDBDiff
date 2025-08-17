@@ -12,7 +12,7 @@ namespace OpenDBDiff.Abstractions.Ui
         int TabIndex { get; set; }
         bool Visible { get; set; }
         DockStyle Dock { get; set; }
-        Boolean TestConnection();
+        bool TestConnection();
         string ConnectionString { get; set; }
         string ErrorConnection { get; }
         string DatabaseName { get; }

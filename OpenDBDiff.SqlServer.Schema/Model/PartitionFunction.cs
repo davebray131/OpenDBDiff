@@ -110,15 +110,10 @@ namespace OpenDBDiff.SqlServer.Schema.Model
             return sql + "\r\nGO\r\n";
         }
 
-        public override string ToSqlDrop()
-        {
-            return "DROP PARTITION FUNCTION [" + Name + "]\r\nGO\r\n";
-        }
+        public override string ToSqlDrop() =>
+            $"DROP PARTITION FUNCTION [{Name}]\r\nGO\r\n";
 
-        public override string ToSqlAdd()
-        {
-            return ToSql();
-        }
+        public override string ToSqlAdd() => ToSql();
 
         public string ToSqlAlter()
         {
@@ -193,7 +188,7 @@ namespace OpenDBDiff.SqlServer.Schema.Model
             return listDiff;
         }
 
-        public static Boolean Compare(PartitionFunction origin, PartitionFunction destination)
+        public static bool Compare(PartitionFunction origin, PartitionFunction destination)
         {
             if (destination == null) throw new ArgumentNullException("destination");
             if (origin == null) throw new ArgumentNullException("origin");
@@ -205,7 +200,7 @@ namespace OpenDBDiff.SqlServer.Schema.Model
             return true;
         }
 
-        public static Boolean CompareValues(PartitionFunction origin, PartitionFunction destination)
+        public static bool CompareValues(PartitionFunction origin, PartitionFunction destination)
         {
             if (destination == null) throw new ArgumentNullException("destination");
             if (origin == null) throw new ArgumentNullException("origin");

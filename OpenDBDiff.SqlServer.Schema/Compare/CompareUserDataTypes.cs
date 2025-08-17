@@ -11,7 +11,7 @@ namespace OpenDBDiff.SqlServer.Schema.Compare
         {
             UserDataType newNode = (UserDataType)node.Clone(originFields.Parent);
             newNode.Status = ObjectStatus.Create;
-            Boolean HasAssembly = originFields.Exists(item => item.AssemblyFullName.Equals(node.AssemblyFullName) && item.IsAssembly);
+            bool HasAssembly = originFields.Exists(item => item.AssemblyFullName.Equals(node.AssemblyFullName) && item.IsAssembly);
             if (HasAssembly)
                 newNode.Status += (int)ObjectStatus.DropOlder;
             originFields.Add(newNode);

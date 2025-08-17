@@ -87,10 +87,7 @@ namespace OpenDBDiff.SqlServer.Schema.Model
         /// <summary>
         /// Devuelve todos las constraints dependientes de una tabla.
         /// </summary>
-        public List<ISchemaBase> Find(int tableId)
-        {
-            return Find(tableId, 0, 0);
-        }
+        public List<ISchemaBase> Find(int tableId) => Find(tableId, 0, 0);
 
         public int DependenciesCount(int objectId, ObjectType type)
         {

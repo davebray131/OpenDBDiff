@@ -8,8 +8,8 @@ namespace OpenDBDiff.SqlServer.Ui
 {
     public partial class SqlServerConnectFront : UserControl, IFront
     {
-        private Boolean isDatabaseFilled = false;
-        private Boolean isServerFilled = false;
+        private bool isDatabaseFilled = false;
+        private bool isServerFilled = false;
 
         private delegate void clearCombo();
 
@@ -67,7 +67,7 @@ namespace OpenDBDiff.SqlServer.Ui
             set { cboServer.Text = value; }
         }
 
-        public Boolean TestConnection()
+        public bool TestConnection()
         {
             try
             {
@@ -146,7 +146,7 @@ namespace OpenDBDiff.SqlServer.Ui
             }
             set
             {
-                if (!String.IsNullOrWhiteSpace(value))
+                if (!string.IsNullOrWhiteSpace(value))
                 {
                     var builder = new SqlConnectionStringBuilder(value);
 
@@ -217,7 +217,7 @@ namespace OpenDBDiff.SqlServer.Ui
         {
             if (!isDatabaseFilled)
             {
-                String connectionString = ConnectionStringToDefaultDatabase;
+                string connectionString = ConnectionStringToDefaultDatabase;
                 ClearDatabase();
                 using (SqlConnection conn = new SqlConnection(connectionString))
                 {

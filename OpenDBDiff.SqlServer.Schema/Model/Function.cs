@@ -1,5 +1,4 @@
-﻿using System;
-using OpenDBDiff.Abstractions.Schema;
+﻿using OpenDBDiff.Abstractions.Schema;
 using OpenDBDiff.Abstractions.Schema.Model;
 using OpenDBDiff.SqlServer.Schema.Model.Util;
 
@@ -10,7 +9,6 @@ namespace OpenDBDiff.SqlServer.Schema.Model
         public Function(ISchemaBase parent)
             : base(parent, ObjectType.Function, ScriptAction.AddFunction, ScriptAction.DropFunction)
         {
-
         }
 
         /// <summary>
@@ -33,20 +31,15 @@ namespace OpenDBDiff.SqlServer.Schema.Model
             return item;
         }
 
-        public override Boolean IsCodeType
+        public override bool IsCodeType
         {
-            get { return true; }
+            get => true;
         }
 
-        public string ToSQLAlter()
-        {
-            return ToSQLAlter(false);
-        }
+        public string ToSQLAlter() => ToSQLAlter(false);
 
-        public string ToSQLAlter(Boolean quitSchemaBinding)
-        {
-            return FormatCode.FormatAlter("FUNCTION", ToSql(), this, quitSchemaBinding);
-        }
+        public string ToSQLAlter(bool quitSchemaBinding) =>
+            FormatCode.FormatAlter("FUNCTION", ToSql(), this, quitSchemaBinding);
 
         public override SQLScriptList ToSqlDiff(System.Collections.Generic.ICollection<ISchemaBase> schemas)
         {

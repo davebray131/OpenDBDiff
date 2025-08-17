@@ -1,5 +1,4 @@
-﻿using System;
-using OpenDBDiff.Abstractions.Schema;
+﻿using OpenDBDiff.Abstractions.Schema;
 using OpenDBDiff.Abstractions.Schema.Attributes;
 using OpenDBDiff.Abstractions.Schema.Model;
 using OpenDBDiff.SqlServer.Schema.Model.Util;
@@ -46,10 +45,7 @@ namespace OpenDBDiff.SqlServer.Schema.Model
         [SchemaNode("Indexes", "Index")]
         public SchemaList<Index, View> Indexes { get; set; }
 
-        public override Boolean IsCodeType
-        {
-            get { return true; }
-        }
+        public override bool IsCodeType => true;
 
         public override string ToSqlAdd()
         {
@@ -77,15 +73,9 @@ namespace OpenDBDiff.SqlServer.Schema.Model
             return sql;
         }
 
-        public string ToSQLAlter()
-        {
-            return ToSQLAlter(false);
-        }
+        public string ToSQLAlter() => ToSQLAlter(false);
 
-        public string ToSQLAlter(Boolean quitSchemaBinding)
-        {
-            return FormatCode.FormatAlter("VIEW", ToSql(), this, quitSchemaBinding);
-        }
+        public string ToSQLAlter(bool quitSchemaBinding) => FormatCode.FormatAlter("VIEW", ToSql(), this, quitSchemaBinding);
 
         /// <summary>
         /// Devuelve el schema de diferencias del Schema en formato SQL.

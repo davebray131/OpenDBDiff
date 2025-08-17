@@ -34,7 +34,7 @@ namespace OpenDBDiff.SqlServer.Schema.Model
 
         public string FileGroup { get; set; }
 
-        public Boolean IsDisabled { get; set; }
+        public bool IsDisabled { get; set; }
 
         public string Index { get; set; }
 
@@ -44,10 +44,7 @@ namespace OpenDBDiff.SqlServer.Schema.Model
 
         public override string FullName
         {
-            get
-            {
-                return this.Name;
-            }
+            get => this.Name;
         }
 
         public List<FullTextIndexColumn> Columns { get; set; }
@@ -145,7 +142,7 @@ namespace OpenDBDiff.SqlServer.Schema.Model
             return list;
         }
 
-        public Boolean Compare(FullTextIndex destination)
+        public bool Compare(FullTextIndex destination)
         {
             if (destination == null) throw new ArgumentNullException("destination");
             if (!this.ChangeTrackingState.Equals(destination.ChangeTrackingState)) return false;

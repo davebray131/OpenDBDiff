@@ -24,7 +24,7 @@ namespace OpenDBDiff.SqlServer.Schema.Generates
             StringBuilder sHex = new StringBuilder(2 * stream.Length);
             for (int i = 0; i < stream.Length; i++)
                 sHex.AppendFormat("{0:X2} ", stream[i]);
-            return "0x" + sHex.ToString().Replace(" ", String.Empty);
+            return "0x" + sHex.ToString().Replace(" ", string.Empty);
         }
 
         public void Fill(Database database, string connectioString)

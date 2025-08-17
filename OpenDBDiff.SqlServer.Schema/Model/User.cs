@@ -11,10 +11,7 @@ namespace OpenDBDiff.SqlServer.Schema.Model
         {
         }
 
-        public override string FullName
-        {
-            get { return "[" + Name + "]"; }
-        }
+        public override string FullName => "[" + Name + "]";
 
         public string Login { get; set; }
 
@@ -37,10 +34,7 @@ namespace OpenDBDiff.SqlServer.Schema.Model
             return "DROP USER " + FullName + "\r\nGO\r\n";
         }
 
-        public override string ToSqlAdd()
-        {
-            return ToSql();
-        }
+        public override string ToSqlAdd() => ToSql();
 
         public override SQLScriptList ToSqlDiff(System.Collections.Generic.ICollection<ISchemaBase> schemas)
         {

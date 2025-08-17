@@ -160,7 +160,7 @@ namespace OpenDBDiff.Tests.Utils
         /// </summary>
         public string ResourceFilePath { get; }
 
-        public IEnumerable<string> GetFileNames(Func<String, Boolean> predicate = null)
+        public IEnumerable<string> GetFileNames(Func<string, bool> predicate = null)
         {
             predicate = predicate ?? (s => true);
 

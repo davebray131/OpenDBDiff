@@ -70,7 +70,7 @@ namespace OpenDBDiff.SqlServer.Schema.Model
         /// <summary>
         /// Indica si la constraint tiene asociada un indice Clustered.
         /// </summary>
-        public Boolean HasClusteredIndex
+        public bool HasClusteredIndex
         {
             get
             {
@@ -86,7 +86,7 @@ namespace OpenDBDiff.SqlServer.Schema.Model
         /// <value>
         /// 	<c>true</c> if this constraint is disabled; otherwise, <c>false</c>.
         /// </value>
-        public Boolean IsDisabled { get; set; }
+        public bool IsDisabled { get; set; }
 
         /// <summary>
         /// Gets or sets the on delete cascade (only for FK).
@@ -108,13 +108,13 @@ namespace OpenDBDiff.SqlServer.Schema.Model
         /// <summary>
         /// Indica si la constraint va a ser usada en replicacion.
         /// </summary>
-        public Boolean NotForReplication { get; set; }
+        public bool NotForReplication { get; set; }
 
         /// <summary>
         /// Gets or sets a value indicating whether [with no check].
         /// </summary>
         /// <value><c>true</c> if [with no check]; otherwise, <c>false</c>.</value>
-        public Boolean WithNoCheck { get; set; }
+        public bool WithNoCheck { get; set; }
 
         /// <summary>
         /// Indica el tipo de constraint (PrimaryKey, ForeignKey, Unique o Default).
@@ -134,7 +134,7 @@ namespace OpenDBDiff.SqlServer.Schema.Model
         /// <summary>
         /// Compara dos campos y devuelve true si son iguales, caso contrario, devuelve false.
         /// </summary>
-        public static Boolean Compare(Constraint origin, Constraint destination)
+        public static bool Compare(Constraint origin, Constraint destination)
         {
             if (destination == null) throw new ArgumentNullException("destination");
             if (origin == null) throw new ArgumentNullException("origin");
@@ -277,22 +277,17 @@ namespace OpenDBDiff.SqlServer.Schema.Model
             {
                 string sqlcheck = "";
                 if (Parent.ObjectType != ObjectType.TableType)
-                    sqlcheck = "CONSTRAINT [" + Name + "] ";
+                    sqlcheck = $"CONSTRAINT [{Name}] ";
 
                 return sqlcheck + "CHECK " + (NotForReplication ? "NOT FOR REPLICATION" : "") + " (" + Definition + ")";
             }
             return "";
         }
 
-        public override string ToSqlAdd()
-        {
-            return "ALTER TABLE " + Parent.FullName + (WithNoCheck ? " WITH NOCHECK" : "") + " ADD " + ToSql() + "\r\nGO\r\n";
-        }
+        public override string ToSqlAdd() =>
+            $"ALTER TABLE " + Parent.FullName + (WithNoCheck ? " WITH NOCHECK" : "") + " ADD " + ToSql() + "\r\nGO\r\n";
 
-        public override string ToSqlDrop()
-        {
-            return ToSqlDrop(null);
-        }
+        public override string ToSqlDrop() => ToSqlDrop(null);
 
         public override SQLScript Create()
         {
@@ -328,8 +323,8 @@ namespace OpenDBDiff.SqlServer.Schema.Model
 
         public string ToSqlDrop(string FileGroupName)
         {
-            string sql = "ALTER TABLE " + ((Table)Parent).FullName + " DROP CONSTRAINT [" + Name + "]";
-            if (!string.IsNullOrEmpty(FileGroupName)) sql += " WITH (MOVE TO [" + FileGroupName + "])";
+            string sql = $"ALTER TABLE {((Table)Parent).FullName} DROP CONSTRAINT [{Name}]";
+            if (!string.IsNullOrEmpty(FileGroupName)) sql += $" WITH (MOVE TO [{FileGroupName}])";
             sql += "\r\nGO\r\n";
             return sql;
         }

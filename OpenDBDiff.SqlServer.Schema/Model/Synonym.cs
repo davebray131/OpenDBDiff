@@ -26,21 +26,11 @@ namespace OpenDBDiff.SqlServer.Schema.Model
 
         public string Value { get; set; }
 
-        public override string ToSql()
-        {
-            string sql = "CREATE SYNONYM " + FullName + " FOR " + Value + "\r\nGO\r\n";
-            return sql;
-        }
+        public override string ToSql() => $"CREATE SYNONYM {FullName} FOR {Value}\r\nGO\r\n";
 
-        public override string ToSqlDrop()
-        {
-            return "DROP SYNONYM " + FullName + "\r\nGO\r\n";
-        }
+        public override string ToSqlDrop() => $"DROP SYNONYM {FullName}\r\nGO\r\n";
 
-        public override string ToSqlAdd()
-        {
-            return ToSql();
-        }
+        public override string ToSqlAdd() => ToSql();
 
         /// <summary>
         /// Devuelve el schema de diferencias del Schema en formato SQL.
@@ -68,7 +58,7 @@ namespace OpenDBDiff.SqlServer.Schema.Model
         /// <summary>
         /// Compara dos Synonyms y devuelve true si son iguales, caso contrario, devuelve false.
         /// </summary>
-        public static Boolean Compare(Synonym origin, Synonym destination)
+        public static bool Compare(Synonym origin, Synonym destination)
         {
             if (destination == null) throw new ArgumentNullException("destination");
             if (origin == null) throw new ArgumentNullException("origin");

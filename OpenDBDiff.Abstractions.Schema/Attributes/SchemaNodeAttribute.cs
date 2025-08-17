@@ -17,7 +17,7 @@ namespace OpenDBDiff.Abstractions.Schema.Attributes
             this.Image = image;
         }
 
-        public SchemaNodeAttribute(string name, string image, Boolean isFullName)
+        public SchemaNodeAttribute(string name, string image, bool isFullName)
         {
             this.Name = name;
             this.Image = image;
@@ -28,6 +28,6 @@ namespace OpenDBDiff.Abstractions.Schema.Attributes
 
         public string Image { get; private set; }
 
-        public Boolean IsFullName { get; private set; }
+        public bool IsFullName { get; private set; }
     }
 }

@@ -12,7 +12,7 @@ namespace OpenDBDiff.SqlServer.Schema.Model
         public XMLSchema(ISchemaBase parent)
             : base(parent, ObjectType.XMLSchema)
         {
-            this.Dependencies = new List<ObjectDependency>();
+            this.Dependencies = [];
         }
 
         /// <summary>
@@ -47,19 +47,13 @@ namespace OpenDBDiff.SqlServer.Schema.Model
             return sql.ToString();
         }
 
-        public override string ToSqlAdd()
-        {
-            return ToSql();
-        }
+        public override string ToSqlAdd() => ToSql();
 
-        public override string ToSqlDrop()
-        {
-            return "DROP XML SCHEMA COLLECTION " + FullName + "\r\nGO\r\n";
-        }
+        public override string ToSqlDrop() => $"DROP XML SCHEMA COLLECTION {FullName}\r\nGO\r\n";
 
         private SQLScriptList ToSQLChangeColumns()
         {
-            Hashtable fields = new Hashtable();
+            Hashtable fields = [];
             SQLScriptList list = new SQLScriptList();
             if ((this.Status == ObjectStatus.Alter) || (this.Status == ObjectStatus.Rebuild))
             {

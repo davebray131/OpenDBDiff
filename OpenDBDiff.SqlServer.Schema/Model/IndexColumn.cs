@@ -30,11 +30,11 @@ namespace OpenDBDiff.SqlServer.Schema.Model
 
         public int KeyOrder { get; set; }
 
-        public Boolean IsIncluded { get; set; }
+        public bool IsIncluded { get; set; }
 
-        public Boolean Order { get; set; }
+        public bool Order { get; set; }
 
-        public static Boolean Compare(IndexColumn origin, IndexColumn destination)
+        public static bool Compare(IndexColumn origin, IndexColumn destination)
         {
             if (destination == null) throw new ArgumentNullException("destination");
             if (origin == null) throw new ArgumentNullException("origin");
@@ -44,20 +44,11 @@ namespace OpenDBDiff.SqlServer.Schema.Model
             return true;
         }
 
-        public override string ToSqlDrop()
-        {
-            return "";
-        }
+        public override string ToSqlDrop() => string.Empty;
 
-        public override string ToSqlAdd()
-        {
-            return "";
-        }
+        public override string ToSqlAdd() => string.Empty;
 
-        public override string ToSql()
-        {
-            return "";
-        }
+        public override string ToSql() => string.Empty;
 
         public int CompareTo(IndexColumn other)
         {

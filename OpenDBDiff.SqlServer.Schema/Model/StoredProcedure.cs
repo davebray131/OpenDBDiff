@@ -1,4 +1,3 @@
-using System;
 using OpenDBDiff.Abstractions.Schema;
 using OpenDBDiff.Abstractions.Schema.Model;
 using OpenDBDiff.SqlServer.Schema.Model.Util;
@@ -30,22 +29,15 @@ namespace OpenDBDiff.SqlServer.Schema.Model
             return item;
         }
 
-        public override Boolean IsCodeType
+        public override bool IsCodeType
         {
-            get { return true; }
+            get => true;
         }
 
-        public override string ToSql()
-        {
-            //if (string.IsNullOrEmpty(sql))
-            sql = FormatCode.FormatCreate("PROC(EDURE)?", Text, this);
-            return sql;
-        }
+        public override string ToSql() => FormatCode.FormatCreate("PROC(EDURE)?", Text, this);
 
-        public string ToSQLAlter()
-        {
-            return FormatCode.FormatAlter("PROC(EDURE)?", ToSql(), this, false);
-        }
+        public string ToSQLAlter() =>
+            FormatCode.FormatAlter("PROC(EDURE)?", ToSql(), this, false);
 
         /// <summary>
         /// Devuelve el schema de diferencias del Schema en formato SQL.

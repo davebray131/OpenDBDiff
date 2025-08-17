@@ -43,7 +43,7 @@ namespace OpenDBDiff.SqlServer.Schema.Compare
                     /*ColumnConstraint oldDefault = null;
                     if (originField.DefaultConstraint != null)
                         oldDefault = originField.DefaultConstraint.Clone(originField);*/
-                    Boolean IsColumnEqual = Column.Compare(originField, node);
+                    bool IsColumnEqual = Column.Compare(originField, node);
                     if ((!IsColumnEqual) || (originField.Position != node.Position))
                     {
                         if (Column.CompareIdentity(originField, node))

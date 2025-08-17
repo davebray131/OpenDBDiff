@@ -28,15 +28,9 @@ namespace OpenDBDiff.SqlServer.Schema.Model
             return sql;
         }
 
-        public override string ToSqlDrop()
-        {
-            return "DROP PARTITION SCHEME " + FullName + "\r\nGO\r\n";
-        }
+        public override string ToSqlDrop() => $"DROP PARTITION SCHEME {FullName}\r\nGO\r\n";
 
-        public override string ToSql()
-        {
-            return ToSqlAdd();
-        }
+        public override string ToSql() => ToSqlAdd();
 
         public override SQLScriptList ToSqlDiff(System.Collections.Generic.ICollection<ISchemaBase> schemas)
         {
@@ -58,7 +52,7 @@ namespace OpenDBDiff.SqlServer.Schema.Model
             return listDiff;
         }
 
-        public static Boolean Compare(PartitionScheme origin, PartitionScheme destination)
+        public static bool Compare(PartitionScheme origin, PartitionScheme destination)
         {
             if (destination == null) throw new ArgumentNullException("destination");
             if (origin == null) throw new ArgumentNullException("origin");

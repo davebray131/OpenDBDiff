@@ -75,7 +75,7 @@ namespace OpenDBDiff.SqlServer.Schema.Model.Util
             };
         }
 
-        public static string FormatAlter(string objectType, string body, ISchemaBase item, Boolean quitSchemaBinding)
+        public static string FormatAlter(string objectType, string body, ISchemaBase item, bool quitSchemaBinding)
         {
             string prevText = null;
             try

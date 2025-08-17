@@ -55,8 +55,8 @@ namespace OpenDBDiff.UI
                     var rightGenerator = this.ProjectSelectorHandler.SetDestinationGenerator(RightDatabaseSelector.ConnectionString, Options);
                     IDatabaseComparer databaseComparer = this.ProjectSelectorHandler.GetDatabaseComparer();
 
-                    var leftPair = new KeyValuePair<String, IGenerator>(LeftDatabaseSelector.ToString(), leftGenerator);
-                    var rightPair = new KeyValuePair<String, IGenerator>(RightDatabaseSelector.ToString(), rightGenerator);
+                    var leftPair = new KeyValuePair<string, IGenerator>(LeftDatabaseSelector.ToString(), leftGenerator);
+                    var rightPair = new KeyValuePair<string, IGenerator>(RightDatabaseSelector.ToString(), rightGenerator);
 
                     // The progress form will execute the comparer to generate action scripts to migrate the right to the left
                     // Hence, inside the ProgressForm and deeper, right is the origin and left is the destination

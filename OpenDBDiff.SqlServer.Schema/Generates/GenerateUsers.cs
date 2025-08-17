@@ -49,7 +49,7 @@ namespace OpenDBDiff.SqlServer.Schema.Generates
                                         Name = reader["name"].ToString(),
                                         Owner = reader["default_schema_name"].ToString(),
                                         Password = "",
-                                        IsSystem = (Boolean)reader["is_fixed_role"]
+                                        IsSystem = (bool)reader["is_fixed_role"]
                                     };
                                     if (type.Equals("A"))
                                         item.Type = Role.RoleTypeEnum.ApplicationRole;

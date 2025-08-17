@@ -226,8 +226,8 @@ namespace OpenDBDiff.SqlServer.Schema.Generates
         private void FillTables(Database database, string connectionString)
         {
             int textInRow;
-            Boolean largeValues;
-            Boolean varDecimal;
+            bool largeValues;
+            bool varDecimal;
             int lastObjectId = 0;
             bool isTable = true;
             ISchemaBase item = null;
@@ -258,7 +258,7 @@ namespace OpenDBDiff.SqlServer.Schema.Generates
                                     };
                                     ((Table)item).HasClusteredIndex = (int)reader[HasClusteredIndexIndex] == 1;
                                     textInRow = (int)reader[Text_In_Row_limitIndex];
-                                    largeValues = (Boolean)reader[large_value_types_out_of_rowIndex];
+                                    largeValues = (bool)reader[large_value_types_out_of_rowIndex];
                                     varDecimal = ((int)reader[HasVarDecimalIndex]) == 1;
                                     if (database.Options.Ignore.FilterTableFileGroup)
                                     {

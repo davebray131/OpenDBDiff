@@ -26,7 +26,7 @@ namespace OpenDBDiff.SqlServer.Schema.Model
         /// <summary>
         /// Compara dos campos y devuelve true si son iguales, caso contrario, devuelve false.
         /// </summary>
-        public static Boolean Compare(ConstraintColumns origin, ConstraintColumns destination)
+        public static bool Compare(ConstraintColumns origin, ConstraintColumns destination)
         {
             if (destination == null) throw new ArgumentNullException("destination");
             if (origin == null) throw new ArgumentNullException("origin");

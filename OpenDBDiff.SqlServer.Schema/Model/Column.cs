@@ -346,25 +346,15 @@ namespace OpenDBDiff.SqlServer.Schema.Model
         /// Toes the SQL drop.
         /// </summary>
         /// <returns></returns>
-        public override string ToSqlDrop()
-        {
-            string sql = "ALTER TABLE " + Parent.FullName + " DROP COLUMN [" + Name + "]\r\nGO\r\n";
-            return sql;
-        }
+        public override string ToSqlDrop() => $"ALTER TABLE {Parent.FullName} DROP COLUMN [{Name}]\r\nGO\r\n";
 
         /// <summary>
         /// Toes the SQL add.
         /// </summary>
         /// <returns></returns>
-        public override string ToSqlAdd()
-        {
-            return "ALTER TABLE " + Parent.FullName + " ADD " + ToSql(false) + "\r\nGO\r\n";
-        }
+        public override string ToSqlAdd() => $"ALTER TABLE {Parent.FullName} ADD {ToSql(false)}\r\nGO\r\n";
 
-        public override string ToSql()
-        {
-            return ToSql(true);
-        }
+        public override string ToSql() => ToSql(true);
 
         public string ToSQLRedefine(string type, int size, string xmlSchema)
         {
@@ -473,10 +463,7 @@ namespace OpenDBDiff.SqlServer.Schema.Model
             return list;
         }
 
-        private SQLScriptList RebuildFullTextIndex()
-        {
-            return RebuildFullTextIndex(null);
-        }
+        private SQLScriptList RebuildFullTextIndex() => RebuildFullTextIndex(null);
 
         private SQLScriptList RebuildFullTextIndex(string index)
         {
@@ -634,9 +621,6 @@ namespace OpenDBDiff.SqlServer.Schema.Model
             return CompareRule(origin, destination);
         }
 
-        public int CompareTo(Column other)
-        {
-            return this.Id.CompareTo(other.Id);
-        }
+        public int CompareTo(Column other) => this.Id.CompareTo(other.Id);
     }
 }

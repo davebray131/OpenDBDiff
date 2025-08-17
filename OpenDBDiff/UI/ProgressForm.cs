@@ -100,7 +100,7 @@ namespace OpenDBDiff.UI
                 destinationProgressControl.Value = e.Progress;
             }
 
-            if (String.Compare(destinationProgressControl.Message, e.Message) != 0)
+            if (string.Compare(destinationProgressControl.Message, e.Message) != 0)
             {
                 destinationProgressControl.Message = e.Message;
             }
@@ -115,7 +115,7 @@ namespace OpenDBDiff.UI
                 originProgressControl.Value = e.Progress;
             }
 
-            if (String.Compare(originProgressControl.Message, e.Message) != 0)
+            if (string.Compare(originProgressControl.Message, e.Message) != 0)
             {
                 originProgressControl.Message = e.Message;
             }

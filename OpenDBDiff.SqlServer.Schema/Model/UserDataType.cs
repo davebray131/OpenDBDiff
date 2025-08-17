@@ -14,7 +14,7 @@ namespace OpenDBDiff.SqlServer.Schema.Model
         {
             Default = new Default(this);
             Rule = new Rule(this);
-            Dependencies = new List<ObjectDependency>();
+            Dependencies = [];
         }
 
         public List<ObjectDependency> Dependencies { get; private set; }
@@ -25,7 +25,7 @@ namespace OpenDBDiff.SqlServer.Schema.Model
 
         public string AssemblyName { get; set; }
 
-        public Boolean IsAssembly { get; set; }
+        public bool IsAssembly { get; set; }
 
         public string AssemblyClass { get; set; }
 
@@ -41,21 +41,13 @@ namespace OpenDBDiff.SqlServer.Schema.Model
         /// </summary>
         public int Precision { get; set; }
 
-        public Boolean AllowNull { get; set; }
+        public bool AllowNull { get; set; }
 
         public int Size { get; set; }
 
         public string Type { get; set; }
 
-        public String AssemblyFullName
-        {
-            get
-            {
-                if (IsAssembly)
-                    return AssemblyName + "." + AssemblyClass;
-                return "";
-            }
-        }
+        public string AssemblyFullName => IsAssembly ? AssemblyName + "." + AssemblyClass : string.Empty;
 
         /// <summary>
         /// Clona el objeto Column en una nueva instancia.
@@ -84,7 +76,7 @@ namespace OpenDBDiff.SqlServer.Schema.Model
             return item;
         }
 
-        public static Boolean CompareRule(UserDataType origin, UserDataType destination)
+        public static bool CompareRule(UserDataType origin, UserDataType destination)
         {
             if (destination == null) throw new ArgumentNullException("destination");
             if (origin == null) throw new ArgumentNullException("origin");
@@ -95,7 +87,7 @@ namespace OpenDBDiff.SqlServer.Schema.Model
             return true;
         }
 
-        public static Boolean CompareDefault(UserDataType origin, UserDataType destination)
+        public static bool CompareDefault(UserDataType origin, UserDataType destination)
         {
             if (destination == null) throw new ArgumentNullException("destination");
             if (origin == null) throw new ArgumentNullException("origin");
@@ -111,35 +103,26 @@ namespace OpenDBDiff.SqlServer.Schema.Model
             string sql = "CREATE TYPE " + FullName;
             if (!IsAssembly)
             {
-                sql += " FROM [" + Type + "]";
+                sql += $" FROM [{Type}]";
                 if (Type.Equals("binary") || Type.Equals("varbinary") || Type.Equals("varchar") || Type.Equals("char") ||
                     Type.Equals("nchar") || Type.Equals("nvarchar"))
                     sql += "(" + Size.ToString(CultureInfo.InvariantCulture) + ")";
                 if (Type.Equals("numeric") || Type.Equals("decimal"))
                     sql += " (" + Precision.ToString(CultureInfo.InvariantCulture) + "," +
                            Scale.ToString(CultureInfo.InvariantCulture) + ")";
-                if (AllowNull)
-                    sql += " NULL";
-                else
-                    sql += " NOT NULL";
+                sql += AllowNull ? " NULL" : " NOT NULL";
             }
             else
             {
-                sql += " EXTERNAL NAME [" + AssemblyName + "].[" + AssemblyClass + "]";
+                sql += $" EXTERNAL NAME [{AssemblyName}].[{AssemblyClass}]";
             }
             sql += "\r\nGO\r\n";
             return sql + ToSQLAddBinds();
         }
 
-        public override string ToSqlDrop()
-        {
-            return "DROP TYPE " + FullName + "\r\nGO\r\n";
-        }
+        public override string ToSqlDrop() => $"DROP TYPE {FullName}\r\nGO\r\n";
 
-        public override string ToSqlAdd()
-        {
-            return ToSql();
-        }
+        public override string ToSqlAdd() => ToSql();
 
         private string ToSQLAddBinds()
         {
@@ -198,8 +181,7 @@ namespace OpenDBDiff.SqlServer.Schema.Model
                                 {
                                     list.AddRange(column.RebuildConstraint(true));
                                     list.Add(
-                                        "ALTER TABLE " + column.Parent.FullName + " ALTER COLUMN " +
-                                        column.ToSQLRedefine(Type, Size, null) + "\r\nGO\r\n", 0,
+                                        $"ALTER TABLE {column.Parent.FullName} ALTER COLUMN {column.ToSQLRedefine(Type, Size, null)}\r\nGO\r\n", 0,
                                         ScriptAction.AlterColumn);
                                     /*Si la columna va a ser eliminada o la tabla va a ser reconstruida, no restaura la columna*/
                                     if ((column.Status != ObjectStatus.Drop) &&
@@ -242,7 +224,7 @@ namespace OpenDBDiff.SqlServer.Schema.Model
             return list;
         }
 
-        private Boolean HasAnotherUDTClass()
+        private bool HasAnotherUDTClass()
         {
             if (IsAssembly)
             {

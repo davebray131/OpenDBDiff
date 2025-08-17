@@ -1,20 +1,14 @@
-using System;
 using OpenDBDiff.Abstractions.Schema.Model;
 
 namespace OpenDBDiff.SqlServer.Schema.Options
 {
     public class SqlOption : IOption
     {
-        public SqlOption()
+        public SqlOption() : this(true)
         {
-            Defaults = new SqlOptionDefault();
-            Ignore = new SqlOptionIgnore(true);
-            Script = new SqlOptionScript();
-            Filters = new SqlOptionFilter();
-            Comparison = new SqlOptionComparison();
         }
 
-        public SqlOption(Boolean defaultFilter)
+        public SqlOption(bool defaultFilter)
         {
             Defaults = new SqlOptionDefault();
             Ignore = new SqlOptionIgnore(defaultFilter);
@@ -50,17 +44,14 @@ namespace OpenDBDiff.SqlServer.Schema.Options
 
         public SqlOptionScript Script { get; set; }
 
-        IOptionFilter IOption.Filters { get { return Filters; } }
-        IOptionsContainer<string> IOption.Defaults { get { return Defaults; } }
-        IOptionsContainer<bool> IOption.Ignore { get { return Ignore; } }
+        IOptionFilter IOption.Filters => Filters;
+        IOptionsContainer<string> IOption.Defaults => Defaults;
+        IOptionsContainer<bool> IOption.Ignore => Ignore;
 
-        IOptionsContainer<bool> IOption.Script { get { return Script; } }
+        IOptionsContainer<bool> IOption.Script => Script;
 
-        IOptionComparison IOption.Comparison { get { return Comparison; } }
+        IOptionComparison IOption.Comparison => Comparison;
 
-        public string Serialize()
-        {
-            return this.ToString();
-        }
+        public string Serialize() => ToString();
     }
 }

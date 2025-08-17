@@ -52,44 +52,41 @@ namespace OpenDBDiff.SqlServer.Schema.Model
 
         public string FileGroup { get; set; }
 
-        public Boolean SortInTempDb { get; set; }
+        public bool SortInTempDb { get; set; }
 
         public string FilterDefintion { get; set; }
 
         public IndexColumns Columns { get; set; }
 
-        public Boolean IsAutoStatistics { get; set; }
+        public bool IsAutoStatistics { get; set; }
 
-        public Boolean IsUniqueKey { get; set; }
+        public bool IsUniqueKey { get; set; }
 
-        public Boolean IsPrimaryKey { get; set; }
+        public bool IsPrimaryKey { get; set; }
 
         public IndexTypeEnum Type { get; set; }
 
         public short FillFactor { get; set; }
 
-        public Boolean IsDisabled { get; set; }
+        public bool IsDisabled { get; set; }
 
-        public Boolean IsPadded { get; set; }
+        public bool IsPadded { get; set; }
 
-        public Boolean IgnoreDupKey { get; set; }
+        public bool IgnoreDupKey { get; set; }
 
-        public Boolean AllowPageLocks { get; set; }
+        public bool AllowPageLocks { get; set; }
 
-        public Boolean AllowRowLocks { get; set; }
+        public bool AllowRowLocks { get; set; }
 
         public override string FullName
         {
-            get
-            {
-                return Parent.FullName + ".[" + Name + "]";
-            }
+            get => $"{Parent.FullName}.[{Name}]";
         }
 
         /// <summary>
         /// Compara dos indices y devuelve true si son iguales, caso contrario, devuelve false.
         /// </summary>
-        public static Boolean Compare(Index origin, Index destination)
+        public static bool Compare(Index origin, Index destination)
         {
             if (destination == null) throw new ArgumentNullException("destination");
             if (origin == null) throw new ArgumentNullException("origin");
@@ -109,7 +106,7 @@ namespace OpenDBDiff.SqlServer.Schema.Model
             return CompareFileGroup(origin, destination);
         }
 
-        public static Boolean CompareExceptIsDisabled(Index origin, Index destination)
+        public static bool CompareExceptIsDisabled(Index origin, Index destination)
         {
             if (destination == null) throw new ArgumentNullException("destination");
             if (origin == null) throw new ArgumentNullException("origin");
@@ -129,7 +126,7 @@ namespace OpenDBDiff.SqlServer.Schema.Model
             return CompareFileGroup(origin, destination);
         }
 
-        private static Boolean CompareFileGroup(Index origin, Index destination)
+        private static bool CompareFileGroup(Index origin, Index destination)
         {
             if (destination == null) throw new ArgumentNullException("destination");
             if (origin == null) throw new ArgumentNullException("origin");
@@ -219,15 +216,9 @@ namespace OpenDBDiff.SqlServer.Schema.Model
             return sql.ToString();
         }
 
-        public override string ToSqlAdd()
-        {
-            return ToSql();
-        }
+        public override string ToSqlAdd() => ToSql();
 
-        public override string ToSqlDrop()
-        {
-            return ToSqlDrop(null);
-        }
+        public override string ToSqlDrop() => ToSqlDrop(null);
 
         private string ToSqlDrop(string FileGroupName)
         {

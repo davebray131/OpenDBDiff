@@ -19,7 +19,7 @@ namespace OpenDBDiff.SqlServer.Schema.Model
 
         public override string FullName
         {
-            get { return "[" + Name + "]"; }
+            get => $"[{Name}]";
         }
 
         public RoleTypeEnum Type { get; set; }
@@ -42,10 +42,7 @@ namespace OpenDBDiff.SqlServer.Schema.Model
             return "DROP " + ((Type == RoleTypeEnum.ApplicationRole) ? "APPLICATION" : "") + " ROLE " + FullName + "\r\nGO\r\n";
         }
 
-        public override string ToSqlAdd()
-        {
-            return ToSql();
-        }
+        public override string ToSqlAdd() => ToSql();
 
         public override SQLScriptList ToSqlDiff(System.Collections.Generic.ICollection<ISchemaBase> schemas)
         {
@@ -68,7 +65,7 @@ namespace OpenDBDiff.SqlServer.Schema.Model
         }
 
 
-        public Boolean Compare(Role obj)
+        public bool Compare(Role obj)
         {
             if (obj == null) throw new ArgumentNullException("destination");
             if (this.Type != obj.Type) return false;

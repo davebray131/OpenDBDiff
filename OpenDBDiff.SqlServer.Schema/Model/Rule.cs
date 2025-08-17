@@ -37,12 +37,9 @@ namespace OpenDBDiff.SqlServer.Schema.Model
 
         public string ToSQLAddUnBind()
         {
-            string sql;
             if (this.Parent.ObjectType == ObjectType.Column)
-                sql = string.Format("EXEC sp_unbindrule @objname=N'[{0}].[{1}]'\r\nGO\r\n", this.Parent.Parent.Name, this.Parent.Name);
-            else
-                sql = string.Format("EXEC sp_unbindrule @objname=N'{0}'\r\nGO\r\n", this.Parent.Name);
-            return sql;
+                return string.Format("EXEC sp_unbindrule @objname=N'[{0}].[{1}]'\r\nGO\r\n", this.Parent.Parent.Name, this.Parent.Name);
+            return string.Format("EXEC sp_unbindrule @objname=N'{0}'\r\nGO\r\n", this.Parent.Name);
         }
 
         private SQLScriptList ToSQLUnBindAll()

@@ -1,4 +1,3 @@
-using System.Text;
 using OpenDBDiff.Abstractions.Schema;
 using OpenDBDiff.Abstractions.Schema.Model;
 
@@ -11,24 +10,11 @@ namespace OpenDBDiff.SqlServer.Schema.Model
         {
         }
 
-        public override string ToSql()
-        {
-            StringBuilder sql = new StringBuilder();
-            sql.Append("CREATE SCHEMA ");
-            sql.Append("[" + this.Name + "] AUTHORIZATION [" + Owner + "]");
-            sql.Append("\r\nGO\r\n");
-            return sql.ToString();
-        }
+        public override string ToSql() => $"CREATE SCHEMA[{this.Name}] AUTHORIZATION[{Owner}]\r\nGO\r\n";
 
-        public override string ToSqlAdd()
-        {
-            return ToSql();
-        }
+        public override string ToSqlAdd() => ToSql();
 
-        public override string ToSqlDrop()
-        {
-            return "DROP SCHEMA [" + Name + "]\r\nGO\r\n";
-        }
+        public override string ToSqlDrop() => $"DROP SCHEMA [{Name}]\r\nGO\r\n";
 
         /// <summary>
         /// Devuelve el schema de diferencias del Schema en formato SQL.

@@ -34,19 +34,19 @@ namespace OpenDBDiff.SqlServer.Schema.Model
         /// <summary>
         /// Indica si la constraint esta deshabilitada.
         /// </summary>
-        public Boolean Disabled { get; set; }
+        public bool Disabled { get; set; }
 
         /// <summary>
         /// Indica si la constraint va a ser usada en replicacion.
         /// </summary>
-        public Boolean NotForReplication { get; set; }
+        public bool NotForReplication { get; set; }
 
 
         /// <summary>
         /// Gets or sets a value indicating whether [with no check].
         /// </summary>
         /// <value><c>true</c> if [with no check]; otherwise, <c>false</c>.</value>
-        public Boolean WithNoCheck { get; set; }
+        public bool WithNoCheck { get; set; }
 
         /// <summary>
         /// Valor de la constraint.
@@ -63,22 +63,21 @@ namespace OpenDBDiff.SqlServer.Schema.Model
         /// </summary>
         public string ToXML()
         {
-            string xml = "";
             if (this.Type == Constraint.ConstraintType.Default)
             {
-                xml += "<COLUMNCONSTRAINT name=\"" + Name + "\" type=\"DF\" value=\"" + Definition + "\"/>\n";
+                return $"<COLUMNCONSTRAINT name=\"{Name}\" type=\"DF\" value=\"{Definition}\"/>\n";
             }
             if (this.Type == Constraint.ConstraintType.Check)
             {
-                xml += "<COLUMNCONSTRAINT name=\"" + Name + "\" type=\"C\" value=\"" + Definition + "\" notForReplication=\"" + (NotForReplication ? "1" : "0") + "\"/>\n";
+                return $"<COLUMNCONSTRAINT name=\"{Name}\" type=\"C\" value=\"{Definition}\" notForReplication=\"" + (NotForReplication ? "1" : "0") + "\"/>\n";
             }
-            return xml;
+            return string.Empty;
         }
 
         /// <summary>
         /// Compara dos campos y devuelve true si son iguales, caso contrario, devuelve false.
         /// </summary>
-        public static Boolean Compare(ColumnConstraint origin, ColumnConstraint destination)
+        public static bool Compare(ColumnConstraint origin, ColumnConstraint destination)
         {
             if (destination == null) throw new ArgumentNullException("destination");
             if (origin == null) throw new ArgumentNullException("origin");
@@ -96,8 +95,7 @@ namespace OpenDBDiff.SqlServer.Schema.Model
                 SetWasInsertInDiffList(action);
                 return new SQLScript(this.ToSqlAdd(), 0, action);
             }
-            else
-                return null;
+            return null;
 
         }
 
@@ -113,7 +111,7 @@ namespace OpenDBDiff.SqlServer.Schema.Model
                 return null;
         }
 
-        public Boolean CanCreate
+        public bool CanCreate
         {
             get
             {
@@ -126,13 +124,8 @@ namespace OpenDBDiff.SqlServer.Schema.Model
         /// <summary>
         /// Devuelve el schema de la constraint en formato SQL.
         /// </summary>
-        public override string ToSql()
-        {
-            string sql = "";
-            if (this.Type == Constraint.ConstraintType.Default)
-                sql = " CONSTRAINT [" + Name + "] DEFAULT " + Definition;
-            return sql;
-        }
+        public override string ToSql() =>
+            this.Type == Constraint.ConstraintType.Default ? $" CONSTRAINT [{Name}] DEFAULT {Definition}" : string.Empty;
 
         /// <summary>
         /// Toes the SQL add.
@@ -141,9 +134,9 @@ namespace OpenDBDiff.SqlServer.Schema.Model
         public override string ToSqlAdd()
         {
             if (this.Type == Constraint.ConstraintType.Default)
-                return "ALTER TABLE " + ((Table)Parent.Parent).FullName + " ADD" + ToSql() + " FOR [" + Parent.Name + "]\r\nGO\r\n";
+                return $"ALTER TABLE {((Table)Parent.Parent).FullName} ADD{ToSql()} FOR [{Parent.Name}]\r\nGO\r\n";
             if (this.Type == Constraint.ConstraintType.Check)
-                return "ALTER TABLE " + ((Table)Parent.Parent).FullName + " ADD" + ToSql() + "\r\nGO\r\n";
+                return $"ALTER TABLE {((Table)Parent.Parent).FullName} ADD{ToSql()}\r\nGO\r\n";
             return "";
         }
 
@@ -151,10 +144,7 @@ namespace OpenDBDiff.SqlServer.Schema.Model
         /// Toes the SQL drop.
         /// </summary>
         /// <returns></returns>
-        public override string ToSqlDrop()
-        {
-            return "ALTER TABLE " + ((Table)Parent.Parent).FullName + " DROP CONSTRAINT [" + Name + "]\r\nGO\r\n";
-        }
+        public override string ToSqlDrop() => $"ALTER TABLE {((Table)Parent.Parent).FullName} DROP CONSTRAINT [{Name}]\r\nGO\r\n";
 
         public override SQLScriptList ToSqlDiff(System.Collections.Generic.ICollection<ISchemaBase> schemas)
         {

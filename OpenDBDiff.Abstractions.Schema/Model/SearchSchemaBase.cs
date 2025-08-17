@@ -5,9 +5,9 @@ namespace OpenDBDiff.Abstractions.Schema.Model
 {
     public class SearchSchemaBase
     {
-        private readonly Dictionary<String, ObjectType> objectTypes;
-        private readonly Dictionary<String, String> objectParent;
-        private readonly Dictionary<Int32, String> objectId;
+        private readonly Dictionary<string, ObjectType> objectTypes;
+        private readonly Dictionary<string, string> objectParent;
+        private readonly Dictionary<Int32, string> objectId;
 
         public SearchSchemaBase()
         {

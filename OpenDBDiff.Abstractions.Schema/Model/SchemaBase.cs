@@ -26,7 +26,7 @@ namespace OpenDBDiff.Abstractions.Schema.Model
 
         /*protected object Clone(object vObj, ISchemaBase parentObject)
         {
-            if (vObj.GetType().IsValueType || vObj.GetType() == Type.GetType("System.String"))
+            if (vObj.GetType().IsValueType || vObj.GetType() == Type.GetType("System.string"))
                 return vObj;
             else
             {
@@ -150,7 +150,7 @@ namespace OpenDBDiff.Abstractions.Schema.Model
         /// </summary>
         /// <param name="action">The action to check in the list</param>
         /// <returns>True if is already inserted. False if it wasn't</returns>
-        public Boolean GetWasInsertInDiffList(ScriptAction action)
+        public bool GetWasInsertInDiffList(ScriptAction action)
         {
             if (wasInsertInDiffList != null)
                 return wasInsertInDiffList.ContainsKey(action);
@@ -215,7 +215,7 @@ namespace OpenDBDiff.Abstractions.Schema.Model
         /// <summary>
         /// Determine if the database object if a System object or not
         /// </summary>
-        public Boolean IsSystem { get; set; }
+        public bool IsSystem { get; set; }
 
         /// <summary>
         /// Returns the status of the object. By default is set to <see cref="ObjectStatus.Original"/>. When setting a value, it also affects to the <see cref="Parent"/> status.
@@ -254,12 +254,12 @@ namespace OpenDBDiff.Abstractions.Schema.Model
             }
         }
 
-        public Boolean HasState(ObjectStatus statusFind)
+        public bool HasState(ObjectStatus statusFind)
         {
             return (this.Status & statusFind) == statusFind;
         }
 
-        public virtual Boolean IsCodeType
+        public virtual bool IsCodeType
         {
             get { return false; }
         }
@@ -278,7 +278,7 @@ namespace OpenDBDiff.Abstractions.Schema.Model
         /// Get if the SQL commands for the collection must build in one single statement
         /// or one statmente for each item of the collection.
         /// </summary>
-        public virtual Boolean MustBuildSqlInLine
+        public virtual bool MustBuildSqlInLine
         {
             get { return false; }
         }

@@ -28,7 +28,7 @@ namespace OpenDBDiff.Front.Extensions
                 .FromHierarchy(ex => ex.InnerException)
                 .Select(ex => ex.Message);
 
-            return String.Join(Environment.NewLine, messages);
+            return string.Join(Environment.NewLine, messages);
         }
     }
 }

@@ -33,25 +33,22 @@ namespace OpenDBDiff.SqlServer.Schema.Model
             return trigger;
         }
 
-        public Boolean IsDDLTrigger { get; set; }
+        public bool IsDDLTrigger { get; set; }
 
-        public Boolean InsteadOf { get; set; }
+        public bool InsteadOf { get; set; }
 
-        public Boolean IsDisabled { get; set; }
+        public bool IsDisabled { get; set; }
 
-        public Boolean NotForReplication { get; set; }
+        public bool NotForReplication { get; set; }
 
-        public override Boolean IsCodeType
-        {
-            get { return true; }
-        }
+        public override bool IsCodeType => true;
 
         public override string ToSqlDrop()
         {
             if (!IsDDLTrigger)
-                return "DROP TRIGGER " + FullName + "\r\nGO\r\n";
-            else
-                return "DROP TRIGGER " + FullName + " ON DATABASE\r\nGO\r\n";
+                return $"DROP TRIGGER {FullName}\r\nGO\r\n";
+
+            return $"DROP TRIGGER {FullName} ON DATABASE\r\nGO\r\n";
         }
 
         public string ToSQLEnabledDisabled()
@@ -59,30 +56,30 @@ namespace OpenDBDiff.SqlServer.Schema.Model
             if (!IsDDLTrigger)
             {
                 if (IsDisabled)
-                    return "DISABLE TRIGGER [" + Name + "] ON " + Parent.FullName + "\r\nGO\r\n";
-                else
-                    return "ENABLE TRIGGER [" + Name + "] ON " + Parent.FullName + "\r\nGO\r\n";
+                    return $"DISABLE TRIGGER [{Name}] ON {Parent.FullName}\r\nGO\r\n";
+
+                return $"ENABLE TRIGGER [{Name}] ON {Parent.FullName}\r\nGO\r\n";
             }
             else
             {
                 if (IsDisabled)
-                    return "DISABLE TRIGGER [" + Name + "]\r\nGO\r\n";
-                else
-                    return "ENABLE TRIGGER [" + Name + "]\r\nGO\r\n";
+                    return $"DISABLE TRIGGER [{Name}]\r\nGO\r\n";
+
+                return $"ENABLE TRIGGER [{Name}]\r\nGO\r\n";
             }
         }
 
         public override SQLScriptList ToSqlDiff(System.Collections.Generic.ICollection<ISchemaBase> schemas)
         {
             SQLScriptList list = new SQLScriptList();
-            if (this.Status == ObjectStatus.Drop)
+            if (Status == ObjectStatus.Drop)
                 list.Add(Drop());
-            if (this.Status == ObjectStatus.Create)
+            if (Status == ObjectStatus.Create)
                 list.Add(Create());
-            if (this.HasState(ObjectStatus.Alter))
+            if (HasState(ObjectStatus.Alter))
                 list.AddRange(Rebuild());
-            if (this.HasState(ObjectStatus.Disabled))
-                list.Add(this.ToSQLEnabledDisabled(), 0, ScriptAction.EnabledTrigger);
+            if (HasState(ObjectStatus.Disabled))
+                list.Add(ToSQLEnabledDisabled(), 0, ScriptAction.EnabledTrigger);
             return list;
         }
 

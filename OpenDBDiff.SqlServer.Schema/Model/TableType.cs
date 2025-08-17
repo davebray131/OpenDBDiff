@@ -55,15 +55,9 @@ namespace OpenDBDiff.SqlServer.Schema.Model
             return sql;
         }
 
-        public override string ToSqlDrop()
-        {
-            return "DROP TYPE " + FullName + "\r\nGO\r\n";
-        }
+        public override string ToSqlDrop() => $"DROP TYPE {FullName}\r\nGO\r\n";
 
-        public override string ToSqlAdd()
-        {
-            return ToSql();
-        }
+        public override string ToSqlAdd() => ToSql();
 
         public override SQLScript Create()
         {
@@ -73,8 +67,7 @@ namespace OpenDBDiff.SqlServer.Schema.Model
                 SetWasInsertInDiffList(action);
                 return new SQLScript(this.ToSqlAdd(), 0, action);
             }
-            else
-                return null;
+            return null;
         }
 
         public override SQLScript Drop()
@@ -85,8 +78,7 @@ namespace OpenDBDiff.SqlServer.Schema.Model
                 SetWasInsertInDiffList(action);
                 return new SQLScript(this.ToSqlDrop(), 0, action);
             }
-            else
-                return null;
+            return null;
         }
 
         public override SQLScriptList ToSqlDiff(System.Collections.Generic.ICollection<ISchemaBase> schemas)

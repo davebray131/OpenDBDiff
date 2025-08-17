@@ -24,34 +24,17 @@ namespace OpenDBDiff.SqlServer.Schema.Model
 
         public string Value { get; set; }
 
-        public string ToSQLAddBind()
-        {
-            string sql = "";
-            sql += "EXEC sp_bindefault N'" + Name + "', N'" + this.Parent.Name + "'\r\nGO\r\n";
-            return sql;
-        }
+        public string ToSQLAddBind() =>
+            $"EXEC sp_bindefault N'{Name}', N'{this.Parent.Name}'\r\nGO\r\n";
 
-        public string ToSQLAddUnBind()
-        {
-            string sql = "";
-            sql += "EXEC sp_unbindefault @objname=N'" + this.Parent.Name + "'\r\nGO\r\n";
-            return sql;
-        }
+        public string ToSQLAddUnBind() =>
+            $"EXEC sp_unbindefault @objname=N'{this.Parent.Name}'\r\nGO\r\n";
 
-        public override string ToSqlAdd()
-        {
-            return ToSql();
-        }
+        public override string ToSqlAdd() => ToSql();
 
-        public override string ToSqlDrop()
-        {
-            return "DROP DEFAULT " + FullName + "\r\nGO\r\n";
-        }
+        public override string ToSqlDrop() => $"DROP DEFAULT {FullName}\r\nGO\r\n";
 
-        public override string ToSql()
-        {
-            return "";
-        }
+        public override string ToSql() => string.Empty;
 
         /// <summary>
         /// Devuelve el schema de diferencias del Schema en formato SQL.

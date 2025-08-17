@@ -37,7 +37,7 @@ namespace OpenDBDiff.SqlServer.Schema.Model
         /// <summary>
         /// Compara dos indices y devuelve true si son iguales, caso contrario, devuelve false.
         /// </summary>
-        public static Boolean Compare(TableOption origin, TableOption destination)
+        public static bool Compare(TableOption origin, TableOption destination)
         {
             if (destination == null) throw new ArgumentNullException("destination");
             if (origin == null) throw new ArgumentNullException("origin");
@@ -48,11 +48,11 @@ namespace OpenDBDiff.SqlServer.Schema.Model
         public override string ToSqlDrop()
         {
             if (this.Name.Equals("TextInRow"))
-                return "EXEC sp_tableoption " + Parent.Name + ", 'text in row','off'\r\nGO\r\n";
+                return $"EXEC sp_tableoption {Parent.Name}, 'text in row','off'\r\nGO\r\n";
             if (this.Name.Equals("LargeValues"))
-                return "EXEC sp_tableoption " + Parent.Name + ", 'large value types out of row','0'\r\nGO\r\n";
+                return $"EXEC sp_tableoption {Parent.Name}, 'large value types out of row','0'\r\nGO\r\n";
             if (this.Name.Equals("VarDecimal"))
-                return "EXEC sp_tableoption " + Parent.Name + ", 'vardecimal storage format','0'\r\nGO\r\n";
+                return $"EXEC sp_tableoption {Parent.Name}, 'vardecimal storage format','0'\r\nGO\r\n";
             if (this.Name.Equals("LockEscalation"))
                 return "";
             return "";
@@ -61,15 +61,15 @@ namespace OpenDBDiff.SqlServer.Schema.Model
         public override string ToSql()
         {
             if (this.Name.Equals("TextInRow"))
-                return "EXEC sp_tableoption " + Parent.Name + ", 'text in row'," + Value + "\r\nGO\r\n";
+                return $"EXEC sp_tableoption {Parent.Name}, 'text in row',{Value}\r\nGO\r\n";
             if (this.Name.Equals("LargeValues"))
-                return "EXEC sp_tableoption " + Parent.Name + ", 'large value types out of row'," + Value + "\r\nGO\r\n";
+                return $"EXEC sp_tableoption {Parent.Name}, 'large value types out of row',{Value}\r\nGO\r\n";
             if (this.Name.Equals("VarDecimal"))
-                return "EXEC sp_tableoption " + Parent.Name + ", 'vardecimal storage format','1'\r\nGO\r\n";
+                return $"EXEC sp_tableoption {Parent.Name}, 'vardecimal storage format','1'\r\nGO\r\n";
             if (this.Name.Equals("LockEscalation"))
             {
                 if ((!this.Value.Equals("TABLE")) || (this.Status != ObjectStatus.Original))
-                    return "ALTER TABLE " + Parent.Name + " SET (LOCK_ESCALATION = " + Value + ")\r\nGO\r\n";
+                    return $"ALTER TABLE {Parent.Name} SET (LOCK_ESCALATION = {Value})\r\nGO\r\n";
             }
             return "";
         }

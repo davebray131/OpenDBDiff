@@ -73,7 +73,7 @@ namespace OpenDBDiff.Settings
             }
         }
 
-        public static void SaveLastConfiguration(String connectionStringSource, String connectionStringDestination)
+        public static void SaveLastConfiguration(string connectionStringSource, string connectionStringDestination)
         {
             var last = GetLastConfiguration() ?? new Project
             {

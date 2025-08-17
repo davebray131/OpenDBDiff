@@ -103,7 +103,7 @@ namespace OpenDBDiff.SqlServer.Schema.Generates
                         // Try to replace the name saved in the definition when the object was created by the one used for the object in sys.object
                         string oldName = match.Groups["spname"].Value;
                         //if (string.IsNullOrEmpty(oldName)) System.Diagnostics.Debugger.Break();
-                        if (String.Compare(oldName, name) != 0)
+                        if (string.Compare(oldName, name) != 0)
                         {
                             rv = rv.Replace(oldName, name);
                         }

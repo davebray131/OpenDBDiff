@@ -243,7 +243,7 @@ namespace OpenDBDiff.UI
             treeView1.Focus();
         }
 
-        private Boolean CanNodeAdd(ISchemaBase item)
+        private bool CanNodeAdd(ISchemaBase item)
         {
             ObjectStatus checkedStatus = ObjectStatus.Original;
             // OriginalStatus == 0, so have to treat differently

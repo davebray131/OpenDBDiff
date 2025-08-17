@@ -155,7 +155,7 @@ namespace OpenDBDiff.SqlServer.Schema.Model
 
         public SqlAction ActionMessage { get; private set; }
 
-        public Boolean IsCaseSensitive
+        public bool IsCaseSensitive
         {
             get
             {
@@ -280,7 +280,7 @@ namespace OpenDBDiff.SqlServer.Schema.Model
             }
         }
 
-        public ISchemaBase Find(String _FullName)
+        public ISchemaBase Find(string _FullName)
         {
             try
             {

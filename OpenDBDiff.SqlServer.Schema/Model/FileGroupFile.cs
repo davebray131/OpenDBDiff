@@ -30,9 +30,9 @@ namespace OpenDBDiff.SqlServer.Schema.Model
 
         public int Size { get; set; }
 
-        public Boolean IsSparse { get; set; }
+        public bool IsSparse { get; set; }
 
-        public Boolean IsPercentGrowth { get; set; }
+        public bool IsPercentGrowth { get; set; }
 
         private string TypeGrowth
         {
@@ -70,7 +70,7 @@ namespace OpenDBDiff.SqlServer.Schema.Model
         /// <summary>
         /// Compara dos triggers y devuelve true si son iguales, caso contrario, devuelve false.
         /// </summary>
-        public static Boolean Compare(FileGroupFile origin, FileGroupFile destination)
+        public static bool Compare(FileGroupFile origin, FileGroupFile destination)
         {
             if (destination == null) throw new ArgumentNullException("destination");
             if (origin == null) throw new ArgumentNullException("origin");

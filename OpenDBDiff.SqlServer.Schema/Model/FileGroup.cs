@@ -29,13 +29,13 @@ namespace OpenDBDiff.SqlServer.Schema.Model
 
         public FileGroupFiles Files { get; set; }
 
-        public Boolean IsFileStream { get; set; }
+        public bool IsFileStream { get; set; }
 
-        public Boolean IsDefaultFileGroup { get; set; }
+        public bool IsDefaultFileGroup { get; set; }
 
-        public Boolean IsReadOnly { get; set; }
+        public bool IsReadOnly { get; set; }
 
-        public static Boolean Compare(FileGroup origin, FileGroup destination)
+        public static bool Compare(FileGroup origin, FileGroup destination)
         {
             if (destination == null) throw new ArgumentNullException("destination");
             if (origin == null) throw new ArgumentNullException("origin");

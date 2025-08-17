@@ -19,9 +19,9 @@ namespace OpenDBDiff.SqlServer.Schema.Model
 
         public string Path { get; set; }
 
-        public Boolean IsDefault { get; set; }
+        public bool IsDefault { get; set; }
 
-        public Boolean IsAccentSensity { get; set; }
+        public bool IsAccentSensity { get; set; }
 
         public string FileGroupName { get; set; }
 
@@ -75,15 +75,9 @@ namespace OpenDBDiff.SqlServer.Schema.Model
             return sql;
         }
 
-        public override string ToSqlDrop()
-        {
-            return "DROP FULLTEXT CATALOG " + FullName + "\r\nGO\r\n";
-        }
+        public override string ToSqlDrop() => $"DROP FULLTEXT CATALOG {FullName}\r\nGO\r\n";
 
-        public override string ToSqlAdd()
-        {
-            return ToSql();
-        }
+        public override string ToSqlAdd() => ToSql();
 
         public override SQLScriptList ToSqlDiff(System.Collections.Generic.ICollection<ISchemaBase> schemas)
         {
@@ -115,7 +109,7 @@ namespace OpenDBDiff.SqlServer.Schema.Model
         /// <summary>
         /// Compara dos Synonyms y devuelve true si son iguales, caso contrario, devuelve false.
         /// </summary>
-        public Boolean Compare(FullText destination)
+        public bool Compare(FullText destination)
         {
             Database database = (Database)this.Parent;
             if (destination == null) throw new ArgumentNullException("destination");

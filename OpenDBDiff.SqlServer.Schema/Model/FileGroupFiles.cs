@@ -40,7 +40,7 @@ namespace OpenDBDiff.SqlServer.Schema.Model
         /// Nombre de la tabla a buscar.
         /// </param>
         /// <returns></returns>
-        public Boolean Find(string table)
+        public bool Find(string table)
         {
             return hash.ContainsKey(table);
         }

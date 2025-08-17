@@ -80,7 +80,7 @@ namespace OpenDBDiff.Abstractions.Schema.Model
         /// Nombre del objecto a buscar.
         /// </param>
         /// <returns></returns>
-        public Boolean Contains(string name)
+        public bool Contains(string name)
         {
             if (IsCaseSensitive)
                 return nameMap.ContainsKey(name);

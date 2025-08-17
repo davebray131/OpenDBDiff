@@ -12,7 +12,7 @@ namespace OpenDBDiff.SqlServer.Schema.Model
     {
         private int dependenciesCount;
         private List<ISchemaBase> dependencies;
-        private Boolean? hasFileStream;
+        private bool? hasFileStream;
 
         public Table(ISchemaBase parent)
             : base(parent, ObjectType.Table)
@@ -32,15 +32,15 @@ namespace OpenDBDiff.SqlServer.Schema.Model
 
         public string FileGroupText { get; set; }
 
-        public Boolean HasChangeDataCapture { get; set; }
+        public bool HasChangeDataCapture { get; set; }
 
-        public Boolean HasChangeTrackingTrackColumn { get; set; }
+        public bool HasChangeTrackingTrackColumn { get; set; }
 
-        public Boolean HasChangeTracking { get; set; }
+        public bool HasChangeTracking { get; set; }
 
         public string FileGroupStream { get; set; }
 
-        public Boolean HasClusteredIndex { get; set; }
+        public bool HasClusteredIndex { get; set; }
 
         public string FileGroup { get; set; }
 
@@ -67,35 +67,21 @@ namespace OpenDBDiff.SqlServer.Schema.Model
         /// <summary>
         /// Indica si la tabla tiene alguna columna que sea Identity.
         /// </summary>
-        public Boolean HasIdentityColumn
+        public bool HasIdentityColumn
         {
-            get
-            {
-                foreach (Column col in Columns)
-                {
-                    if (col.IsIdentity) return true;
-                }
-                return false;
-            }
+            get => Columns.Any(r => r.IsIdentity);
         }
 
-        public Boolean HasFileStream
+        public bool HasFileStream
         {
             get
             {
-                if (hasFileStream == null)
-                {
-                    hasFileStream = false;
-                    foreach (Column col in Columns)
-                    {
-                        if (col.IsFileStream) hasFileStream = true;
-                    }
-                }
+                hasFileStream ??= Columns.Any(r => r.IsFileStream);
                 return hasFileStream.Value;
             }
         }
 
-        public Boolean HasBlobColumn
+        public bool HasBlobColumn
         {
             get
             {
@@ -188,7 +174,7 @@ namespace OpenDBDiff.SqlServer.Schema.Model
         /// <summary>
         /// Devuelve el schema de la tabla en formato SQL.
         /// </summary>
-        public string ToSql(Boolean showFK)
+        public string ToSql(bool showFK)
         {
             Database database = null;
             ISchemaBase current = this;
@@ -272,32 +258,28 @@ namespace OpenDBDiff.SqlServer.Schema.Model
             var sql = new StringBuilder();
             if (HasChangeTracking)
             {
-                sql.Append("ALTER TABLE " + FullName + " ENABLE CHANGE_TRACKING");
+                sql.Append($"ALTER TABLE {FullName} ENABLE CHANGE_TRACKING");
                 if (HasChangeTrackingTrackColumn)
                     sql.Append(" WITH(TRACK_COLUMNS_UPDATED = ON)");
             }
             else
-                sql.Append("ALTER TABLE " + FullName + " DISABLE CHANGE_TRACKING");
+            {
+                sql.Append($"ALTER TABLE {FullName} DISABLE CHANGE_TRACKING");
+            }
 
             return sql.Append("\r\nGO\r\n").ToString();
         }
 
-        public override string ToSqlAdd()
-        {
-            return ToSql();
-        }
+        public override string ToSqlAdd() => ToSql();
 
-        public override string ToSqlDrop()
-        {
-            return "DROP TABLE " + FullName + "\r\nGO\r\n";
-        }
+        public override string ToSqlDrop() => $"DROP TABLE {FullName}\r\nGO\r\n";
 
         /*
                 private SQLScriptList BuildSQLFileGroup()
                 {
                     var listDiff = new SQLScriptList();
 
-                    Boolean found = false;
+                    bool found = false;
                     Index clustered = Indexes.Find(item => item.Type == Index.IndexTypeEnum.Clustered);
                     if (clustered == null)
                     {
@@ -404,7 +386,7 @@ namespace OpenDBDiff.SqlServer.Schema.Model
         {
             var sql = new StringBuilder();
             string tempTable = "Temp" + Name;
-            Boolean IsIdentityNew = false;
+            bool IsIdentityNew = false;
 
             var columnNamesStringBuilder = new StringBuilder();
             var valuesStringBuilder = new StringBuilder();
@@ -461,12 +443,11 @@ namespace OpenDBDiff.SqlServer.Schema.Model
                 var listValues = valuesStringBuilder.ToString(0, valuesStringBuilder.Length - 1);
                 sql.AppendLine(ToSQLTemp(tempTable));
                 if (HasIdentityColumn && (!IsIdentityNew))
-                    sql.AppendLine("SET IDENTITY_INSERT [" + Owner + "].[" + tempTable + "] ON");
-                sql.AppendLine("INSERT INTO [" + Owner + "].[" + tempTable + "] (" + listColumns + ")" + " SELECT " +
-                       listValues + " FROM " + FullName);
+                    sql.AppendLine($"SET IDENTITY_INSERT [{Owner}].[{tempTable}] ON");
+                sql.AppendLine($"INSERT INTO [{Owner}].[{tempTable}] ({listColumns}) SELECT {listValues} FROM {FullName}");
                 if (HasIdentityColumn && (!IsIdentityNew))
-                    sql.AppendLine("SET IDENTITY_INSERT [" + Owner + "].[" + tempTable + "] OFF\r\nGO\r\n");
-                sql.AppendLine("DROP TABLE " + FullName + "\r\nGO");
+                    sql.AppendLine($"SET IDENTITY_INSERT [{Owner}].[{tempTable}] OFF\r\nGO\r\n");
+                sql.AppendLine($"DROP TABLE {FullName}\r\nGO");
 
                 if (HasFileStream)
                 {
@@ -475,13 +456,11 @@ namespace OpenDBDiff.SqlServer.Schema.Model
                         if (item.Type == Constraint.ConstraintType.Unique &&
                             item.Status != ObjectStatus.Drop)
                         {
-                            sql.AppendLine("EXEC sp_rename N'[" + Owner + "].[Temp_XX_" + item.Name +
-                                    "]',N'" + item.Name + "', 'OBJECT'\r\nGO");
+                            sql.AppendLine($"EXEC sp_rename N'[{Owner}].[Temp_XX_{item.Name}]',N'{item.Name}', 'OBJECT'\r\nGO");
                         }
                     });
                 }
-                sql.AppendLine("EXEC sp_rename N'[" + Owner + "].[" + tempTable + "]',N'" + Name +
-                       "', 'OBJECT'\r\nGO\r\n");
+                sql.AppendLine($"EXEC sp_rename N'[{Owner}].[{tempTable}]',N'{Name}', 'OBJECT'\r\nGO\r\n");
                 sql.Append(OriginalTable.Options.ToSql());
             }
             else
@@ -498,7 +477,7 @@ namespace OpenDBDiff.SqlServer.Schema.Model
             return listDiff;
         }
 
-        private string ToSQLTemp(String TableName)
+        private string ToSQLTemp(string TableName)
         {
             var sql = new StringBuilder();
 
@@ -511,7 +490,7 @@ namespace OpenDBDiff.SqlServer.Schema.Model
             if (!string.IsNullOrWhiteSpace(sql.ToString()))
                 sql.AppendLine();
 
-            sql.AppendLine("CREATE TABLE [" + Owner + "].[" + TableName + "]\r\n(");
+            sql.AppendLine($"CREATE TABLE [{Owner}].[{TableName}]\r\n(");
 
             Columns.Sort();
 
@@ -534,7 +513,7 @@ namespace OpenDBDiff.SqlServer.Schema.Model
                     if (item.Type == Constraint.ConstraintType.Unique &&
                         item.Status != ObjectStatus.Drop)
                     {
-                        item.Name = "Temp_XX_" + item.Name;
+                        item.Name = $"Temp_XX_{item.Name}";
                         sql.AppendLine("\t" + item.ToSql() + ",");
                         item.SetWasInsertInDiffList(ScriptAction.AddConstraint);
                         item.Name = item.Name.Substring(8, item.Name.Length - 8);
@@ -546,17 +525,17 @@ namespace OpenDBDiff.SqlServer.Schema.Model
             {
                 sql.AppendLine();
                 if (!string.IsNullOrEmpty(CompressType))
-                    sql.AppendLine("WITH (DATA_COMPRESSION = " + CompressType + ")");
+                    sql.AppendLine($"WITH (DATA_COMPRESSION = {CompressType})");
             }
             sql.Append(")");
 
             if (!string.IsNullOrEmpty(FileGroup)) sql.Append(" ON [" + FileGroup + "]");
 
             if (!string.IsNullOrEmpty(FileGroupText) && HasBlobColumn)
-                sql.Append(" TEXTIMAGE_ON [" + FileGroupText + "]");
+                sql.Append($" TEXTIMAGE_ON [{FileGroupText}]");
 
             if (!string.IsNullOrEmpty(FileGroupStream) && HasFileStream)
-                sql.Append(" FILESTREAM_ON [" + FileGroupStream + "]");
+                sql.Append($" FILESTREAM_ON [{FileGroupStream}]");
 
             sql.AppendLine();
             sql.AppendLine("GO");
@@ -570,7 +549,7 @@ namespace OpenDBDiff.SqlServer.Schema.Model
             /*Si el estado es AlterRebuildDependeciesStatus, busca las dependencias solamente en las columnas que fueron modificadas*/
             if (Status == ObjectStatus.RebuildDependencies)
             {
-                myDependencies = new List<ISchemaBase>();
+                myDependencies = [];
                 for (int ic = 0; ic < Columns.Count; ic++)
                 {
                     if ((Columns[ic].Status == ObjectStatus.RebuildDependencies) ||
@@ -584,7 +563,7 @@ namespace OpenDBDiff.SqlServer.Schema.Model
             else
                 myDependencies = ((Database)Parent).Dependencies.Find(Id);
 
-            dependencies = new List<ISchemaBase>();
+            dependencies = [];
             for (int j = 0; j < myDependencies.Count; j++)
             {
                 ISchemaBase item = null;
@@ -708,7 +687,7 @@ namespace OpenDBDiff.SqlServer.Schema.Model
         /// <summary>
         /// Compara dos tablas y devuelve true si son iguales, caso contrario, devuelve false.
         /// </summary>
-        public static Boolean CompareFileGroup(Table origin, Table destination)
+        public static bool CompareFileGroup(Table origin, Table destination)
         {
             if (destination == null) throw new ArgumentNullException("destination");
             if (origin == null) throw new ArgumentNullException("origin");
@@ -721,7 +700,7 @@ namespace OpenDBDiff.SqlServer.Schema.Model
         /// <summary>
         /// Compara dos tablas y devuelve true si son iguales, caso contrario, devuelve false.
         /// </summary>
-        public static Boolean CompareFileGroupText(Table origin, Table destination)
+        public static bool CompareFileGroupText(Table origin, Table destination)
         {
             if (destination == null) throw new ArgumentNullException("destination");
             if (origin == null) throw new ArgumentNullException("origin");
