@@ -3,12 +3,10 @@ using OpenDBDiff.SqlServer.Schema.Model;
 
 namespace OpenDBDiff.SqlServer.Schema.Generates;
 
-public class GenerateDDLTriggers
+
+public class GenerateDDLTriggers(Generate root)
 {
-    private readonly Generate root;
-
-    public GenerateDDLTriggers(Generate root) => this.root = root;
-
+    private readonly Generate root = root;
     private static string GetSQL() => SQLQueries.SQLQueryFactory.Get("GetDDLTriggers");
 
     public void Fill(Database database, string connectionString)

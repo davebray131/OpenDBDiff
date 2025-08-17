@@ -1,4 +1,5 @@
 using System;
+using System.Text;
 using OpenDBDiff.Abstractions.Schema;
 using OpenDBDiff.Abstractions.Schema.Model;
 
@@ -13,18 +14,18 @@ public class Assembly : Code
     {
         var item = new Assembly(parent)
         {
-            Id = this.Id,
-            Name = this.Name,
-            Owner = this.Owner,
-            Visible = this.Visible,
-            Text = this.Text,
-            PermissionSet = this.PermissionSet,
-            CLRName = this.CLRName,
-            Guid = this.Guid,
-            Files = this.Files
+            Id = Id,
+            Name = Name,
+            Owner = Owner,
+            Visible = Visible,
+            Text = Text,
+            PermissionSet = PermissionSet,
+            CLRName = CLRName,
+            Guid = Guid,
+            Files = Files
         };
-        this.DependenciesOut.ForEach(dep => item.DependenciesOut.Add(dep));
-        this.ExtendedProperties.ForEach(ep => item.ExtendedProperties.Add(ep));
+        DependenciesOut.ForEach(dep => item.DependenciesOut.Add(dep));
+        ExtendedProperties.ForEach(ep => item.ExtendedProperties.Add(ep));
         return item;
     }
 
@@ -51,18 +52,18 @@ public class Assembly : Code
             access = "SAFE";
         }
 
-        var toSql = "CREATE ASSEMBLY ";
-        toSql += FullName + "\r\n";
-        toSql += "AUTHORIZATION " + Owner + "\r\n";
-        toSql += "FROM " + Text + "\r\n";
-        toSql += "WITH PERMISSION_SET = " + access + "\r\n";
-        toSql += "GO\r\n";
-        toSql += Files.ToSql();
-        toSql += this.ExtendedProperties.ToSql();
-        return toSql;
+        var sql = new StringBuilder();
+        sql.AppendLine($"CREATE ASSEMBLY {FullName}");
+        sql.AppendLine($"AUTHORIZATION {Owner}");
+        sql.AppendLine($"FROM {Text}");
+        sql.AppendLine($"WITH PERMISSION_SET = {access}");
+        sql.AppendLine("GO");
+        sql.Append(Files.ToSql());
+        sql.Append(ExtendedProperties.ToSql());
+        return sql.ToString();
     }
 
-    public override string ToSqlDrop() => "DROP ASSEMBLY " + FullName + "\r\nGO\r\n";
+    public override string ToSqlDrop() => $"DROP ASSEMBLY {FullName}\r\nGO\r\n";
 
     public override string ToSqlAdd() => ToSql();
 
@@ -79,46 +80,46 @@ public class Assembly : Code
             access = "SAFE";
         }
 
-        return "ALTER ASSEMBLY " + FullName + " WITH PERMISSION_SET = " + access + "\r\nGO\r\n";
+        return $"ALTER ASSEMBLY {FullName} WITH PERMISSION_SET = {access}\r\nGO\r\n";
     }
 
-    private string ToSQLAlterOwner() => "ALTER AUTHORIZATION ON ASSEMBLY::" + FullName + " TO " + Owner + "\r\nGO\r\n";
+    private string ToSQLAlterOwner() => $"ALTER AUTHORIZATION ON ASSEMBLY::{FullName} TO {Owner}\r\nGO\r\n";
 
     public override SQLScriptList ToSqlDiff(System.Collections.Generic.ICollection<ISchemaBase> schemas)
     {
         var list = new SQLScriptList();
 
-        if (this.Status == ObjectStatus.Drop)
+        if (Status == ObjectStatus.Drop)
         {
             list.AddRange(RebuildDependencies());
             list.Add(Drop());
         }
-        if (this.Status == ObjectStatus.Create)
+        if (Status == ObjectStatus.Create)
         {
             list.Add(Create());
         }
 
-        if (this.HasState(ObjectStatus.Rebuild))
+        if (HasState(ObjectStatus.Rebuild))
         {
             list.AddRange(Rebuild());
         }
 
-        if (this.HasState(ObjectStatus.ChangeOwner))
+        if (HasState(ObjectStatus.ChangeOwner))
         {
             list.Add(ToSQLAlterOwner(), 0, ScriptAction.AlterAssembly);
         }
 
-        if (this.HasState(ObjectStatus.PermissionSet))
+        if (HasState(ObjectStatus.PermissionSet))
         {
             list.Add(ToSQLAlter(), 0, ScriptAction.AlterAssembly);
         }
 
-        if (this.HasState(ObjectStatus.Alter))
+        if (HasState(ObjectStatus.Alter))
         {
             list.AddRange(Files.ToSqlDiff());
         }
 
-        list.AddRange(this.ExtendedProperties.ToSqlDiff());
+        list.AddRange(ExtendedProperties.ToSqlDiff());
         return list;
     }
 
@@ -126,37 +127,22 @@ public class Assembly : Code
     {
         if (obj == null)
         {
-            throw new ArgumentNullException("obj");
+            throw new ArgumentNullException(nameof(obj));
         }
 
-        if (!this.CLRName.Equals(obj.CLRName))
+        if (
+            !CLRName.Equals(obj.CLRName) ||
+            !PermissionSet.Equals(obj.PermissionSet) ||
+            !Owner.Equals(obj.Owner) ||
+            !Text.Equals(obj.Text) ||
+            Files.Count != obj.Files.Count)
         {
             return false;
         }
 
-        if (!this.PermissionSet.Equals(obj.PermissionSet))
+        for (var j = 0; j < Files.Count; j++)
         {
-            return false;
-        }
-
-        if (!this.Owner.Equals(obj.Owner))
-        {
-            return false;
-        }
-
-        if (!this.Text.Equals(obj.Text))
-        {
-            return false;
-        }
-
-        if (this.Files.Count != obj.Files.Count)
-        {
-            return false;
-        }
-
-        for (var j = 0; j < this.Files.Count; j++)
-        {
-            if (!this.Files[j].Content.Equals(obj.Files[j].Content))
+            if (!Files[j].Content.Equals(obj.Files[j].Content))
             {
                 return false;
             }

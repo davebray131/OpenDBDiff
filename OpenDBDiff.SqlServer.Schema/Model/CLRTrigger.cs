@@ -3,16 +3,11 @@ using OpenDBDiff.Abstractions.Schema.Model;
 
 namespace OpenDBDiff.SqlServer.Schema.Model;
 
-public class CLRTrigger : CLRCode
+public class CLRTrigger(ISchemaBase parent) : CLRCode(parent, ObjectType.CLRTrigger, ScriptAction.AddTrigger, ScriptAction.DropTrigger)
 {
-    public CLRTrigger(ISchemaBase parent)
-        : base(parent, ObjectType.CLRTrigger, ScriptAction.AddTrigger, ScriptAction.DropTrigger)
-    {
-    }
-
     public override string ToSql()
     {
-        var sql = "CREATE TRIGGER " + FullName + " ON " + Parent.FullName;
+        var sql = $"CREATE TRIGGER {FullName} ON {Parent.FullName}";
         sql += " AFTER ";
         if (IsInsert)
         {
@@ -29,9 +24,9 @@ public class CLRTrigger : CLRCode
             sql += "DELETE,";
         }
 
-        sql = sql.Substring(0, sql.Length - 1) + " ";
-        sql += "AS\r\n";
-        sql += "EXTERNAL NAME [" + AssemblyName + "].[" + AssemblyClass + "].[" + AssemblyMethod + "]\r\n";
+        sql = sql.Substring(0, sql.Length - 1);
+        sql += " AS\r\n";
+        sql += $"EXTERNAL NAME [{AssemblyName}].[{AssemblyClass}].[{AssemblyMethod}]\r\n";
         sql += "GO\r\n";
         return sql;
     }
@@ -46,21 +41,21 @@ public class CLRTrigger : CLRCode
     {
         var list = new SQLScriptList();
 
-        if (this.HasState(ObjectStatus.Drop))
+        if (HasState(ObjectStatus.Drop))
         {
             list.Add(Drop());
         }
 
-        if (this.HasState(ObjectStatus.Create))
+        if (HasState(ObjectStatus.Create))
         {
             list.Add(Create());
         }
 
-        if (this.Status == ObjectStatus.Alter)
+        if (Status == ObjectStatus.Alter)
         {
             list.AddRange(Rebuild());
         }
-        list.AddRange(this.ExtendedProperties.ToSqlDiff());
+        list.AddRange(ExtendedProperties.ToSqlDiff());
         return list;
     }
 }

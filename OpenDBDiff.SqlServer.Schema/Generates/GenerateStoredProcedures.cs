@@ -6,16 +6,12 @@ using OpenDBDiff.SqlServer.Schema.Model;
 
 namespace OpenDBDiff.SqlServer.Schema.Generates;
 
-public class GenerateStoredProcedures
+public class GenerateStoredProcedures(Generate root)
 {
     private static int NameIndex = -1;
     private static int object_idIndex = -1;
     private static int ownerIndex = -1;
     private static int typeIndex = -1;
-
-    private readonly Generate root;
-
-    public GenerateStoredProcedures(Generate root) => this.root = root;
 
     private static void InitIndex(SqlDataReader reader)
     {
@@ -30,12 +26,9 @@ public class GenerateStoredProcedures
 
     private static string GetSQLParameters() => SQLQueries.SQLQueryFactory.Get("GetParameters");
 
-    private static string GetSQL(DatabaseInfo.SQLServerVersion version)
-    {
-        return version == DatabaseInfo.SQLServerVersion.SQLServerAzure10
+    private static string GetSQL(DatabaseInfo.SQLServerVersion version) => version == DatabaseInfo.SQLServerVersion.SQLServerAzure10
             ? SQLQueries.SQLQueryFactory.Get("GetProcedures", DatabaseInfo.SQLServerVersion.SQLServerAzure10)
             : SQLQueries.SQLQueryFactory.Get("GetProcedures");
-    }
 
     private static void FillParameters(Database database, string connectionString)
     {

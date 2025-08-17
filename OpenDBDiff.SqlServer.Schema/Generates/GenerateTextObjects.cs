@@ -8,11 +8,9 @@ using OpenDBDiff.SqlServer.Schema.Options;
 
 namespace OpenDBDiff.SqlServer.Schema.Generates;
 
-public class GenerateTextObjects
+public class GenerateTextObjects(Generate root)
 {
-    private readonly Generate root;
-
-    public GenerateTextObjects(Generate root) => this.root = root;
+    private readonly Generate root = root;
 
     private static string GetSQL(SqlOption options)
     {

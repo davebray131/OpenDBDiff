@@ -3,15 +3,9 @@ using OpenDBDiff.Abstractions.Schema;
 
 namespace OpenDBDiff.SqlServer.Schema.Model;
 
-public class TablePartition : SQLServerSchemaBase
+public class TablePartition(Table parent) : SQLServerSchemaBase(parent, ObjectType.Partition)
 {
-    public TablePartition(Table parent)
-        : base(parent, ObjectType.Partition)
-    {
-    }
-
     public string CompressType { get; set; }
-
 
     public override string ToSql() => throw new NotImplementedException();
 

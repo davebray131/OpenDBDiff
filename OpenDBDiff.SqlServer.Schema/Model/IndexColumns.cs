@@ -3,12 +3,8 @@ using OpenDBDiff.Abstractions.Schema.Model;
 
 namespace OpenDBDiff.SqlServer.Schema.Model;
 
-public class IndexColumns : SchemaList<IndexColumn, ISchemaBase>
+public class IndexColumns(ISchemaBase parent) : SchemaList<IndexColumn, ISchemaBase>(parent)
 {
-    public IndexColumns(ISchemaBase parent)
-        : base(parent)
-    {
-    }
 
     /// <summary>
     /// Clona el objeto ColumnConstraints en una nueva instancia.
@@ -16,7 +12,7 @@ public class IndexColumns : SchemaList<IndexColumn, ISchemaBase>
     public IndexColumns Clone()
     {
         var columns = new IndexColumns(Parent);
-        for (var index = 0; index < this.Count; index++)
+        for (var index = 0; index < Count; index++)
         {
             columns.Add(this[index].Clone(Parent));
         }
@@ -30,12 +26,12 @@ public class IndexColumns : SchemaList<IndexColumn, ISchemaBase>
     {
         if (destination == null)
         {
-            throw new ArgumentNullException("destination");
+            throw new ArgumentNullException(nameof(destination));
         }
 
         if (origin == null)
         {
-            throw new ArgumentNullException("origin");
+            throw new ArgumentNullException(nameof(origin));
         }
 
         if (origin.Count != destination.Count)

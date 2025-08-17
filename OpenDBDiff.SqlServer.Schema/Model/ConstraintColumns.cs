@@ -3,20 +3,16 @@ using OpenDBDiff.Abstractions.Schema.Model;
 
 namespace OpenDBDiff.SqlServer.Schema.Model;
 
-public class ConstraintColumns : SchemaList<ConstraintColumn, Constraint>
+public class ConstraintColumns(Constraint parent) : SchemaList<ConstraintColumn, Constraint>(parent)
 {
-    public ConstraintColumns(Constraint parent)
-        : base(parent)
-    {
-    }
 
     /// <summary>
     /// Clona el objeto ColumnConstraints en una nueva instancia.
     /// </summary>
     public ConstraintColumns Clone()
     {
-        var columns = new ConstraintColumns(this.Parent);
-        for (var index = 0; index < this.Count; index++)
+        var columns = new ConstraintColumns(Parent);
+        for (var index = 0; index < Count; index++)
         {
             columns.Add(this[index].Clone());
         }
@@ -30,12 +26,12 @@ public class ConstraintColumns : SchemaList<ConstraintColumn, Constraint>
     {
         if (destination == null)
         {
-            throw new ArgumentNullException("destination");
+            throw new ArgumentNullException(nameof(destination));
         }
 
         if (origin == null)
         {
-            throw new ArgumentNullException("origin");
+            throw new ArgumentNullException(nameof(origin));
         }
 
         if (origin.Count != destination.Count)

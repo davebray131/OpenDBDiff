@@ -6,15 +6,15 @@ public class ObjectDependency
 {
     public ObjectDependency(string name, string Column, ObjectType type)
     {
-        this.Name = name;
-        this.ColumnName = Column;
-        this.Type = type;
+        Name = name;
+        ColumnName = Column;
+        Type = type;
     }
 
     public ObjectDependency(string name, string Column)
     {
-        this.Name = name;
-        this.ColumnName = Column;
+        Name = name;
+        ColumnName = Column;
     }
 
     public string Name { get; set; }

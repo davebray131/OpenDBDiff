@@ -33,16 +33,16 @@ public class PartitionScheme : SQLServerSchemaBase
     {
         var listDiff = new SQLScriptList();
 
-        if (this.Status == ObjectStatus.Drop)
+        if (Status == ObjectStatus.Drop)
         {
             listDiff.Add(ToSqlDrop(), 0, ScriptAction.DropPartitionScheme);
         }
-        if (this.Status == ObjectStatus.Rebuild)
+        if (Status == ObjectStatus.Rebuild)
         {
             listDiff.Add(ToSqlDrop(), 0, ScriptAction.DropPartitionScheme);
             listDiff.Add(ToSqlAdd(), 0, ScriptAction.AddPartitionScheme);
         }
-        if (this.Status == ObjectStatus.Create)
+        if (Status == ObjectStatus.Create)
         {
             listDiff.Add(ToSqlAdd(), 0, ScriptAction.AddPartitionScheme);
         }
@@ -53,12 +53,12 @@ public class PartitionScheme : SQLServerSchemaBase
     {
         if (destination == null)
         {
-            throw new ArgumentNullException("destination");
+            throw new ArgumentNullException(nameof(destination));
         }
 
         if (origin == null)
         {
-            throw new ArgumentNullException("origin");
+            throw new ArgumentNullException(nameof(origin));
         }
 
         if (!origin.PartitionFunction.Equals(destination.PartitionFunction))

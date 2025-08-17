@@ -5,12 +5,9 @@ using OpenDBDiff.SqlServer.Schema.Model;
 
 namespace OpenDBDiff.SqlServer.Schema.Generates;
 
-public class GeneratePartitionFunctions
+public class GeneratePartitionFunctions(Generate root)
 {
-    private readonly Generate root;
-
-    public GeneratePartitionFunctions(Generate root) => this.root = root;
-
+    private readonly Generate root = root;
     private static string GetSQL() => SQLQueries.SQLQueryFactory.Get("GetPartitionFunctions");
 
     private static string ToHex(byte[] stream)
@@ -18,7 +15,7 @@ public class GeneratePartitionFunctions
         var sHex = new StringBuilder(2 * stream.Length);
         for (var i = 0; i < stream.Length; i++)
         {
-            _ = sHex.AppendFormat("{0:X2} ", stream[i]);
+            sHex.AppendFormat("{0:X2} ", stream[i]);
         }
 
         return "0x" + sHex.ToString().Replace(" ", string.Empty);
@@ -60,11 +57,11 @@ public class GeneratePartitionFunctions
                         item.Values.Add(ToHex((byte[])reader["value"]));
                         break;
                     case "date":
-                        item.Values.Add(string.Format("'{0:yyyy/MM/dd}'", (DateTime)reader["value"]));
+                        item.Values.Add($"'{(DateTime)reader["value"]:yyyy/MM/dd}'");
                         break;
                     case "smalldatetime":
                     case "datetime":
-                        item.Values.Add(string.Format("'{0:yyyy/MM/dd HH:mm:ss.fff}'", (DateTime)reader["value"]));
+                        item.Values.Add($"'{(DateTime)reader["value"]:yyyy/MM/dd HH:mm:ss.fff}'");
                         break;
                     default:
                         item.Values.Add(reader["value"].ToString());

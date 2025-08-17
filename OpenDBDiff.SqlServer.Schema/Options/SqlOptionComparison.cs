@@ -22,7 +22,7 @@ public class SqlOptionComparison : IOptionComparison
 
     public SqlOptionComparison(IOptionComparison comparison)
     {
-        this.ReloadComparisonOnUpdate = comparison.ReloadComparisonOnUpdate;
+        ReloadComparisonOnUpdate = comparison.ReloadComparisonOnUpdate;
         var options = comparison.GetOptions();
         IgnoreWhiteSpacesInCode = bool.Parse(options["IgnoreWhiteSpacesInCode"]);
         CaseSensityInCode = (CaseSensityOptions)Enum.Parse(typeof(CaseSensityOptions), options["CaseSensityInCode"], true);

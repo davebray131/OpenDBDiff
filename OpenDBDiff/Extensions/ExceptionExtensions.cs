@@ -10,7 +10,7 @@ public static class ExceptionExtensions
     {
         if (ex == null)
         {
-            throw new ArgumentNullException("ex");
+            throw new ArgumentNullException(nameof(ex));
         }
 
         var innerException = ex;

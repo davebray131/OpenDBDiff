@@ -7,7 +7,7 @@ namespace OpenDBDiff.SqlServer.Schema.Model;
 public class Trigger : Code
 {
     public Trigger(ISchemaBase parent)
-        : base(parent, ObjectType.Trigger, ScriptAction.AddTrigger, ScriptAction.DropTrigger) => this.Parent = parent;
+        : base(parent, ObjectType.Trigger, ScriptAction.AddTrigger, ScriptAction.DropTrigger) => Parent = parent;
 
     /// <summary>
     /// Clona el objeto en una nueva instancia.
@@ -16,16 +16,16 @@ public class Trigger : Code
     {
         var trigger = new Trigger(parent)
         {
-            Text = this.Text,
-            Status = this.Status,
-            Name = this.Name,
-            IsDisabled = this.IsDisabled,
-            InsteadOf = this.InsteadOf,
-            NotForReplication = this.NotForReplication,
-            Owner = this.Owner,
-            Id = this.Id,
-            IsDDLTrigger = this.IsDDLTrigger,
-            Guid = this.Guid
+            Text = Text,
+            Status = Status,
+            Name = Name,
+            IsDisabled = IsDisabled,
+            InsteadOf = InsteadOf,
+            NotForReplication = NotForReplication,
+            Owner = Owner,
+            Id = Id,
+            IsDDLTrigger = IsDDLTrigger,
+            Guid = Guid
         };
         return trigger;
     }
@@ -42,14 +42,11 @@ public class Trigger : Code
 
     public override string ToSqlDrop() => !IsDDLTrigger ? $"DROP TRIGGER {FullName}\r\nGO\r\n" : $"DROP TRIGGER {FullName} ON DATABASE\r\nGO\r\n";
 
-    public string ToSQLEnabledDisabled()
-    {
-        return !IsDDLTrigger
+    public string ToSQLEnabledDisabled() => !IsDDLTrigger
             ? IsDisabled
                 ? $"DISABLE TRIGGER [{Name}] ON {Parent.FullName}\r\nGO\r\n"
                 : $"ENABLE TRIGGER [{Name}] ON {Parent.FullName}\r\nGO\r\n"
             : IsDisabled ? $"DISABLE TRIGGER [{Name}]\r\nGO\r\n" : $"ENABLE TRIGGER [{Name}]\r\nGO\r\n";
-    }
 
     public override SQLScriptList ToSqlDiff(System.Collections.Generic.ICollection<ISchemaBase> schemas)
     {
@@ -77,10 +74,7 @@ public class Trigger : Code
         return list;
     }
 
-    public override bool Compare(ICode obj)
-    {
-        return obj == null
-            ? throw new ArgumentNullException("obj")
-            : this.ToSql().Equals(obj.ToSql()) && this.InsteadOf == ((Trigger)obj).InsteadOf && this.IsDisabled == ((Trigger)obj).IsDisabled && this.NotForReplication == ((Trigger)obj).NotForReplication;
-    }
+    public override bool Compare(ICode obj) => obj == null
+            ? throw new ArgumentNullException(nameof(obj))
+            : ToSql().Equals(obj.ToSql()) && InsteadOf == ((Trigger)obj).InsteadOf && IsDisabled == ((Trigger)obj).IsDisabled && NotForReplication == ((Trigger)obj).NotForReplication;
 }

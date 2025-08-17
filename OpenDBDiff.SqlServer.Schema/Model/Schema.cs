@@ -10,7 +10,7 @@ public class Schema : SQLServerSchemaBase
     {
     }
 
-    public override string ToSql() => $"CREATE SCHEMA[{this.Name}] AUTHORIZATION[{Owner}]\r\nGO\r\n";
+    public override string ToSql() => $"CREATE SCHEMA[{Name}] AUTHORIZATION[{Owner}]\r\nGO\r\n";
 
     public override string ToSqlAdd() => ToSql();
 
@@ -23,11 +23,11 @@ public class Schema : SQLServerSchemaBase
     {
         var listDiff = new SQLScriptList();
 
-        if (this.Status == ObjectStatus.Drop)
+        if (Status == ObjectStatus.Drop)
         {
             listDiff.Add(ToSqlDrop(), 0, ScriptAction.DropSchema);
         }
-        if (this.Status == ObjectStatus.Create)
+        if (Status == ObjectStatus.Create)
         {
             listDiff.Add(ToSql(), 0, ScriptAction.AddSchema);
         }

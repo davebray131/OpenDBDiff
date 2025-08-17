@@ -58,13 +58,13 @@ namespace OpenDBDiff.SqlServer.Ui
             cboObjects.ValueMember = "ObjectType";
         }
 
-        private void CancelFormButton_Click(object sender, EventArgs e) => this.Close();
+        private void CancelFormButton_Click(object sender, EventArgs e) => Close();
 
         private void ApplyButton_Click(object sender, EventArgs e)
         {
             if (cboObjects.SelectedItem == null)
             {
-                _ = MessageBox.Show(this, "All fields are required.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show(this, "All fields are required.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
 
@@ -72,7 +72,7 @@ namespace OpenDBDiff.SqlServer.Ui
 
             if (sqlOption.Filters.Items.Contains(fi))
             {
-                _ = MessageBox.Show(this, string.Format("The list of name filters already includes an entry for text '{0}' of type '{1}'", fi.FilterPattern, fi.ObjectType.ToString()), "Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                MessageBox.Show(this, string.Format("The list of name filters already includes an entry for text '{0}' of type '{1}'", fi.FilterPattern, fi.ObjectType.ToString()), "Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                 return;
             }
 
@@ -87,7 +87,7 @@ namespace OpenDBDiff.SqlServer.Ui
             }
             HandlerHelper.RaiseOnChange();
 
-            this.Close();
+            Close();
         }
     }
 }

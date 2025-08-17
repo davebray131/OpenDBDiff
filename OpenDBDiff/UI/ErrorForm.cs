@@ -32,11 +32,11 @@ public partial class ErrorForm : Form
             .OrderByDescending(m => exceptionMessages.IndexOf(m));
 
         var exceptionErrorMessage = new StringBuilder();
-        _ = exceptionErrorMessage.Append(this.Text);
+        exceptionErrorMessage.Append(Text);
 
         foreach (var message in distinctMessages.Skip(1))
         {
-            _ = exceptionErrorMessage.Append($"\r\n{message}");
+            exceptionErrorMessage.Append($"\r\n{message}");
         }
 
         var mostInnerException = exceptions.Last();
@@ -56,7 +56,7 @@ public partial class ErrorForm : Form
             stackTrace = SystemExceptionsRegex.Replace(stackTrace, string.Empty);
         }
 
-        _ = exceptionErrorMessage.Append($"\r\n{mostInnerException.GetType().Name}: {mostInnerException.Message}\r\n{stackTrace}");
+        exceptionErrorMessage.Append($"\r\n{mostInnerException.GetType().Name}: {mostInnerException.Message}\r\n{stackTrace}");
 
         //var ignoreChunks = new System.Text.RegularExpressions.Regex(@": \[[^\)]*\)|\.\.\.\)|\'[^\']*\'|\([^\)]*\)|\" + '"' + @"[^\" + '"' + @"]*\" + '"' + @"|Source|Destination");
 
@@ -70,16 +70,16 @@ public partial class ErrorForm : Form
             {
                 if (queryString.Length > 0)
                 {
-                    _ = queryString.Append(orOperator);
+                    queryString.Append(orOperator);
                 }
-                _ = queryString.Append("\"");
-                _ = queryString.Append(message);
-                _ = queryString.Append("\"");
+                queryString.Append("\"");
+                queryString.Append(message);
+                queryString.Append("\"");
             }
         }
         var searchHash = GenerateHash(queryString.ToString());
 
-        _ = exceptionErrorMessage.AppendFormat("\r\n\r\n{0}", searchHash);
+        exceptionErrorMessage.AppendFormat("\r\n\r\n{0}", searchHash);
 
         ErrorInformation = string.Join("\r\n",
             "1.  To report an error search first in the Github issues to see if it's already been reported.",
@@ -95,7 +95,7 @@ public partial class ErrorForm : Form
         ).Trim() + "\r\n\r\n" + exceptionErrorMessage.ToString();
         SearchTerm = queryString.ToString();
 
-        this.ErrorInformationTextBox.Text = ErrorInformation;
+        ErrorInformationTextBox.Text = ErrorInformation;
     }
 
     private static string GenerateHash(string queryString)
@@ -119,7 +119,7 @@ public partial class ErrorForm : Form
         }
     }
 
-    private void BtnClose_Click(object sender, EventArgs e) => this.Close();
+    private void BtnClose_Click(object sender, EventArgs e) => Close();
 
     private void BtnCopy_Click(object sender, EventArgs e)
     {
@@ -129,7 +129,7 @@ public partial class ErrorForm : Form
         }
         catch (Exception ex)
         {
-            _ = MessageBox.Show(this, "Error while trying to copy the error to the clipboard: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            MessageBox.Show(this, "Error while trying to copy the error to the clipboard: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
         }
     }
 
@@ -137,15 +137,15 @@ public partial class ErrorForm : Form
     {
         try
         {
-            _ = System.Diagnostics.Process.Start("https://github.com/OpenDBDiff/OpenDBDiff/issues?q=is%3Aissue+" + Uri.EscapeDataString(SearchTerm));
+            System.Diagnostics.Process.Start("https://github.com/OpenDBDiff/OpenDBDiff/issues?q=is%3Aissue+" + Uri.EscapeDataString(SearchTerm));
         }
         catch (Exception ex)
         {
-            _ = MessageBox.Show(this, "Error while trying to search the error in the Github issues: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            MessageBox.Show(this, "Error while trying to search the error in the Github issues: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
         }
     }
 
-    private void ErrorForm_Load(object sender, EventArgs e) => this.ErrorInformationTextBox.Text = ErrorInformation;
+    private void ErrorForm_Load(object sender, EventArgs e) => ErrorInformationTextBox.Text = ErrorInformation;
 
     private void ReportIssueButton_Click(object sender, EventArgs e)
     {
@@ -153,11 +153,11 @@ public partial class ErrorForm : Form
         {
             try
             {
-                _ = System.Diagnostics.Process.Start("https://github.com/OpenDBDiff/OpenDBDiff/issues/new");
+                System.Diagnostics.Process.Start("https://github.com/OpenDBDiff/OpenDBDiff/issues/new");
             }
             catch (Exception ex)
             {
-                _ = MessageBox.Show(this, "Error while trying to create a new Github issue: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show(this, "Error while trying to create a new Github issue: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
     }

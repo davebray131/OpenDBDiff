@@ -3,13 +3,8 @@ using OpenDBDiff.Abstractions.Schema.Model;
 
 namespace OpenDBDiff.SqlServer.Schema.Model;
 
-public abstract class CLRCode : Code
+public abstract class CLRCode(ISchemaBase parent, ObjectType type, ScriptAction addAction, ScriptAction dropAction) : Code(parent, type, addAction, dropAction)
 {
-    public CLRCode(ISchemaBase parent, ObjectType type, ScriptAction addAction, ScriptAction dropAction)
-        : base(parent, type, addAction, dropAction)
-    {
-    }
-
     public string AssemblyMethod { get; set; }
 
     public string AssemblyExecuteAs { get; set; }

@@ -26,10 +26,10 @@ internal static class UserSQLCommand
     private static string Get2008()
     {
         var sql = new StringBuilder();
-        _ = sql.AppendLine("SELECT is_fixed_role, type, ISNULL(suser_sname(sid),'') AS Login,Name,principal_id, ISNULL(default_schema_name,'') AS default_schema_name ");
-        _ = sql.AppendLine("FROM sys.database_principals ");
-        _ = sql.AppendLine("WHERE type IN ('S','U','A','R') ");
-        _ = sql.AppendLine("ORDER BY Name");
+        sql.AppendLine("SELECT is_fixed_role, type, ISNULL(suser_sname(sid),'') AS Login,Name,principal_id, ISNULL(default_schema_name,'') AS default_schema_name ");
+        sql.AppendLine("FROM sys.database_principals ");
+        sql.AppendLine("WHERE type IN ('S','U','A','R') ");
+        sql.AppendLine("ORDER BY Name");
         return sql.ToString();
     }
 
@@ -38,10 +38,10 @@ internal static class UserSQLCommand
         var sql = new StringBuilder();
         //to get LoginName in Azure (asside for the current login) you would have to link to master and query sys.sysusers or sys.sql_users
         //the CASE test below will at least get you the Current login
-        _ = sql.AppendLine("SELECT is_fixed_role, type, CASE WHEN suser_sid()=sid THEN suser_sname() ELSE '' END  AS Login,Name,principal_id, ISNULL(default_schema_name,'') AS default_schema_name ");
-        _ = sql.AppendLine("FROM sys.database_principals ");
-        _ = sql.AppendLine("WHERE type IN ('S','U','A','R') ");
-        _ = sql.AppendLine("ORDER BY Name");
+        sql.AppendLine("SELECT is_fixed_role, type, CASE WHEN suser_sid()=sid THEN suser_sname() ELSE '' END  AS Login,Name,principal_id, ISNULL(default_schema_name,'') AS default_schema_name ");
+        sql.AppendLine("FROM sys.database_principals ");
+        sql.AppendLine("WHERE type IN ('S','U','A','R') ");
+        sql.AppendLine("ORDER BY Name");
         return sql.ToString();
     }
 }

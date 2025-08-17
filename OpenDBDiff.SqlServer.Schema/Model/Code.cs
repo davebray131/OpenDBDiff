@@ -25,7 +25,7 @@ public abstract class Code : SQLServerSchemaBase, ICode
         DependenciesOut = [];
         typeName = GetObjectTypeName(ObjectType);
         /*Por el momento, solo los Assemblys manejan deep de dependencias*/
-        if (this.ObjectType == ObjectType.Assembly)
+        if (ObjectType == ObjectType.Assembly)
         {
             deepMax = 501;
             deepMin = 500;
@@ -45,7 +45,7 @@ public abstract class Code : SQLServerSchemaBase, ICode
         if (!GetWasInsertInDiffList(addAction))
         {
             SetWasInsertInDiffList(addAction);
-            return new SQLScript(this.ToSqlAdd(), iCount, addAction);
+            return new SQLScript(ToSqlAdd(), iCount, addAction);
         }
         else
         {
@@ -59,7 +59,7 @@ public abstract class Code : SQLServerSchemaBase, ICode
         if (!GetWasInsertInDiffList(dropAction))
         {
             SetWasInsertInDiffList(dropAction);
-            return new SQLScript(this.ToSqlDrop(), iCount, dropAction);
+            return new SQLScript(ToSqlDrop(), iCount, dropAction);
         }
         else
         {
@@ -67,24 +67,13 @@ public abstract class Code : SQLServerSchemaBase, ICode
         }
     }
 
-    private static string GetObjectTypeName(ObjectType type)
-    {
-        if (type == ObjectType.Rule)
-        {
-            return "RULE";
-        }
-
-        if (type == ObjectType.Trigger)
-        {
-            return "TRIGGER";
-        }
-
-        if (type == ObjectType.View)
-        {
-            return "VIEW";
-        }
-
-        return type == ObjectType.Function
+    private static string GetObjectTypeName(ObjectType type) => type == ObjectType.Rule
+            ? "RULE"
+            : type == ObjectType.Trigger
+            ? "TRIGGER"
+            : type == ObjectType.View
+            ? "VIEW"
+            : type == ObjectType.Function
             ? "FUNCTION"
             : type == ObjectType.StoredProcedure
             ? "PROCEDURE"
@@ -93,7 +82,6 @@ public abstract class Code : SQLServerSchemaBase, ICode
             : type == ObjectType.CLRTrigger
             ? "TRIGGER"
             : type == ObjectType.CLRFunction ? "FUNCTION" : type == ObjectType.Assembly ? "ASSEMBLY" : "";
-    }
 
     /// <summary>
     /// Names collection of dependant objects of the object
@@ -114,10 +102,10 @@ public abstract class Code : SQLServerSchemaBase, ICode
         get
         {
             var iCount = 0;
-            if (this.DependenciesOut.Any())
+            if (DependenciesOut.Any())
             {
                 Dictionary<string, bool> depencyTracker = [];
-                iCount = DependenciesCountFilter(this.FullName, depencyTracker);
+                iCount = DependenciesCountFilter(FullName, depencyTracker);
             }
             return iCount;
         }
@@ -197,7 +185,7 @@ public abstract class Code : SQLServerSchemaBase, ICode
                             list.Add(item.Drop(), newDeepMin);
                         }
                     }
-                    if ((this.Status != ObjectStatus.Drop) && (item.Status != ObjectStatus.Create))
+                    if ((Status != ObjectStatus.Drop) && (item.Status != ObjectStatus.Create))
                     {
                         list.Add(item.Create(), newDeepMax);
                     }
@@ -221,12 +209,12 @@ public abstract class Code : SQLServerSchemaBase, ICode
     {
         var list = new SQLScriptList();
         list.AddRange(RebuildDependencies());
-        if (this.Status != ObjectStatus.Create)
+        if (Status != ObjectStatus.Create)
         {
             list.Add(Drop(), deepMin);
         }
 
-        if (this.Status != ObjectStatus.Drop)
+        if (Status != ObjectStatus.Drop)
         {
             list.Add(Create(), deepMax);
         }
@@ -238,7 +226,7 @@ public abstract class Code : SQLServerSchemaBase, ICode
     /// Rebuilds the dependant objects.
     /// </summary>
     /// <returns></returns>
-    public SQLScriptList RebuildDependencies() => RebuildDependencies(this.DependenciesOut, deepMin, deepMax);
+    public SQLScriptList RebuildDependencies() => RebuildDependencies(DependenciesOut, deepMin, deepMax);
 
     public override string ToSql()
     {
@@ -253,7 +241,7 @@ public abstract class Code : SQLServerSchemaBase, ICode
     public override string ToSqlAdd()
     {
         var sql = ToSql();
-        sql += this.ExtendedProperties.ToSql();
+        sql += ExtendedProperties.ToSql();
         return sql;
     }
 
@@ -263,14 +251,14 @@ public abstract class Code : SQLServerSchemaBase, ICode
     {
         if (obj == null)
         {
-            throw new ArgumentNullException("obj");
+            throw new ArgumentNullException(nameof(obj));
         }
 
         string sql1;
         string sql2;
 
         var whitespace = new Regex(@"\s");
-        sql1 = whitespace.Replace(this.ToSql(), "");
+        sql1 = whitespace.Replace(ToSql(), "");
         sql2 = whitespace.Replace(obj.ToSql(), "");
 
         return ((Database)RootParent).Options.Comparison.CaseSensityInCode == Options.SqlOptionComparison.CaseSensityOptions.CaseInsensity
@@ -282,15 +270,15 @@ public abstract class Code : SQLServerSchemaBase, ICode
     {
         if (obj == null)
         {
-            throw new ArgumentNullException("obj");
+            throw new ArgumentNullException(nameof(obj));
         }
 
-        var sql1 = this.ToSql();
+        var sql1 = ToSql();
         var sql2 = obj.ToSql();
         if (((Database)RootParent).Options.Comparison.IgnoreWhiteSpacesInCode)
         {
             var whitespace = new Regex(@"\s");
-            sql1 = whitespace.Replace(this.ToSql(), "");
+            sql1 = whitespace.Replace(ToSql(), "");
             sql2 = whitespace.Replace(obj.ToSql(), "");
         }
         return ((Database)RootParent).Options.Comparison.CaseSensityInCode == SqlOptionComparison.CaseSensityOptions.CaseInsensity

@@ -6,11 +6,9 @@ using OpenDBDiff.SqlServer.Schema.Model;
 
 namespace OpenDBDiff.SqlServer.Schema.Generates;
 
-public class GenerateXMLSchemas
+public class GenerateXMLSchemas(Generate root)
 {
-    private readonly Generate root;
-
-    public GenerateXMLSchemas(Generate root) => this.root = root;
+    private readonly Generate root = root;
 
     private static string GetSQLColumnsDependencies() => SQLQueries.SQLQueryFactory.Get("GetXMLSchemaCollections");
 

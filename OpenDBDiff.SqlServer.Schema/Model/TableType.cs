@@ -18,19 +18,19 @@ public class TableType : SQLServerSchemaBase, ITable<TableType>
     {
         var tableType = new TableType(parent)
         {
-            Owner = this.Owner,
-            Name = this.Name,
-            Id = this.Id,
-            Guid = this.Guid,
-            Status = this.Status,
+            Owner = Owner,
+            Name = Name,
+            Id = Id,
+            Guid = Guid,
+            Status = Status,
             Columns = null,
             Constraints = null,
             Indexes = null
         };
 
-        tableType.Columns = this.Columns.Clone(tableType);
-        tableType.Constraints = this.Constraints.Clone(tableType);
-        tableType.Indexes = this.Indexes.Clone(tableType);
+        tableType.Columns = Columns.Clone(tableType);
+        tableType.Constraints = Constraints.Clone(tableType);
+        tableType.Indexes = Indexes.Clone(tableType);
 
         return tableType;
     }
@@ -65,7 +65,7 @@ public class TableType : SQLServerSchemaBase, ITable<TableType>
         if (!GetWasInsertInDiffList(action))
         {
             SetWasInsertInDiffList(action);
-            return new SQLScript(this.ToSqlAdd(), 0, action);
+            return new SQLScript(ToSqlAdd(), 0, action);
         }
         return null;
     }
@@ -76,7 +76,7 @@ public class TableType : SQLServerSchemaBase, ITable<TableType>
         if (!GetWasInsertInDiffList(action))
         {
             SetWasInsertInDiffList(action);
-            return new SQLScript(this.ToSqlDrop(), 0, action);
+            return new SQLScript(ToSqlDrop(), 0, action);
         }
         return null;
     }
@@ -86,15 +86,15 @@ public class TableType : SQLServerSchemaBase, ITable<TableType>
         try
         {
             var list = new SQLScriptList();
-            if (this.Status == ObjectStatus.Drop)
+            if (Status == ObjectStatus.Drop)
             {
                 list.Add(Drop());
             }
-            if (this.HasState(ObjectStatus.Create))
+            if (HasState(ObjectStatus.Create))
             {
                 list.Add(Create());
             }
-            if (this.Status == ObjectStatus.Alter)
+            if (Status == ObjectStatus.Alter)
             {
                 list.Add(ToSqlDrop() + ToSql(), 0, ScriptAction.AddTableType);
             }

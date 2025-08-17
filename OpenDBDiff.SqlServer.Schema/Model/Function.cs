@@ -4,12 +4,8 @@ using OpenDBDiff.SqlServer.Schema.Model.Util;
 
 namespace OpenDBDiff.SqlServer.Schema.Model;
 
-public class Function : Code
+public class Function(ISchemaBase parent) : Code(parent, ObjectType.Function, ScriptAction.AddFunction, ScriptAction.DropFunction)
 {
-    public Function(ISchemaBase parent)
-        : base(parent, ObjectType.Function, ScriptAction.AddFunction, ScriptAction.DropFunction)
-    {
-    }
 
     /// <summary>
     /// Clona el objeto en una nueva instancia.
@@ -18,16 +14,16 @@ public class Function : Code
     {
         var item = new Function(parent)
         {
-            Text = this.Text,
-            Status = this.Status,
-            Name = this.Name,
-            Id = this.Id,
-            Owner = this.Owner,
-            Guid = this.Guid,
-            IsSchemaBinding = this.IsSchemaBinding
+            Text = Text,
+            Status = Status,
+            Name = Name,
+            Id = Id,
+            Owner = Owner,
+            Guid = Guid,
+            IsSchemaBinding = IsSchemaBinding
         };
-        this.DependenciesIn.ForEach(dep => item.DependenciesIn.Add(dep));
-        this.DependenciesOut.ForEach(dep => item.DependenciesOut.Add(dep));
+        DependenciesIn.ForEach(dep => item.DependenciesIn.Add(dep));
+        DependenciesOut.ForEach(dep => item.DependenciesOut.Add(dep));
         return item;
     }
 
@@ -40,36 +36,36 @@ public class Function : Code
     public override SQLScriptList ToSqlDiff(System.Collections.Generic.ICollection<ISchemaBase> schemas)
     {
         var list = new SQLScriptList();
-        if (this.Status != ObjectStatus.Original)
+        if (Status != ObjectStatus.Original)
         {
             RootParent.ActionMessage.Add(this);
         }
 
-        if (this.HasState(ObjectStatus.Drop))
+        if (HasState(ObjectStatus.Drop))
         {
             list.Add(Drop());
         }
 
-        if (this.HasState(ObjectStatus.Create))
+        if (HasState(ObjectStatus.Create))
         {
             list.Add(Create());
         }
 
-        if (this.HasState(ObjectStatus.Alter))
+        if (HasState(ObjectStatus.Alter))
         {
-            if (this.HasState(ObjectStatus.RebuildDependencies))
+            if (HasState(ObjectStatus.RebuildDependencies))
             {
                 list.AddRange(RebuildDependencies());
             }
 
-            if (!this.GetWasInsertInDiffList(ScriptAction.DropFunction))
+            if (!GetWasInsertInDiffList(ScriptAction.DropFunction))
             {
-                if (this.HasState(ObjectStatus.Rebuild))
+                if (HasState(ObjectStatus.Rebuild))
                 {
                     list.Add(Drop());
                     list.Add(Create());
                 }
-                if (this.HasState(ObjectStatus.AlterBody))
+                if (HasState(ObjectStatus.AlterBody))
                 {
                     var iCount = DependenciesCount;
                     list.Add(ToSQLAlter(), iCount, ScriptAction.AlterFunction);

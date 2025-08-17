@@ -6,11 +6,11 @@ namespace OpenDBDiff.SqlServer.Schema.Model;
 
 public class TableOption : SQLServerSchemaBase
 {
-    public TableOption(string Name, string value, ISchemaBase parent)
+    public TableOption(string name, string value, ISchemaBase parent)
         : base(parent, ObjectType.TableOption)
     {
-        this.Name = Name;
-        this.Value = value;
+        Name = name;
+        Value = value;
     }
 
     public TableOption(ISchemaBase parent)
@@ -25,9 +25,9 @@ public class TableOption : SQLServerSchemaBase
     {
         var option = new TableOption(parent)
         {
-            Name = this.Name,
-            Status = this.Status,
-            Value = this.Value
+            Name = Name,
+            Status = Status,
+            Value = Value
         };
         return option;
     }
@@ -37,49 +37,43 @@ public class TableOption : SQLServerSchemaBase
     /// <summary>
     /// Compara dos indices y devuelve true si son iguales, caso contrario, devuelve false.
     /// </summary>
-    public static bool Compare(TableOption origin, TableOption destination)
-    {
-        return destination == null
-            ? throw new ArgumentNullException("destination")
-            : origin == null ? throw new ArgumentNullException("origin") : destination.Value.Equals(origin.Value);
-    }
+    public static bool Compare(TableOption origin, TableOption destination) => destination == null
+            ? throw new ArgumentNullException(nameof(destination))
+            : origin == null ? throw new ArgumentNullException(nameof(origin)) : destination.Value.Equals(origin.Value);
 
-    public override string ToSqlDrop()
-    {
-        return this.Name.Equals("TextInRow")
+    public override string ToSqlDrop() => Name.Equals("TextInRow")
             ? $"EXEC sp_tableoption {Parent.Name}, 'text in row','off'\r\nGO\r\n"
-            : this.Name.Equals("LargeValues")
+            : Name.Equals("LargeValues")
             ? $"EXEC sp_tableoption {Parent.Name}, 'large value types out of row','0'\r\nGO\r\n"
-            : this.Name.Equals("VarDecimal")
+            : Name.Equals("VarDecimal")
             ? $"EXEC sp_tableoption {Parent.Name}, 'vardecimal storage format','0'\r\nGO\r\n"
-            : this.Name.Equals("LockEscalation") ? "" : "";
-    }
+            : Name.Equals("LockEscalation") ? "" : "";
 
     public override string ToSql()
     {
-        if (this.Name.Equals("TextInRow"))
+        if (Name.Equals("TextInRow"))
         {
             return $"EXEC sp_tableoption {Parent.Name}, 'text in row',{Value}\r\nGO\r\n";
         }
 
-        if (this.Name.Equals("LargeValues"))
+        if (Name.Equals("LargeValues"))
         {
             return $"EXEC sp_tableoption {Parent.Name}, 'large value types out of row',{Value}\r\nGO\r\n";
         }
 
-        if (this.Name.Equals("VarDecimal"))
+        if (Name.Equals("VarDecimal"))
         {
             return $"EXEC sp_tableoption {Parent.Name}, 'vardecimal storage format','1'\r\nGO\r\n";
         }
 
-        if (this.Name.Equals("LockEscalation"))
+        if (Name.Equals("LockEscalation"))
         {
-            if ((!this.Value.Equals("TABLE")) || (this.Status != ObjectStatus.Original))
+            if ((!Value.Equals("TABLE")) || (Status != ObjectStatus.Original))
             {
                 return $"ALTER TABLE {Parent.Name} SET (LOCK_ESCALATION = {Value})\r\nGO\r\n";
             }
         }
-        return "";
+        return string.Empty;
     }
 
     public override string ToSqlAdd() => ToSql();
@@ -88,17 +82,17 @@ public class TableOption : SQLServerSchemaBase
     {
         var listDiff = new SQLScriptList();
 
-        if (this.Status == ObjectStatus.Drop)
+        if (Status == ObjectStatus.Drop)
         {
             listDiff.Add(ToSqlDrop(), 0, ScriptAction.AddOptions);
         }
 
-        if (this.Status == ObjectStatus.Create)
+        if (Status == ObjectStatus.Create)
         {
             listDiff.Add(ToSql(), 0, ScriptAction.DropOptions);
         }
 
-        if (this.Status == ObjectStatus.Alter)
+        if (Status == ObjectStatus.Alter)
         {
             listDiff.Add(ToSqlDrop(), 0, ScriptAction.DropOptions);
             listDiff.Add(ToSql(), 0, ScriptAction.AddOptions);

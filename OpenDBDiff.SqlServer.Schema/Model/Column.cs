@@ -13,9 +13,9 @@ public class Column : SQLServerSchemaBase, IComparable<Column>
     {
         ComputedFormula = "";
         Collation = "";
-        this.Default = new Default(this);
-        this.Rule = new Rule(this);
-        this.DefaultConstraint = null;
+        Default = new Default(this);
+        Rule = new Rule(this);
+        DefaultConstraint = null;
     }
 
     /// <summary>
@@ -23,40 +23,40 @@ public class Column : SQLServerSchemaBase, IComparable<Column>
     /// </summary>
     public new Column Clone(ISchemaBase parent)
     {
-        var col = parent == null ? new Column(this.Parent) : new Column(parent);
-        col.ComputedFormula = this.ComputedFormula;
-        col.DataUserTypeId = this.DataUserTypeId;
-        col.Id = this.Id;
-        col.Guid = this.Guid;
-        col.Owner = this.Owner;
-        col.IdentityIncrement = this.IdentityIncrement;
-        col.IdentitySeed = this.IdentitySeed;
-        col.IsIdentity = this.IsIdentity;
-        col.IsIdentityForReplication = this.IsIdentityForReplication;
-        col.IsComputed = this.IsComputed;
-        col.IsRowGuid = this.IsRowGuid;
-        col.IsPersisted = this.IsPersisted;
-        col.IsFileStream = this.IsFileStream;
-        col.IsSparse = this.IsSparse;
-        col.IsXmlDocument = this.IsXmlDocument;
-        col.IsUserDefinedType = this.IsUserDefinedType;
-        col.HasComputedDependencies = this.HasComputedDependencies;
-        col.HasIndexDependencies = this.HasIndexDependencies;
-        col.Name = this.Name;
-        col.IsNullable = this.IsNullable;
-        col.Position = this.Position;
-        col.Precision = this.Precision;
-        col.Scale = this.Scale;
-        col.Collation = this.Collation;
-        col.Size = this.Size;
-        col.Status = this.Status;
-        col.Type = this.Type;
-        col.XmlSchema = this.XmlSchema;
-        col.Default = this.Default.Clone(this);
-        col.Rule = this.Rule.Clone(this);
-        if (this.DefaultConstraint != null)
+        var col = parent == null ? new Column(Parent) : new Column(parent);
+        col.ComputedFormula = ComputedFormula;
+        col.DataUserTypeId = DataUserTypeId;
+        col.Id = Id;
+        col.Guid = Guid;
+        col.Owner = Owner;
+        col.IdentityIncrement = IdentityIncrement;
+        col.IdentitySeed = IdentitySeed;
+        col.IsIdentity = IsIdentity;
+        col.IsIdentityForReplication = IsIdentityForReplication;
+        col.IsComputed = IsComputed;
+        col.IsRowGuid = IsRowGuid;
+        col.IsPersisted = IsPersisted;
+        col.IsFileStream = IsFileStream;
+        col.IsSparse = IsSparse;
+        col.IsXmlDocument = IsXmlDocument;
+        col.IsUserDefinedType = IsUserDefinedType;
+        col.HasComputedDependencies = HasComputedDependencies;
+        col.HasIndexDependencies = HasIndexDependencies;
+        col.Name = Name;
+        col.IsNullable = IsNullable;
+        col.Position = Position;
+        col.Precision = Precision;
+        col.Scale = Scale;
+        col.Collation = Collation;
+        col.Size = Size;
+        col.Status = Status;
+        col.Type = Type;
+        col.XmlSchema = XmlSchema;
+        col.Default = Default.Clone(this);
+        col.Rule = Rule.Clone(this);
+        if (DefaultConstraint != null)
         {
-            col.DefaultConstraint = this.DefaultConstraint.Clone(this);
+            col.DefaultConstraint = DefaultConstraint.Clone(this);
         }
 
         return col;
@@ -175,7 +175,7 @@ public class Column : SQLServerSchemaBase, IComparable<Column>
     /// <value>
     /// 	<c>true</c> if this instance has to rebuild; otherwise, <c>false</c>.
     /// </value>
-    public bool HasToRebuild(int newPosition, string newType, bool isFileStream) => (newType.Equals("text") && (!this.IsText)) || (newType.Equals("ntext") && (!this.IsText)) || (newType.Equals("image") && (!this.IsBinary)) || isFileStream != this.IsFileStream || (Position != newPosition) || HasComputedDependencies || HasIndexDependencies || IsComputed || Type.ToLower().Equals("timestamp");
+    public bool HasToRebuild(int newPosition, string newType, bool isFileStream) => (newType.Equals("text") && (!IsText)) || (newType.Equals("ntext") && (!IsText)) || (newType.Equals("image") && (!IsBinary)) || isFileStream != IsFileStream || (Position != newPosition) || HasComputedDependencies || HasIndexDependencies || IsComputed || Type.ToLower().Equals("timestamp");
 
     /// <summary>
     /// Gets or sets the computed formula (only in Computed columns).
@@ -258,11 +258,11 @@ public class Column : SQLServerSchemaBase, IComparable<Column>
         xml += constraints.ToXML();
         xml += "</COLUMN>\n";
         return xml;*/
-        var serial = new XmlSerializer(this.GetType());
+        var serial = new XmlSerializer(GetType());
         return serial.ToString();
     }
 
-    public bool HasToForceValue => this.HasState(ObjectStatus.Update) || ((!this.IsNullable) && (this.Status == ObjectStatus.Create));
+    public bool HasToForceValue => HasState(ObjectStatus.Update) || ((!IsNullable) && (Status == ObjectStatus.Create));
 
     /// <summary>
     /// Gets the default force value.
@@ -272,15 +272,15 @@ public class Column : SQLServerSchemaBase, IComparable<Column>
     {
         get
         {
-            var tl = this.Type;
-            if (this.IsUserDefinedType)
+            var tl = Type;
+            if (IsUserDefinedType)
             {
-                tl = ((Database)this.Parent.Parent).UserTypes[Type].Type.ToLower();
+                tl = ((Database)Parent.Parent).UserTypes[Type].Type.ToLower();
             }
 
-            if (((Database)Parent.Parent).Options.Defaults.UseDefaultValueIfExists && (this.DefaultConstraint != null))
+            if (((Database)Parent.Parent).Options.Defaults.UseDefaultValueIfExists && (DefaultConstraint != null))
             {
-                return this.DefaultConstraint.Definition;
+                return DefaultConstraint.Definition;
             }
             else
             {
@@ -358,35 +358,35 @@ public class Column : SQLServerSchemaBase, IComparable<Column>
 
         if (type != null)
         {
-            originalType = this.Type;
-            this.Type = type;
+            originalType = Type;
+            Type = type;
         }
         if (size != 0)
         {
-            originalSize = this.Size;
-            this.Size = size;
+            originalSize = Size;
+            Size = size;
         }
         if (xmlSchema != null)
         {
-            originalXMLSchema = this.XmlSchema;
-            this.XmlSchema = xmlSchema;
+            originalXMLSchema = XmlSchema;
+            XmlSchema = xmlSchema;
 
         }
-        sql = this.ToSql(false);
+        sql = ToSql(false);
 
         if (type != null)
         {
-            this.Type = originalType;
+            Type = originalType;
         }
 
         if (size != 0)
         {
-            this.Size = originalSize;
+            Size = originalSize;
         }
 
         if (xmlSchema != null)
         {
-            this.XmlSchema = originalXMLSchema;
+            XmlSchema = originalXMLSchema;
         }
 
         return sql;
@@ -397,16 +397,16 @@ public class Column : SQLServerSchemaBase, IComparable<Column>
     public string ToSql(bool sqlConstraint)
     {
         var sql = "";
-        sql += "[" + Name + "] ";
+        sql += $"[{Name}] ";
         if (!IsComputed)
         {
-            if (this.IsUserDefinedType)
+            if (IsUserDefinedType)
             {
                 sql += Type;
             }
             else
             {
-                sql += "[" + Type + "]";
+                sql += $"[{Type}]";
             }
 
             if (Type.Equals("binary") || Type.Equals("varbinary") || Type.Equals("varchar") || Type.Equals("char") || Type.Equals("nchar") || Type.Equals("nvarchar"))
@@ -419,11 +419,11 @@ public class Column : SQLServerSchemaBase, IComparable<Column>
                 {
                     if (Type.Equals("nchar") || Type.Equals("nvarchar"))
                     {
-                        sql += " (" + (Size / 2).ToString(CultureInfo.InvariantCulture) + ")";
+                        sql += $" ({(Size / 2).ToString(CultureInfo.InvariantCulture)})";
                     }
                     else
                     {
-                        sql += " (" + Size.ToString(CultureInfo.InvariantCulture) + ")";
+                        sql += $" ({Size.ToString(CultureInfo.InvariantCulture)})";
                     }
                 }
             }
@@ -433,11 +433,11 @@ public class Column : SQLServerSchemaBase, IComparable<Column>
                 {
                     if (IsXmlDocument)
                     {
-                        sql += "(DOCUMENT " + XmlSchema + ")";
+                        sql += $"(DOCUMENT {XmlSchema})";
                     }
                     else
                     {
-                        sql += "(CONTENT " + XmlSchema + ")";
+                        sql += $"(CONTENT {XmlSchema})";
                     }
                 }
             }
@@ -450,17 +450,17 @@ public class Column : SQLServerSchemaBase, IComparable<Column>
             {
                 if (Type.Equals("datetime2") || Type.Equals("datetimeoffset") || Type.Equals("time"))
                 {
-                    sql += "(" + Scale.ToString(CultureInfo.InvariantCulture) + ")";
+                    sql += $"({Scale.ToString(CultureInfo.InvariantCulture)})";
                 }
             }
             if ((!string.IsNullOrEmpty(Collation)) && (!IsUserDefinedType))
             {
-                sql += " COLLATE " + Collation;
+                sql += $" COLLATE {Collation}";
             }
 
             if (IsIdentity)
             {
-                sql += " IDENTITY (" + IdentitySeed.ToString(CultureInfo.InvariantCulture) + "," + IdentityIncrement.ToString(CultureInfo.InvariantCulture) + ")";
+                sql += $" IDENTITY ({IdentitySeed.ToString(CultureInfo.InvariantCulture)},{IdentityIncrement.ToString(CultureInfo.InvariantCulture)})";
             }
 
             if (IsIdentityForReplication)
@@ -527,7 +527,7 @@ public class Column : SQLServerSchemaBase, IComparable<Column>
         var list = new SQLScriptList();
         ((Table)Parent).FullTextIndex.ForEach(item =>
         {
-            it = index == null ? item.Columns.Exists(col => { return col.ColumnName.Equals(this.Name); }) : item.Index.Equals(index);
+            it = index == null ? item.Columns.Exists(col => { return col.ColumnName.Equals(Name); }) : item.Index.Equals(index);
 
             if (it)
             {
@@ -551,7 +551,7 @@ public class Column : SQLServerSchemaBase, IComparable<Column>
         var list = new SQLScriptList();
         ((Table)Parent).Constraints.ForEach(item =>
         {
-            var ic = item.Columns.Find(this.Id);
+            var ic = item.Columns.Find(Id);
             if (ic != null)
             {
                 if (item.Status != ObjectStatus.Create)
@@ -577,7 +577,7 @@ public class Column : SQLServerSchemaBase, IComparable<Column>
         {
             ((Table)Parent).Indexes.ForEach(item =>
                 {
-                    var ic = item.Columns.Find(this.Id);
+                    var ic = item.Columns.Find(Id);
                     if (ic != null)
                     {
                         if (item.Status != ObjectStatus.Create)
@@ -615,7 +615,7 @@ public class Column : SQLServerSchemaBase, IComparable<Column>
     public SQLScriptList RebuildSchemaBindingDependencies()
     {
         var list = new SQLScriptList();
-        var items = ((Database)this.Parent.Parent).Dependencies.Find(this.Parent.Id, this.Id, 0);
+        var items = ((Database)Parent.Parent).Dependencies.Find(Parent.Id, Id, 0);
         items.ForEach(item =>
         {
             if ((item.ObjectType == ObjectType.Function) || (item.ObjectType == ObjectType.View))
@@ -637,7 +637,7 @@ public class Column : SQLServerSchemaBase, IComparable<Column>
     public SQLScriptList Alter(ScriptAction typeStatus)
     {
         var list = new SQLScriptList();
-        var sql = "ALTER TABLE " + Parent.FullName + " ALTER COLUMN " + this.ToSql(false) + "\r\nGO\r\n";
+        var sql = $"ALTER TABLE {Parent.FullName} ALTER COLUMN {ToSql(false)}\r\nGO\r\n";
         list.Add(sql, 0, typeStatus);
         return list;
     }
@@ -646,25 +646,22 @@ public class Column : SQLServerSchemaBase, IComparable<Column>
     /// Compara solo las propiedades de dos campos relacionadas con los Identity. Si existen
     /// diferencias, devuelve falso, caso contrario, true.
     /// </summary>
-    public static bool CompareIdentity(Column origin, Column destination)
-    {
-        return destination == null
-            ? throw new ArgumentNullException("destination")
+    public static bool CompareIdentity(Column origin, Column destination) => destination == null
+            ? throw new ArgumentNullException(nameof(destination))
             : origin == null
-            ? throw new ArgumentNullException("origin")
+            ? throw new ArgumentNullException(nameof(origin))
             : origin.IsIdentity == destination.IsIdentity && origin.IsIdentityForReplication == destination.IsIdentityForReplication && origin.IdentityIncrement == destination.IdentityIncrement && origin.IdentitySeed == destination.IdentitySeed;
-    }
 
     public static bool CompareRule(Column origin, Column destination)
     {
         if (destination == null)
         {
-            throw new ArgumentNullException("destination");
+            throw new ArgumentNullException(nameof(destination));
         }
 
         if (origin == null)
         {
-            throw new ArgumentNullException("origin");
+            throw new ArgumentNullException(nameof(origin));
         }
 
         if ((origin.Rule.Name != null) && (destination.Rule.Name == null))
@@ -695,12 +692,12 @@ public class Column : SQLServerSchemaBase, IComparable<Column>
     {
         if (destination == null)
         {
-            throw new ArgumentNullException("destination");
+            throw new ArgumentNullException(nameof(destination));
         }
 
         if (origin == null)
         {
-            throw new ArgumentNullException("origin");
+            throw new ArgumentNullException(nameof(origin));
         }
 
         if (!origin.ComputedFormula.Equals(destination.ComputedFormula))
@@ -787,5 +784,5 @@ public class Column : SQLServerSchemaBase, IComparable<Column>
         return CompareIdentity(origin, destination) && CompareRule(origin, destination);
     }
 
-    public int CompareTo(Column other) => this.Id.CompareTo(other.Id);
+    public int CompareTo(Column other) => Id.CompareTo(other.Id);
 }

@@ -8,33 +8,30 @@ using OpenDBDiff.Abstractions.Schema.Model;
 
 namespace OpenDBDiff.SqlServer.Schema.Model;
 
-public class PartitionFunction : SQLServerSchemaBase
+public class PartitionFunction(ISchemaBase parent) : SQLServerSchemaBase(parent, ObjectType.PartitionFunction)
 {
     private const int IS_STRING = 0;
     private const int IS_UNIQUE = 1;
     private const int IS_DATE = 2;
     private const int IS_NUMERIC = 3;
 
-    public PartitionFunction(ISchemaBase parent)
-        : base(parent, ObjectType.PartitionFunction) => Values = [];
-
     public new PartitionFunction Clone(ISchemaBase parent)
     {
         var item = new PartitionFunction(parent)
         {
-            Id = this.Id,
-            IsBoundaryRight = this.IsBoundaryRight,
-            Name = this.Name,
-            Precision = this.Precision,
-            Scale = this.Scale,
-            Size = this.Size,
-            Type = this.Type
+            Id = Id,
+            IsBoundaryRight = IsBoundaryRight,
+            Name = Name,
+            Precision = Precision,
+            Scale = Scale,
+            Size = Size,
+            Type = Type
         };
-        this.Values.ForEach(value => { item.Values.Add(value); });
+        Values.ForEach(item.Values.Add);
         return item;
     }
 
-    public List<string> Values { get; set; }
+    public List<string> Values { get; set; } = [];
 
     public PartitionFunction Old { get; set; }
 
@@ -48,9 +45,7 @@ public class PartitionFunction : SQLServerSchemaBase
 
     public string Type { get; set; }
 
-    private int ValueItem(string typeName)
-    {
-        return typeName.Equals("nchar") || typeName.Equals("nvarchar") || typeName.Equals("varchar") || typeName.Equals("char")
+    private int ValueItem(string typeName) => typeName.Equals("nchar") || typeName.Equals("nvarchar") || typeName.Equals("varchar") || typeName.Equals("char")
             ? IS_STRING
             : typeName.Equals("uniqueidentifier")
             ? IS_UNIQUE
@@ -59,7 +54,6 @@ public class PartitionFunction : SQLServerSchemaBase
             : typeName.Equals("numeric") || typeName.Equals("decimal") || typeName.Equals("float") || typeName.Equals("real") || typeName.Equals("money") || typeName.Equals("smallmoney")
             ? IS_NUMERIC
             : IS_NUMERIC;
-    }
 
     public override string ToSql()
     {
@@ -143,7 +137,7 @@ public class PartitionFunction : SQLServerSchemaBase
         var sql = "ALTER PARTITION FUNCTION [" + Name + "]()\r\n";
         string sqlMerge;
         string sqlSplit;
-        var items = Old.Values.Except<string>(this.Values);
+        var items = Old.Values.Except<string>(Values);
         var valueType = ValueItem(Type);
         foreach (var item in items)
         {
@@ -174,7 +168,7 @@ public class PartitionFunction : SQLServerSchemaBase
 
             _ = sqlFinal.Append(sql + sqlMerge + ")\r\nGO\r\n");
         }
-        var items2 = this.Values.Except<string>(this.Old.Values);
+        var items2 = Values.Except<string>(Old.Values);
         foreach (var item in items2)
         {
             sqlSplit = "SPLIT RANGE (";
@@ -214,44 +208,35 @@ public class PartitionFunction : SQLServerSchemaBase
     {
         var listDiff = new SQLScriptList();
 
-        if (this.Status == ObjectStatus.Drop)
+        if (Status == ObjectStatus.Drop)
         {
             listDiff.Add(ToSqlDrop(), 0, ScriptAction.DropPartitionFunction);
         }
-        if (this.Status == ObjectStatus.Rebuild)
+        if (Status == ObjectStatus.Rebuild)
         {
             listDiff.Add(ToSqlDrop() + ToSqlAdd(), 0, ScriptAction.AlterPartitionFunction);
         }
-        if (this.Status == ObjectStatus.Alter)
+        if (Status == ObjectStatus.Alter)
         {
             listDiff.Add(ToSqlAlter(), 0, ScriptAction.AlterPartitionFunction);
         }
 
-        if (this.Status == ObjectStatus.Create)
+        if (Status == ObjectStatus.Create)
         {
             listDiff.Add(ToSqlAdd(), 0, ScriptAction.AddPartitionFunction);
         }
         return listDiff;
     }
 
-    public static bool Compare(PartitionFunction origin, PartitionFunction destination)
-    {
-        if (destination == null)
-        {
-            throw new ArgumentNullException("destination");
-        }
-
-        return origin == null
-            ? throw new ArgumentNullException("origin")
-            : origin.Type.Equals(destination.Type) && origin.Size == destination.Size && origin.Precision == destination.Precision && origin.Scale == destination.Scale && origin.IsBoundaryRight == destination.IsBoundaryRight;
-    }
-
-    public static bool CompareValues(PartitionFunction origin, PartitionFunction destination)
-    {
-        return destination == null
-            ? throw new ArgumentNullException("destination")
+    public static bool Compare(PartitionFunction origin, PartitionFunction destination) => destination == null
+            ? throw new ArgumentNullException(nameof(destination))
             : origin == null
-            ? throw new ArgumentNullException("origin")
+            ? throw new ArgumentNullException(nameof(origin))
+            : origin.Type.Equals(destination.Type) && origin.Size == destination.Size && origin.Precision == destination.Precision && origin.Scale == destination.Scale && origin.IsBoundaryRight == destination.IsBoundaryRight;
+
+    public static bool CompareValues(PartitionFunction origin, PartitionFunction destination) => destination == null
+            ? throw new ArgumentNullException(nameof(destination))
+            : origin == null
+            ? throw new ArgumentNullException(nameof(origin))
             : origin.Values.Count == destination.Values.Count && origin.Values.Except(destination.Values).ToList().Count == 0;
-    }
 }

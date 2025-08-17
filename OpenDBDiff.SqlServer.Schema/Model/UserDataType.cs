@@ -80,12 +80,12 @@ public class UserDataType : SQLServerSchemaBase
     {
         if (destination == null)
         {
-            throw new ArgumentNullException("destination");
+            throw new ArgumentNullException(nameof(destination));
         }
 
         if (origin == null)
         {
-            throw new ArgumentNullException("origin");
+            throw new ArgumentNullException(nameof(origin));
         }
 
         if ((origin.Rule.Name != null) && (destination.Rule.Name == null))
@@ -113,12 +113,12 @@ public class UserDataType : SQLServerSchemaBase
     {
         if (destination == null)
         {
-            throw new ArgumentNullException("destination");
+            throw new ArgumentNullException(nameof(destination));
         }
 
         if (origin == null)
         {
-            throw new ArgumentNullException("origin");
+            throw new ArgumentNullException(nameof(origin));
         }
 
         if ((origin.Default.Name != null) && (destination.Default.Name == null))
@@ -411,23 +411,7 @@ public class UserDataType : SQLServerSchemaBase
         }
     }
 
-    public bool Compare(UserDataType obj)
-    {
-        if (obj == null)
-        {
-            throw new ArgumentNullException("obj");
-        }
-
-        if (Scale != obj.Scale)
-        {
-            return false;
-        }
-
-        if (Precision != obj.Precision)
-        {
-            return false;
-        }
-
-        return AllowNull == obj.AllowNull && Size == obj.Size && Type.Equals(obj.Type) && IsAssembly == obj.IsAssembly && AssemblyClass.Equals(obj.AssemblyClass) && AssemblyName.Equals(obj.AssemblyName) && CompareDefault(this, obj) && CompareRule(this, obj);
-    }
+    public bool Compare(UserDataType obj) => obj == null
+            ? throw new ArgumentNullException(nameof(obj))
+            : Scale == obj.Scale && Precision == obj.Precision && AllowNull == obj.AllowNull && Size == obj.Size && Type.Equals(obj.Type) && IsAssembly == obj.IsAssembly && AssemblyClass.Equals(obj.AssemblyClass) && AssemblyName.Equals(obj.AssemblyName) && CompareDefault(this, obj) && CompareRule(this, obj);
 }

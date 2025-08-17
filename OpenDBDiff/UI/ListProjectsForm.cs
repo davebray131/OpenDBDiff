@@ -22,7 +22,7 @@ public sealed partial class ListProjectsForm : Form
     {
         InitializeComponent();
 
-        Projects = projects.ToList();
+        Projects = [.. projects];
 
         ProjectsListView.Items.Clear();
 
@@ -30,14 +30,14 @@ public sealed partial class ListProjectsForm : Form
         {
             foreach (var p in Projects)
             {
-                _ = ProjectsListView.Items.Add(new ListViewItem(items: new string[] { p.ProjectName, p.ConnectionStringSource, p.ConnectionStringDestination }, imageIndex: 0));
+                ProjectsListView.Items.Add(new ListViewItem(items: [p.ProjectName, p.ConnectionStringSource, p.ConnectionStringDestination], imageIndex: 0));
             }
 
             ProjectsListView.AutoResizeColumns(ColumnHeaderAutoResizeStyle.ColumnContent);
         }
         else
         {
-            _ = ProjectsListView.Items.Add(new ListViewItem
+            ProjectsListView.Items.Add(new ListViewItem
             {
                 Text = "There are no saved projects."
             });
@@ -66,7 +66,7 @@ public sealed partial class ListProjectsForm : Form
         }
         catch (Exception ex)
         {
-            _ = MessageBox.Show(this, ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            MessageBox.Show(this, ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
         }
     }
 
@@ -82,14 +82,14 @@ public sealed partial class ListProjectsForm : Form
                                     MessageBoxIcon.Question) == DialogResult.Yes)
                 {
                     OnDelete?.Invoke(Projects[ProjectsListView.SelectedItems[0].Index]);
-                    _ = Projects.Remove(Projects[ProjectsListView.SelectedItems[0].Index]);
+                    Projects.Remove(Projects[ProjectsListView.SelectedItems[0].Index]);
                     ProjectsListView.Items.Remove(ProjectsListView.SelectedItems[0]);
                 }
             }
         }
         catch (Exception ex)
         {
-            _ = MessageBox.Show(this, ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            MessageBox.Show(this, ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
         }
     }
 

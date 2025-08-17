@@ -12,7 +12,7 @@ namespace OpenDBDiff.Tests.Model.Tests
     {
         private readonly ResourceFileExtractor extractor;
 
-        public FormatCodeTests() => this.extractor = new ResourceFileExtractor(".SqlSnippets.Triggers.");
+        public FormatCodeTests() => extractor = new ResourceFileExtractor(".SqlSnippets.Triggers.");
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]

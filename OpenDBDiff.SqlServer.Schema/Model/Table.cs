@@ -78,20 +78,7 @@ public class Table : SQLServerSchemaBase, IComparable<Table>, ITable<Table>
         }
     }
 
-    public bool HasBlobColumn
-    {
-        get
-        {
-            foreach (var col in Columns)
-            {
-                if (col.IsBLOB)
-                {
-                    return true;
-                }
-            }
-            return false;
-        }
-    }
+    public bool HasBlobColumn => Columns.Any(r => r.IsBLOB);
 
     /// <summary>
     /// Indica la cantidad de Constraints dependientes de otra tabla (FK) que tiene
@@ -103,8 +90,7 @@ public class Table : SQLServerSchemaBase, IComparable<Table>, ITable<Table>
         {
             if (dependenciesCount == -1)
             {
-                dependenciesCount = ((Database)Parent).Dependencies.DependenciesCount(Id,
-                                                                                       ObjectType.Constraint);
+                dependenciesCount = ((Database)Parent).Dependencies.DependenciesCount(Id, ObjectType.Constraint);
             }
 
             return dependenciesCount;
@@ -118,12 +104,9 @@ public class Table : SQLServerSchemaBase, IComparable<Table>, ITable<Table>
     /// (Primero van los Drops, luego los Create y finalesmente los Alter).
     /// Si la operacion es la misma, ordena por cantidad de tablas dependientes.
     /// </summary>
-    public int CompareTo(Table other)
-    {
-        return other == null
-            ? throw new ArgumentNullException("other")
+    public int CompareTo(Table other) => other == null
+            ? throw new ArgumentNullException(nameof(other))
             : Status == other.Status ? DependenciesCount.CompareTo(other.DependenciesCount) : other.Status.CompareTo(Status);
-    }
 
     #endregion IComparable<Table> Members
 
@@ -196,11 +179,11 @@ public class Table : SQLServerSchemaBase, IComparable<Table>, ITable<Table>
         var sqlFK = "";
         if (Columns.Any())
         {
-            _ = sql.AppendLine("CREATE TABLE " + FullName + "\r\n(");
-            _ = sql.Append(Columns.ToSql());
+            sql.AppendLine($"CREATE TABLE {FullName}\r\n(");
+            sql.Append(Columns.ToSql());
             if (Constraints.Any())
             {
-                _ = sql.AppendLine(",");
+                sql.AppendLine(",");
                 Constraints.AsQueryable()
                     // Add the constraint if it's not in DropStatus
                     .Where(c => !c.HasState(ObjectStatus.Drop))
@@ -209,69 +192,65 @@ public class Table : SQLServerSchemaBase, IComparable<Table>, ITable<Table>
                     {
                         if (item.Type == Constraint.ConstraintType.PrimaryKey)
                         {
-                            sqlPK += "\t" + item.ToSql() + ",\r\n";
+                            sqlPK += $"\t{item.ToSql()},\r\n";
                         }
 
                         if (item.Type == Constraint.ConstraintType.Unique)
                         {
-                            sqlUC += "\t" + item.ToSql() + ",\r\n";
+                            sqlUC += $"\t{item.ToSql()},\r\n";
                         }
 
                         if (showFK && item.Type == Constraint.ConstraintType.ForeignKey)
                         {
-                            sqlFK += "\t" + item.ToSql() + ",\r\n";
+                            sqlFK += $"\t{item.ToSql()},\r\n";
                         }
                     });
-                _ = sql.Append(sqlPK + sqlUC + sqlFK);
+                sql.Append(sqlPK + sqlUC + sqlFK);
                 sql = new StringBuilder(sql.ToString(0, sql.Length - 3)).AppendLine();
             }
             else
             {
-                _ = sql.AppendLine();
+                sql.AppendLine();
                 if (!string.IsNullOrEmpty(CompressType))
                 {
-                    _ = sql.AppendLine("WITH (DATA_COMPRESSION = " + CompressType + ")");
+                    sql.AppendLine($"WITH (DATA_COMPRESSION = {CompressType})");
                 }
             }
-            _ = sql.Append(")");
+            sql.Append(")");
 
             if (!isAzure10)
             {
                 if (!string.IsNullOrEmpty(FileGroup))
                 {
-                    _ = sql.Append(" ON [" + FileGroup + "]");
+                    sql.Append($" ON [{FileGroup}]");
                 }
 
                 if (!string.IsNullOrEmpty(FileGroupText))
                 {
                     if (HasBlobColumn)
                     {
-                        _ = sql.Append(" TEXTIMAGE_ON [" + FileGroupText + "]");
+                        sql.Append($" TEXTIMAGE_ON [{FileGroupText}]");
                     }
                 }
                 if ((!string.IsNullOrEmpty(FileGroupStream)) && HasFileStream)
                 {
-                    _ = sql.Append(" FILESTREAM_ON [" + FileGroupStream + "]");
+                    sql.Append($" FILESTREAM_ON [{FileGroupStream}]");
                 }
             }
-            _ = sql.AppendLine();
-            _ = sql.AppendLine("GO");
-            Constraints.ForEach(item =>
-                                    {
-                                        if (item.Type == Constraint.ConstraintType.Check)
-                                        {
-                                            _ = sql.AppendLine(item.ToSqlAdd());
-                                        }
-                                    });
+            sql.AppendLine();
+            sql.AppendLine("GO");
+
+            Constraints.Where(r => r.Type == Constraint.ConstraintType.Check).ToList().ForEach(item => sql.AppendLine(item.ToSqlAdd()));
+
             if (HasChangeTracking)
             {
-                _ = sql.Append(ToSqlChangeTracking());
+                sql.Append(ToSqlChangeTracking());
             }
 
-            _ = sql.Append(Indexes.ToSql());
-            _ = sql.Append(FullTextIndex.ToSql());
-            _ = sql.Append(Options.ToSql());
-            _ = sql.Append(Triggers.ToSql());
+            sql.Append(Indexes.ToSql());
+            sql.Append(FullTextIndex.ToSql());
+            sql.Append(Options.ToSql());
+            sql.Append(Triggers.ToSql());
         }
         return sql.ToString();
     }
@@ -281,15 +260,15 @@ public class Table : SQLServerSchemaBase, IComparable<Table>, ITable<Table>
         var sql = new StringBuilder();
         if (HasChangeTracking)
         {
-            _ = sql.Append($"ALTER TABLE {FullName} ENABLE CHANGE_TRACKING");
+            sql.Append($"ALTER TABLE {FullName} ENABLE CHANGE_TRACKING");
             if (HasChangeTrackingTrackColumn)
             {
-                _ = sql.Append(" WITH(TRACK_COLUMNS_UPDATED = ON)");
+                sql.Append(" WITH(TRACK_COLUMNS_UPDATED = ON)");
             }
         }
         else
         {
-            _ = sql.Append($"ALTER TABLE {FullName} DISABLE CHANGE_TRACKING");
+            sql.Append($"ALTER TABLE {FullName} DISABLE CHANGE_TRACKING");
         }
 
         return sql.Append("\r\nGO\r\n").ToString();
@@ -362,7 +341,7 @@ public class Table : SQLServerSchemaBase, IComparable<Table>, ITable<Table>
             {
                 if (item.Type == Constraint.ConstraintType.ForeignKey)
                 {
-                    _ = sql.AppendLine(item.ToSqlAdd());
+                    sql.AppendLine(item.ToSqlAdd());
                 }
             });
             listDiff.Add(ToSql(false), dependenciesCount, ScriptAction.AddTable);
@@ -414,7 +393,7 @@ public class Table : SQLServerSchemaBase, IComparable<Table>, ITable<Table>
     private string ToSQLTableRebuild()
     {
         var sql = new StringBuilder();
-        var tempTable = "Temp" + Name;
+        var tempTable = $"Temp{Name}";
         var IsIdentityNew = false;
 
         var columnNamesStringBuilder = new StringBuilder();
@@ -432,31 +411,31 @@ public class Table : SQLServerSchemaBase, IComparable<Table>, ITable<Table>
                     !(column.Status == ObjectStatus.Create &&
                       (column.Type.ToLower().Equals("xml") || column.IsIdentity)))
                 {
-                    _ = columnNamesStringBuilder.Append("[");
-                    _ = columnNamesStringBuilder.Append(column.Name);
-                    _ = columnNamesStringBuilder.Append("],");
+                    columnNamesStringBuilder.Append("[");
+                    columnNamesStringBuilder.Append(column.Name);
+                    columnNamesStringBuilder.Append("],");
 
                     if (column.HasToForceValue)
                     {
                         if (column.HasState(ObjectStatus.Update))
                         {
-                            _ = valuesStringBuilder.Append("ISNULL([");
-                            _ = valuesStringBuilder.Append(column.Name);
-                            _ = valuesStringBuilder.Append("],");
-                            _ = valuesStringBuilder.Append(column.DefaultForceValue);
-                            _ = valuesStringBuilder.Append("),");
+                            valuesStringBuilder.Append("ISNULL([");
+                            valuesStringBuilder.Append(column.Name);
+                            valuesStringBuilder.Append("],");
+                            valuesStringBuilder.Append(column.DefaultForceValue);
+                            valuesStringBuilder.Append("),");
                         }
                         else
                         {
-                            _ = valuesStringBuilder.Append(column.DefaultForceValue);
-                            _ = valuesStringBuilder.Append(",");
+                            valuesStringBuilder.Append(column.DefaultForceValue);
+                            valuesStringBuilder.Append(",");
                         }
                     }
                     else
                     {
-                        _ = valuesStringBuilder.Append("[");
-                        _ = valuesStringBuilder.Append(column.Name);
-                        _ = valuesStringBuilder.Append("],");
+                        valuesStringBuilder.Append("[");
+                        valuesStringBuilder.Append(column.Name);
+                        valuesStringBuilder.Append("],");
                     }
                 }
                 else
@@ -473,19 +452,19 @@ public class Table : SQLServerSchemaBase, IComparable<Table>, ITable<Table>
         {
             var listColumns = columnNamesStringBuilder.ToString(0, columnNamesStringBuilder.Length - 1);
             var listValues = valuesStringBuilder.ToString(0, valuesStringBuilder.Length - 1);
-            _ = sql.AppendLine(ToSQLTemp(tempTable));
-            if (HasIdentityColumn && (!IsIdentityNew))
+            sql.AppendLine(ToSQLTemp(tempTable));
+            if (HasIdentityColumn && !IsIdentityNew)
             {
-                _ = sql.AppendLine($"SET IDENTITY_INSERT [{Owner}].[{tempTable}] ON");
+                sql.AppendLine($"SET IDENTITY_INSERT [{Owner}].[{tempTable}] ON");
             }
 
-            _ = sql.AppendLine($"INSERT INTO [{Owner}].[{tempTable}] ({listColumns}) SELECT {listValues} FROM {FullName}");
-            if (HasIdentityColumn && (!IsIdentityNew))
+            sql.AppendLine($"INSERT INTO [{Owner}].[{tempTable}] ({listColumns}) SELECT {listValues} FROM {FullName}");
+            if (HasIdentityColumn && !IsIdentityNew)
             {
-                _ = sql.AppendLine($"SET IDENTITY_INSERT [{Owner}].[{tempTable}] OFF\r\nGO\r\n");
+                sql.AppendLine($"SET IDENTITY_INSERT [{Owner}].[{tempTable}] OFF\r\nGO\r\n");
             }
 
-            _ = sql.AppendLine($"DROP TABLE {FullName}\r\nGO");
+            sql.AppendLine($"DROP TABLE {FullName}\r\nGO");
 
             if (HasFileStream)
             {
@@ -494,12 +473,12 @@ public class Table : SQLServerSchemaBase, IComparable<Table>, ITable<Table>
                     if (item.Type == Constraint.ConstraintType.Unique &&
                         item.Status != ObjectStatus.Drop)
                     {
-                        _ = sql.AppendLine($"EXEC sp_rename N'[{Owner}].[Temp_XX_{item.Name}]',N'{item.Name}', 'OBJECT'\r\nGO");
+                        sql.AppendLine($"EXEC sp_rename N'[{Owner}].[Temp_XX_{item.Name}]',N'{item.Name}', 'OBJECT'\r\nGO");
                     }
                 });
             }
-            _ = sql.AppendLine($"EXEC sp_rename N'[{Owner}].[{tempTable}]',N'{Name}', 'OBJECT'\r\nGO\r\n");
-            _ = sql.Append(OriginalTable.Options.ToSql());
+            sql.AppendLine($"EXEC sp_rename N'[{Owner}].[{tempTable}]',N'{Name}', 'OBJECT'\r\nGO\r\n");
+            sql.Append(OriginalTable.Options.ToSql());
         }
         else
         {
@@ -525,15 +504,15 @@ public class Table : SQLServerSchemaBase, IComparable<Table>, ITable<Table>
         // Drop constraints first, to avoid duplicate constraints created in temp table
         foreach (var column in Columns.Where(c => !string.IsNullOrWhiteSpace(c.DefaultConstraint?.Name)))
         {
-            _ = sql.Append($"ALTER TABLE {this.FullName} DROP CONSTRAINT [{column.DefaultConstraint.Name}]\r\n");
+            sql.Append($"ALTER TABLE {FullName} DROP CONSTRAINT [{column.DefaultConstraint.Name}]\r\n");
         }
 
         if (!string.IsNullOrWhiteSpace(sql.ToString()))
         {
-            _ = sql.AppendLine();
+            sql.AppendLine();
         }
 
-        _ = sql.AppendLine($"CREATE TABLE [{Owner}].[{TableName}]\r\n(");
+        sql.AppendLine($"CREATE TABLE [{Owner}].[{TableName}]\r\n(");
 
         Columns.Sort();
 
@@ -541,26 +520,26 @@ public class Table : SQLServerSchemaBase, IComparable<Table>, ITable<Table>
         {
             if (Columns[index].Status != ObjectStatus.Drop)
             {
-                _ = sql.Append("\t" + Columns[index].ToSql(true));
+                sql.Append("\t" + Columns[index].ToSql(true));
                 if (index != Columns.Count - 1)
                 {
-                    _ = sql.Append(",");
+                    sql.Append(",");
                 }
 
-                _ = sql.AppendLine();
+                sql.AppendLine();
             }
         }
         if (HasFileStream)
         {
             sql = new StringBuilder(sql.ToString(0, sql.Length - 2));
-            _ = sql.AppendLine(",");
+            sql.AppendLine(",");
             Constraints.ForEach(item =>
             {
                 if (item.Type == Constraint.ConstraintType.Unique &&
                     item.Status != ObjectStatus.Drop)
                 {
                     item.Name = $"Temp_XX_{item.Name}";
-                    _ = sql.AppendLine("\t" + item.ToSql() + ",");
+                    sql.AppendLine($"\t{item.ToSql()},");
                     item.SetWasInsertInDiffList(ScriptAction.AddConstraint);
                     item.Name = item.Name.Substring(8, item.Name.Length - 8);
                 }
@@ -569,31 +548,31 @@ public class Table : SQLServerSchemaBase, IComparable<Table>, ITable<Table>
         }
         else
         {
-            _ = sql.AppendLine();
+            sql.AppendLine();
             if (!string.IsNullOrEmpty(CompressType))
             {
-                _ = sql.AppendLine($"WITH (DATA_COMPRESSION = {CompressType})");
+                sql.AppendLine($"WITH (DATA_COMPRESSION = {CompressType})");
             }
         }
-        _ = sql.Append(")");
+        sql.Append(")");
 
         if (!string.IsNullOrEmpty(FileGroup))
         {
-            _ = sql.Append(" ON [" + FileGroup + "]");
+            sql.Append($" ON [{FileGroup}]");
         }
 
         if (!string.IsNullOrEmpty(FileGroupText) && HasBlobColumn)
         {
-            _ = sql.Append($" TEXTIMAGE_ON [{FileGroupText}]");
+            sql.Append($" TEXTIMAGE_ON [{FileGroupText}]");
         }
 
         if (!string.IsNullOrEmpty(FileGroupStream) && HasFileStream)
         {
-            _ = sql.Append($" FILESTREAM_ON [{FileGroupStream}]");
+            sql.Append($" FILESTREAM_ON [{FileGroupStream}]");
         }
 
-        _ = sql.AppendLine();
-        _ = sql.AppendLine("GO");
+        sql.AppendLine();
+        sql.AppendLine("GO");
 
         return sql.ToString();
     }
@@ -784,12 +763,12 @@ public class Table : SQLServerSchemaBase, IComparable<Table>, ITable<Table>
     {
         if (destination == null)
         {
-            throw new ArgumentNullException("destination");
+            throw new ArgumentNullException(nameof(destination));
         }
 
         if (origin == null)
         {
-            throw new ArgumentNullException("origin");
+            throw new ArgumentNullException(nameof(origin));
         }
 
         if (!string.IsNullOrEmpty(destination.FileGroup) && (!string.IsNullOrEmpty(origin.FileGroup)))
@@ -810,12 +789,12 @@ public class Table : SQLServerSchemaBase, IComparable<Table>, ITable<Table>
     {
         if (destination == null)
         {
-            throw new ArgumentNullException("destination");
+            throw new ArgumentNullException(nameof(destination));
         }
 
         if (origin == null)
         {
-            throw new ArgumentNullException("origin");
+            throw new ArgumentNullException(nameof(origin));
         }
 
         if (!string.IsNullOrEmpty(destination.FileGroupText) && (!string.IsNullOrEmpty(origin.FileGroupText)))

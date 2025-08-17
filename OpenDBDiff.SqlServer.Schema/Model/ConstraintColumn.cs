@@ -3,26 +3,21 @@ using OpenDBDiff.Abstractions.Schema;
 
 namespace OpenDBDiff.SqlServer.Schema.Model;
 
-public class ConstraintColumn : SQLServerSchemaBase, IComparable<ConstraintColumn>
+public class ConstraintColumn(Constraint parentObject) : SQLServerSchemaBase(parentObject, ObjectType.ConstraintColumn), IComparable<ConstraintColumn>
 {
-    public ConstraintColumn(Constraint parentObject)
-        : base(parentObject, ObjectType.ConstraintColumn)
-    {
-    }
-
     public ConstraintColumn Clone()
     {
-        var ccol = new ConstraintColumn((Constraint)this.Parent)
+        var ccol = new ConstraintColumn((Constraint)Parent)
         {
-            ColumnRelationalName = this.ColumnRelationalName,
-            ColumnRelationalId = this.ColumnRelationalId,
-            Name = this.Name,
-            IsIncluded = this.IsIncluded,
-            Order = this.Order,
-            KeyOrder = this.KeyOrder,
-            Id = this.Id,
-            DataTypeId = this.DataTypeId,
-            ColumnRelationalDataTypeId = this.ColumnRelationalDataTypeId
+            ColumnRelationalName = ColumnRelationalName,
+            ColumnRelationalId = ColumnRelationalId,
+            Name = Name,
+            IsIncluded = IsIncluded,
+            Order = Order,
+            KeyOrder = KeyOrder,
+            Id = Id,
+            DataTypeId = DataTypeId,
+            ColumnRelationalDataTypeId = ColumnRelationalDataTypeId
         };
         return ccol;
     }
@@ -64,12 +59,12 @@ public class ConstraintColumn : SQLServerSchemaBase, IComparable<ConstraintColum
     {
         if (destination == null)
         {
-            throw new ArgumentNullException("destination");
+            throw new ArgumentNullException(nameof(destination));
         }
 
         if (origin == null)
         {
-            throw new ArgumentNullException("origin");
+            throw new ArgumentNullException(nameof(origin));
         }
 
         if ((origin.ColumnRelationalName == null) && (destination.ColumnRelationalName != null))
@@ -87,5 +82,5 @@ public class ConstraintColumn : SQLServerSchemaBase, IComparable<ConstraintColum
         return origin.IsIncluded == destination.IsIncluded && origin.Order == destination.Order && origin.KeyOrder == destination.KeyOrder;
     }
 
-    public int CompareTo(ConstraintColumn other) => this.ColumnRelationalId.CompareTo(other.ColumnRelationalId);
+    public int CompareTo(ConstraintColumn other) => ColumnRelationalId.CompareTo(other.ColumnRelationalId);
 }

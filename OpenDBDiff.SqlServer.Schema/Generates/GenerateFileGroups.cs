@@ -3,11 +3,9 @@ using OpenDBDiff.SqlServer.Schema.Model;
 
 namespace OpenDBDiff.SqlServer.Schema.Generates;
 
-public class GenerateFileGroups
+public class GenerateFileGroups(Generate root)
 {
-    private readonly Generate root;
-
-    public GenerateFileGroups(Generate root) => this.root = root;
+    private readonly Generate root = root;
 
     private static string GetSQLFile(FileGroup filegroup)
     {

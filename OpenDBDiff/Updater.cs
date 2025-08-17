@@ -29,7 +29,7 @@ static class Updater
             try
             {
                 connection.Open();
-                _ = command.ExecuteNonQuery();
+                command.ExecuteNonQuery();
                 connection.Close();
             }
             catch (Exception e)
@@ -56,7 +56,7 @@ static class Updater
             try
             {
                 connection.Open();
-                _ = command.ExecuteNonQuery();
+                command.ExecuteNonQuery();
                 connection.Close();
             }
             catch (Exception e)
@@ -88,7 +88,7 @@ static class Updater
         }
         catch (Exception e)
         {
-            _ = MessageBox.Show(e.Message);
+            MessageBox.Show(e.Message);
         }
         return data;
     }
@@ -108,7 +108,7 @@ static class Updater
 
         var sb = new StringBuilder();
         var SqlDiff = target.ToSqlDiff([]);
-        string[] splitOn = { "GO" };
+        string[] splitOn = ["GO"];
         var tempList = SqlDiff.ToSQL().Split(splitOn, StringSplitOptions.RemoveEmptyEntries);
         var scripts = new List<string>(tempList);
 
@@ -126,12 +126,12 @@ static class Updater
             try
             {
                 connection.Open();
-                _ = command.ExecuteNonQuery();
+                command.ExecuteNonQuery();
                 connection.Close();
             }
             catch (Exception e)
             {
-                _ = sb.AppendLine($"{target.Name}: {e.Message}");
+                sb.AppendLine($"{target.Name}: {e.Message}");
                 connection.Close();
             }
         }
@@ -141,7 +141,7 @@ static class Updater
     public static string Rebuild(ISchemaBase target, string connectionString)
     {
         var SqlDiff = target.ToSqlDiff([]);
-        string[] splitOn = { "GO" };
+        string[] splitOn = ["GO"];
         var tempList = SqlDiff.ToSQL().Split(splitOn, StringSplitOptions.RemoveEmptyEntries);
         var scripts = new List<string>(tempList);
         var result = string.Empty;
@@ -150,7 +150,7 @@ static class Updater
         {
             script = script.Replace("CREATE TABLE", "ALTER TABLE");
         }
-        _ = MessageBox.Show(script);
+        MessageBox.Show(script);
         return result;
     }
 
@@ -163,13 +163,13 @@ static class Updater
         {
             using var builder = new SqlCommandBuilder(da);
             connection.Open();
-            _ = da.Update(table);
+            da.Update(table);
             connection.Close();
             return true;
         }
         catch (Exception e)
         {
-            _ = MessageBox.Show(e.Message);
+            MessageBox.Show(e.Message);
             return false;
         }
     }

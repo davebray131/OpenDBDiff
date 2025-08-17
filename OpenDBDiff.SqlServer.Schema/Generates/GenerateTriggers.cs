@@ -10,18 +10,12 @@ using OpenDBDiff.SqlServer.Schema.Options;
 
 namespace OpenDBDiff.SqlServer.Schema.Generates;
 
-public class GenerateTriggers
+public class GenerateTriggers(Generate root)
 {
-    private readonly Generate root;
-
-    public GenerateTriggers(Generate root) => this.root = root;
-
-    private static string GetSQL(DatabaseInfo.SQLServerVersion version, SqlOption options)
-    {
-        return version == DatabaseInfo.SQLServerVersion.SQLServerAzure10
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0060:Remove unused parameter", Justification = "<Pending>")]
+    private static string GetSQL(DatabaseInfo.SQLServerVersion version, SqlOption options) => version == DatabaseInfo.SQLServerVersion.SQLServerAzure10
             ? SQLQueries.SQLQueryFactory.Get("GetTriggers", version)
             : SQLQueries.SQLQueryFactory.Get("GetTriggers");
-    }
 
     public void Fill(Database database, string connectionString, List<MessageLog> messages)
     {

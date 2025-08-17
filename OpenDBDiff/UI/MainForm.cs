@@ -36,7 +36,7 @@ public partial class MainForm : Form
     {
         InitializeComponent();
 
-        Font = new Font("Calibri", 11);
+        Font = new Font("Calibri", 10);
 
         Text = string.Concat(nameof(OpenDBDiff), " v", Assembly.GetExecutingAssembly().GetName().Version.ToString());
     }
@@ -50,10 +50,10 @@ public partial class MainForm : Form
             if (!string.IsNullOrEmpty(ProjectSelectorHandler.GetSourceDatabaseName()) &&
                  (!string.IsNullOrEmpty(ProjectSelectorHandler.GetDestinationDatabaseName())))
             {
-                Options ??= this.ProjectSelectorHandler.GetDefaultProjectOptions();
-                var leftGenerator = this.ProjectSelectorHandler.SetSourceGenerator(LeftDatabaseSelector.ConnectionString, Options);
-                var rightGenerator = this.ProjectSelectorHandler.SetDestinationGenerator(RightDatabaseSelector.ConnectionString, Options);
-                var databaseComparer = this.ProjectSelectorHandler.GetDatabaseComparer();
+                Options ??= ProjectSelectorHandler.GetDefaultProjectOptions();
+                var leftGenerator = ProjectSelectorHandler.SetSourceGenerator(LeftDatabaseSelector.ConnectionString, Options);
+                var rightGenerator = ProjectSelectorHandler.SetDestinationGenerator(RightDatabaseSelector.ConnectionString, Options);
+                var databaseComparer = ProjectSelectorHandler.GetDatabaseComparer();
 
                 var leftPair = new KeyValuePair<string, IGenerator>(LeftDatabaseSelector.ToString(), leftGenerator);
                 var rightPair = new KeyValuePair<string, IGenerator>(RightDatabaseSelector.ToString(), rightGenerator);
@@ -61,16 +61,16 @@ public partial class MainForm : Form
                 // The progress form will execute the comparer to generate action scripts to migrate the right to the left
                 // Hence, inside the ProgressForm and deeper, right is the origin and left is the destination
                 progress = new ProgressForm(rightPair, leftPair, databaseComparer);
-                _ = progress.ShowDialog(this);
+                progress.ShowDialog(this);
                 if (progress.Error != null)
                 {
                     throw new SchemaException(progress.Error.Message, progress.Error);
                 }
 
-                txtSyncScript.LexerLanguage = this.ProjectSelectorHandler.GetScriptLanguage();
+                txtSyncScript.LexerLanguage = ProjectSelectorHandler.GetScriptLanguage();
                 txtSyncScript.ReadOnly = false;
                 errorLocation = "Generating Synchronized Script";
-                txtSyncScript.Text = progress.Destination.ToSqlDiff(this._selectedSchemas).ToSQL();
+                txtSyncScript.Text = progress.Destination.ToSqlDiff(_selectedSchemas).ToSQL();
                 txtSyncScript.ReadOnly = true;
                 txtSyncScript.SetMarginWidth();
 
@@ -88,7 +88,7 @@ public partial class MainForm : Form
             }
             else
             {
-                _ = MessageBox.Show(Owner, "Please select a valid connection string", "ERROR", MessageBoxButtons.OK,
+                MessageBox.Show(Owner, "Please select a valid connection string", "ERROR", MessageBoxButtons.OK,
                                 MessageBoxIcon.Information);
             }
         }
@@ -166,28 +166,28 @@ public partial class MainForm : Form
                 oldLine = i < diff.OldText.Lines.Count ? diff.OldText.Lines[i] : null;
                 if (oldLine.Type == ChangeType.Inserted)
                 {
-                    _ = sb.AppendLine(" " + oldLine.Text);
+                    sb.AppendLine(" " + oldLine.Text);
                 }
                 else if (oldLine.Type == ChangeType.Deleted)
                 {
-                    _ = sb.AppendLine("- " + oldLine.Text);
+                    sb.AppendLine("- " + oldLine.Text);
                     indexes[2].Add(index);
                 }
                 else if (oldLine.Type == ChangeType.Modified)
                 {
-                    _ = sb.AppendLine("* " + newLine.Text);
+                    sb.AppendLine("* " + newLine.Text);
                     indexes[1].Add(index++);
-                    _ = sb.AppendLine("* " + oldLine.Text);
+                    sb.AppendLine("* " + oldLine.Text);
                     indexes[3].Add(index);
                 }
                 else if (oldLine.Type == ChangeType.Imaginary)
                 {
-                    _ = sb.AppendLine("+ " + newLine.Text);
+                    sb.AppendLine("+ " + newLine.Text);
                     indexes[0].Add(index);
                 }
                 else if (oldLine.Type == ChangeType.Unchanged)
                 {
-                    _ = sb.AppendLine("  " + oldLine.Text);
+                    sb.AppendLine("  " + oldLine.Text);
                 }
                 index++;
             }
@@ -197,7 +197,7 @@ public partial class MainForm : Form
             {
                 foreach (var ind in indexes[i])
                 {
-                    _ = txtDiff.Lines[ind].MarkerAdd(i);
+                    txtDiff.Lines[ind].MarkerAdd(i);
                 }
             }
         }
@@ -219,10 +219,10 @@ public partial class MainForm : Form
 
         if (schemaTreeView1.LeftDatabase is IDatabase db)
         {
-            this._selectedSchemas = this.schemaTreeView1.GetCheckedSchemas();
-            this.txtSyncScript.ReadOnly = false;
-            this.txtSyncScript.Text = db.ToSqlDiff(this._selectedSchemas).ToSQL();
-            this.txtSyncScript.ReadOnly = true;
+            _selectedSchemas = schemaTreeView1.GetCheckedSchemas();
+            txtSyncScript.ReadOnly = false;
+            txtSyncScript.Text = db.ToSqlDiff(_selectedSchemas).ToSQL();
+            txtSyncScript.ReadOnly = true;
             txtSyncScript.SetMarginWidth();
         }
     }
@@ -232,7 +232,7 @@ public partial class MainForm : Form
         var tree = (TreeView)schemaTreeView1.Controls.Find("treeView1", true)[0];
         var selected = (ISchemaBase)tree.SelectedNode.Tag;
         var dataCompare = new DataCompareForm(selected, LeftDatabaseSelector.ConnectionString, RightDatabaseSelector.ConnectionString);
-        _ = dataCompare.ShowDialog();
+        dataCompare.ShowDialog();
     }
 
     private void BtnCompare_Click(object sender, EventArgs e)
@@ -258,7 +258,7 @@ public partial class MainForm : Form
         }
     }
 
-    private void HandleException(string errorLocation, Exception ex) => _ = new ErrorForm(ex).ShowDialog(this);
+    private void HandleException(string errorLocation, Exception ex) => new ErrorForm(ex).ShowDialog(this);
 
     private void UnloadProjectHandler()
     {
@@ -322,14 +322,14 @@ public partial class MainForm : Form
                 saveFileDialog1.InitialDirectory = Path.GetDirectoryName(saveFileDialog1.FileName);
                 saveFileDialog1.FileName = Path.GetFileName(saveFileDialog1.FileName);
             }
-            _ = saveFileDialog1.ShowDialog(this);
+            saveFileDialog1.ShowDialog(this);
             if (!string.IsNullOrEmpty(saveFileDialog1.FileName))
             {
                 if (schemaTreeView1.LeftDatabase is IDatabase db)
                 {
                     using var writer = new StreamWriter(saveFileDialog1.FileName, false);
-                    this._selectedSchemas = this.schemaTreeView1.GetCheckedSchemas();
-                    writer.Write(db.ToSqlDiff(this._selectedSchemas).ToSQL());
+                    _selectedSchemas = schemaTreeView1.GetCheckedSchemas();
+                    writer.Write(db.ToSqlDiff(_selectedSchemas).ToSQL());
                     writer.Close();
                 }
             }
@@ -348,7 +348,7 @@ public partial class MainForm : Form
         }
         catch (Exception ex)
         {
-            _ = MessageBox.Show("An error ocurred while trying to copying the text to the clipboard");
+            MessageBox.Show("An error ocurred while trying to copying the text to the clipboard");
             Trace.WriteLine("ERROR: +" + ex.Message);
         }
     }
@@ -380,10 +380,10 @@ public partial class MainForm : Form
                                     {
                                         switch (selected.Status)
                                         {
-                                            case ObjectStatus.Create: _ = sb.Append(Updater.CreateNew(selected, RightDatabaseSelector.ConnectionString)); break;
-                                            case ObjectStatus.Alter: _ = sb.Append(Updater.Alter(selected, RightDatabaseSelector.ConnectionString)); break;
-                                            case ObjectStatus.AlterWhitespace: _ = sb.Append(Updater.Alter(selected, RightDatabaseSelector.ConnectionString)); break;
-                                            default: _ = sb.AppendLine($"Nothing could be found to do for table '{selected.Name}'"); break;
+                                            case ObjectStatus.Create: sb.Append(Updater.CreateNew(selected, RightDatabaseSelector.ConnectionString)); break;
+                                            case ObjectStatus.Alter: sb.Append(Updater.Alter(selected, RightDatabaseSelector.ConnectionString)); break;
+                                            case ObjectStatus.AlterWhitespace: sb.Append(Updater.Alter(selected, RightDatabaseSelector.ConnectionString)); break;
+                                            default: sb.AppendLine($"Nothing could be found to do for table '{selected.Name}'"); break;
                                         }
                                     }
                                     break;
@@ -392,10 +392,10 @@ public partial class MainForm : Form
                                     {
                                         switch (selected.Status)
                                         {
-                                            case ObjectStatus.Create: _ = sb.Append(Updater.CreateNew(selected, RightDatabaseSelector.ConnectionString)); break;
-                                            case ObjectStatus.Alter: _ = sb.Append(Updater.Alter(selected, RightDatabaseSelector.ConnectionString)); break;
-                                            case ObjectStatus.AlterWhitespace: _ = sb.Append(Updater.Alter(selected, RightDatabaseSelector.ConnectionString)); break;
-                                            default: _ = sb.AppendLine($"Nothing could be found to do for stored procedure '{selected.Name}'"); break;
+                                            case ObjectStatus.Create: sb.Append(Updater.CreateNew(selected, RightDatabaseSelector.ConnectionString)); break;
+                                            case ObjectStatus.Alter: sb.Append(Updater.Alter(selected, RightDatabaseSelector.ConnectionString)); break;
+                                            case ObjectStatus.AlterWhitespace: sb.Append(Updater.Alter(selected, RightDatabaseSelector.ConnectionString)); break;
+                                            default: sb.AppendLine($"Nothing could be found to do for stored procedure '{selected.Name}'"); break;
                                         }
                                     }
                                     break;
@@ -404,11 +404,11 @@ public partial class MainForm : Form
                                     {
                                         switch (selected.Status)
                                         {
-                                            case ObjectStatus.Create: _ = sb.Append(Updater.CreateNew(selected, RightDatabaseSelector.ConnectionString)); break;
-                                            case ObjectStatus.Alter: _ = sb.Append(Updater.Alter(selected, RightDatabaseSelector.ConnectionString)); break;
-                                            case ObjectStatus.AlterWhitespace: _ = sb.Append(Updater.Alter(selected, RightDatabaseSelector.ConnectionString)); break;
-                                            case ObjectStatus.Alter | ObjectStatus.AlterBody: _ = sb.Append(Updater.Alter(selected, RightDatabaseSelector.ConnectionString)); break;
-                                            default: _ = sb.AppendLine($"Nothing could be found to do for function '{selected.Name}'"); break;
+                                            case ObjectStatus.Create: sb.Append(Updater.CreateNew(selected, RightDatabaseSelector.ConnectionString)); break;
+                                            case ObjectStatus.Alter: sb.Append(Updater.Alter(selected, RightDatabaseSelector.ConnectionString)); break;
+                                            case ObjectStatus.AlterWhitespace: sb.Append(Updater.Alter(selected, RightDatabaseSelector.ConnectionString)); break;
+                                            case ObjectStatus.Alter | ObjectStatus.AlterBody: sb.Append(Updater.Alter(selected, RightDatabaseSelector.ConnectionString)); break;
+                                            default: sb.AppendLine($"Nothing could be found to do for function '{selected.Name}'"); break;
                                         }
                                     }
                                     break;
@@ -417,11 +417,11 @@ public partial class MainForm : Form
                                     {
                                         switch (selected.Status)
                                         {
-                                            case ObjectStatus.Create: _ = sb.Append(Updater.CreateNew(selected, RightDatabaseSelector.ConnectionString)); break;
-                                            case ObjectStatus.Alter: _ = sb.Append(Updater.Alter(selected, RightDatabaseSelector.ConnectionString)); break;
-                                            case ObjectStatus.AlterWhitespace: _ = sb.Append(Updater.Alter(selected, RightDatabaseSelector.ConnectionString)); break;
-                                            case ObjectStatus.Alter | ObjectStatus.AlterBody: _ = sb.Append(Updater.Alter(selected, RightDatabaseSelector.ConnectionString)); break;
-                                            default: _ = sb.AppendLine($"Nothing could be found to do for view '{selected.Name}'"); break;
+                                            case ObjectStatus.Create: sb.Append(Updater.CreateNew(selected, RightDatabaseSelector.ConnectionString)); break;
+                                            case ObjectStatus.Alter: sb.Append(Updater.Alter(selected, RightDatabaseSelector.ConnectionString)); break;
+                                            case ObjectStatus.AlterWhitespace: sb.Append(Updater.Alter(selected, RightDatabaseSelector.ConnectionString)); break;
+                                            case ObjectStatus.Alter | ObjectStatus.AlterBody: sb.Append(Updater.Alter(selected, RightDatabaseSelector.ConnectionString)); break;
+                                            default: sb.AppendLine($"Nothing could be found to do for view '{selected.Name}'"); break;
                                         }
                                     }
                                     break;
@@ -430,8 +430,8 @@ public partial class MainForm : Form
                                     {
                                         switch (selected.Status)
                                         {
-                                            case ObjectStatus.Create: _ = sb.Append(Updater.AddNew(selected, RightDatabaseSelector.ConnectionString)); break;
-                                            default: _ = sb.AppendLine($"Nothing could be found to do for '{selected.Name}'"); break;
+                                            case ObjectStatus.Create: sb.Append(Updater.AddNew(selected, RightDatabaseSelector.ConnectionString)); break;
+                                            default: sb.AppendLine($"Nothing could be found to do for '{selected.Name}'"); break;
                                         }
                                     }
                                     break;
@@ -488,9 +488,9 @@ public partial class MainForm : Form
     private void BtnOptions_Click(object sender, EventArgs e)
     {
         Options ??= ProjectSelectorHandler.GetDefaultProjectOptions();
-        var form = new OptionForm(this.ProjectSelectorHandler, Options);
+        var form = new OptionForm(ProjectSelectorHandler, Options);
         form.OptionSaved += new OptionControl.OptionEventHandler((option) => Options = option);
-        _ = form.ShowDialog(this);
+        form.ShowDialog(this);
     }
 
     private void LoadProjectHandlers()
@@ -506,7 +506,7 @@ public partial class MainForm : Form
         LoadProjectHandlers();
         foreach (var projectHandler in ProjectHandlers)
         {
-            _ = toolProjectTypes.Items.Add(projectHandler);
+            toolProjectTypes.Items.Add(projectHandler);
         }
 
         if (toolProjectTypes.SelectedItem == null && toolProjectTypes.Items.Count > 0)
@@ -575,7 +575,7 @@ public partial class MainForm : Form
 
                 ActiveProject.ProjectName = newProjectName;
             }
-            _ = Project.Upsert(ActiveProject);
+            Project.Upsert(ActiveProject);
         }
         catch (Exception ex)
         {
@@ -594,11 +594,11 @@ public partial class MainForm : Form
                 form.OnSelect += new ListProjectHandler(Form_OnSelect);
                 form.OnDelete += new ListProjectHandler(Form_OnDelete);
                 form.OnRename += new ListProjectHandler(Form_OnRename);
-                _ = form.ShowDialog(this);
+                form.ShowDialog(this);
             }
             else
             {
-                _ = MessageBox.Show(this, "There are currently no saved projects.", "Projects", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                MessageBox.Show(this, "There are currently no saved projects.", "Projects", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
         }
         catch (Exception ex)
@@ -611,7 +611,7 @@ public partial class MainForm : Form
     {
         try
         {
-            _ = Project.Upsert(itemSelected);
+            Project.Upsert(itemSelected);
         }
         catch (Exception ex)
         {
@@ -623,7 +623,7 @@ public partial class MainForm : Form
     {
         try
         {
-            _ = Project.Delete(itemSelected.Id);
+            Project.Delete(itemSelected.Id);
             if ((ActiveProject?.Id).HasValue && ActiveProject.Id == itemSelected.Id)
             {
                 ActiveProject = null;

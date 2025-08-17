@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Windows.Forms;
 using LiteDB;
 using OpenDBDiff.Abstractions.Schema.Model;
@@ -40,7 +39,7 @@ public class Project
             var userLocalAppDataDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), nameof(OpenDBDiff));
             if (!Directory.Exists(userLocalAppDataDirectory))
             {
-                _ = Directory.CreateDirectory(userLocalAppDataDirectory);
+                Directory.CreateDirectory(userLocalAppDataDirectory);
             }
 
             return Path.Combine(userLocalAppDataDirectory, settingsFile);
@@ -57,7 +56,7 @@ public class Project
     public static IEnumerable<Project> GetAll()
     {
         using var db = GetDatabase();
-        return db.GetCollection<Project>("projects").FindAll().ToArray();
+        return [.. db.GetCollection<Project>("projects").FindAll()];
     }
 
     public static Project GetLastConfiguration()
@@ -81,7 +80,7 @@ public class Project
         };
         last.ConnectionStringSource = connectionStringSource;
         last.ConnectionStringDestination = connectionStringDestination;
-        _ = Upsert(last);
+        Upsert(last);
     }
 
     public static bool Upsert(Project item)

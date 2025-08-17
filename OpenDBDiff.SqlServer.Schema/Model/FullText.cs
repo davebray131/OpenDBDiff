@@ -4,15 +4,9 @@ using OpenDBDiff.Abstractions.Schema.Model;
 
 namespace OpenDBDiff.SqlServer.Schema.Model;
 
-public class FullText : SQLServerSchemaBase
+public class FullText(ISchemaBase parent) : SQLServerSchemaBase(parent, ObjectType.FullText)
 {
-    public FullText(ISchemaBase parent)
-        : base(parent, ObjectType.FullText)
-    {
-
-    }
-
-    public override string FullName => "[" + Name + "]";
+    public override string FullName => $"[{Name}]";
 
     public string Path { get; set; }
 
@@ -24,33 +18,25 @@ public class FullText : SQLServerSchemaBase
 
     public override string ToSql()
     {
-        var database = (Database)this.Parent;
+        var database = (Database)Parent;
 
-        var sql = "CREATE FULLTEXT CATALOG " + FullName + " ";
-        if (!IsAccentSensity)
-        {
-            sql += "WITH ACCENT_SENSITIVITY = OFF\r\n";
-        }
-        else
-        {
-            sql += "WITH ACCENT_SENSITIVITY = ON\r\n";
-        }
+        var sql = $"CREATE FULLTEXT CATALOG {FullName} WITH ACCENT_SENSITIVITY = {OnOff(IsAccentSensity)}\r\n";
 
-        if (!string.IsNullOrEmpty(this.Path))
+        if (!string.IsNullOrEmpty(Path))
         {
             if (!database.Options.Ignore.FilterFullTextPath)
             {
                 sql += "--";
             }
 
-            sql += "IN PATH N'" + Path + "'\r\n";
+            sql += $"IN PATH N'{Path}'\r\n";
         }
         if (IsDefault)
         {
             sql += "AS DEFAULT\r\n";
         }
 
-        sql += "AUTHORIZATION [" + Owner + "]\r\n";
+        sql += $"AUTHORIZATION [{Owner}]\r\n";
         return sql + "GO\r\n";
     }
 
@@ -58,37 +44,27 @@ public class FullText : SQLServerSchemaBase
     {
         if (IsDefault)
         {
-            var sql = "ALTER FULLTEXT CATALOG " + FullName + "\r\n";
+            var sql = $"ALTER FULLTEXT CATALOG {FullName}\r\n";
             sql += "AS DEFAULT";
             sql += "\r\nGO\r\n";
             return sql;
         }
-        else
-        {
-            return "";
-        }
+        return string.Empty;
     }
 
     private string ToSqlAlterOwner()
     {
-        var sql = "ALTER AUTHORIZATION ON FULLTEXT CATALOG::" + FullName + "\r\n";
-        sql += "TO [" + Owner + "]\r\nGO\r\n";
+
+        var sql = $"ALTER AUTHORIZATION ON FULLTEXT CATALOG::{FullName}\r\n";
+        sql += $"TO [{Owner}]\r\nGO\r\n";
         return sql;
     }
 
     private string ToSqlAlter()
     {
-        var sql = "ALTER FULLTEXT CATALOG " + FullName + "\r\n";
+        var sql = $"ALTER FULLTEXT CATALOG {FullName}\r\n";
         sql += "REBUILD WITH ACCENT_SENSITIVITY = ";
-        if (IsAccentSensity)
-        {
-            sql += "ON";
-        }
-        else
-        {
-            sql += "OFF";
-        }
-
+        sql += IsAccentSensity ? "ON" : "OFF";
         sql += "\r\nGO\r\n";
         return sql;
     }
@@ -101,23 +77,23 @@ public class FullText : SQLServerSchemaBase
     {
         var listDiff = new SQLScriptList();
 
-        if (this.Status == ObjectStatus.Drop)
+        if (Status == ObjectStatus.Drop)
         {
             listDiff.Add(ToSqlDrop(), 0, ScriptAction.DropFullText);
         }
-        if (this.Status == ObjectStatus.Create)
+        if (Status == ObjectStatus.Create)
         {
             listDiff.Add(ToSql(), 0, ScriptAction.AddFullText);
         }
-        if (this.HasState(ObjectStatus.Alter))
+        if (HasState(ObjectStatus.Alter))
         {
             listDiff.Add(ToSqlAlter(), 0, ScriptAction.AddFullText);
         }
-        if (this.HasState(ObjectStatus.Disabled))
+        if (HasState(ObjectStatus.Disabled))
         {
             listDiff.Add(ToSqlAlterDefault(), 0, ScriptAction.AddFullText);
         }
-        if (this.HasState(ObjectStatus.ChangeOwner))
+        if (HasState(ObjectStatus.ChangeOwner))
         {
             listDiff.Add(ToSqlAlterOwner(), 0, ScriptAction.AddFullText);
         }
@@ -129,25 +105,25 @@ public class FullText : SQLServerSchemaBase
     /// </summary>
     public bool Compare(FullText destination)
     {
-        var database = (Database)this.Parent;
+        var database = (Database)Parent;
         if (destination == null)
         {
-            throw new ArgumentNullException("destination");
+            throw new ArgumentNullException(nameof(destination));
         }
 
-        if (!this.IsAccentSensity.Equals(destination.IsAccentSensity))
+        if (!IsAccentSensity.Equals(destination.IsAccentSensity))
         {
             return false;
         }
 
-        if (!this.IsDefault.Equals(destination.IsDefault))
+        if (!IsDefault.Equals(destination.IsDefault))
         {
             return false;
         }
 
-        if ((!string.IsNullOrEmpty(this.FileGroupName)) && (!string.IsNullOrEmpty(destination.FileGroupName)))
+        if ((!string.IsNullOrEmpty(FileGroupName)) && (!string.IsNullOrEmpty(destination.FileGroupName)))
         {
-            if (!this.FileGroupName.Equals(destination.FileGroupName))
+            if (!FileGroupName.Equals(destination.FileGroupName))
             {
                 return false;
             }
@@ -155,9 +131,9 @@ public class FullText : SQLServerSchemaBase
 
         if (database.Options.Ignore.FilterFullTextPath)
         {
-            if ((!string.IsNullOrEmpty(this.Path)) && (!string.IsNullOrEmpty(destination.Path)))
+            if ((!string.IsNullOrEmpty(Path)) && (!string.IsNullOrEmpty(destination.Path)))
             {
-                return this.Path.Equals(destination.Path, StringComparison.CurrentCultureIgnoreCase);
+                return Path.Equals(destination.Path, StringComparison.CurrentCultureIgnoreCase);
             }
         }
 

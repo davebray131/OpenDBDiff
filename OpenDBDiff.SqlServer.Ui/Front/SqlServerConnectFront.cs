@@ -67,7 +67,7 @@ namespace OpenDBDiff.SqlServer.Ui
             {
                 using (var connection = new SqlConnection())
                 {
-                    connection.ConnectionString = this.ConnectionString;
+                    connection.ConnectionString = ConnectionString;
                     connection.Open();
                     connection.Close();
                     return true;
@@ -155,12 +155,9 @@ namespace OpenDBDiff.SqlServer.Ui
 
         public Control Control => this;
 
-        private void BtnTest_Click(object sender, EventArgs e)
-        {
-            _ = TestConnection()
+        private void BtnTest_Click(object sender, EventArgs e) => _ = TestConnection()
                 ? MessageBox.Show(this, "Test successful!", "Test", MessageBoxButtons.OK, MessageBoxIcon.Information)
                 : MessageBox.Show(this, "Test failed!\r\n" + ErrorConnection, "Test", MessageBoxButtons.OK, MessageBoxIcon.Error);
-        }
 
         private void AddComboItem(string item)
         {
@@ -232,14 +229,14 @@ namespace OpenDBDiff.SqlServer.Ui
             {
                 if (!isServerFilled)
                 {
-                    this.Cursor = Cursors.WaitCursor;
+                    Cursor = Cursors.WaitCursor;
                     SqlServerList.Get().ForEach(item => cboServer.Items.Add(item));
                     isServerFilled = true;
                 }
             }
             catch (Exception ex)
             {
-                _ = MessageBox.Show(this, ex.Message, "ERROR", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show(this, ex.Message, "ERROR", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
             finally
             {
@@ -251,18 +248,18 @@ namespace OpenDBDiff.SqlServer.Ui
         {
             try
             {
-                this.Cursor = Cursors.WaitCursor;
+                Cursor = Cursors.WaitCursor;
                 FillDatabase();
             }
             catch (Exception ex)
             {
-                this.Cursor = Cursors.Default;
+                Cursor = Cursors.Default;
                 cboDatabase.Items.Clear();
-                _ = MessageBox.Show(this, ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show(this, ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
             finally
             {
-                this.Cursor = Cursors.Default;
+                Cursor = Cursors.Default;
             }
         }
 
@@ -274,11 +271,11 @@ namespace OpenDBDiff.SqlServer.Ui
         {
             var clone = new SqlServerConnectFront
             {
-                ServerName = this.ServerName,
-                UseWindowsAuthentication = this.UseWindowsAuthentication,
-                UserName = this.UserName,
-                Password = this.Password,
-                DatabaseName = this.DatabaseName,
+                ServerName = ServerName,
+                UseWindowsAuthentication = UseWindowsAuthentication,
+                UserName = UserName,
+                Password = Password,
+                DatabaseName = DatabaseName,
                 Location = new System.Drawing.Point(1, 1),
                 Name = "SourceControl",
                 Anchor = AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right
@@ -291,11 +288,11 @@ namespace OpenDBDiff.SqlServer.Ui
         {
             if (other is SqlServerConnectFront sql)
             {
-                this.ServerName = sql.ServerName;
-                this.DatabaseName = sql.DatabaseName;
-                this.UseWindowsAuthentication = sql.UseWindowsAuthentication;
-                this.UserName = sql.UserName;
-                this.Password = sql.Password;
+                ServerName = sql.ServerName;
+                DatabaseName = sql.DatabaseName;
+                UseWindowsAuthentication = sql.UseWindowsAuthentication;
+                UserName = sql.UserName;
+                Password = sql.Password;
             }
         }
     }

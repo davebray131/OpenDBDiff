@@ -11,9 +11,9 @@ public partial class DataCompareForm : Form
     public DataCompareForm(ISchemaBase Selected, string SrcConnectionString, string DestConnectionString)
     {
         InitializeComponent();
-        this.selected = Selected;
-        this.srcConnectionString = SrcConnectionString;
-        this.destConnectionString = DestConnectionString;
+        selected = Selected;
+        srcConnectionString = SrcConnectionString;
+        destConnectionString = DestConnectionString;
 
         DoCompare();
     }
@@ -85,7 +85,7 @@ public partial class DataCompareForm : Form
         }
 
         destination.BeginLoadData();
-        _ = destination.LoadDataRow(sourceItems, false);
+        destination.LoadDataRow(sourceItems, false);
         destination.EndLoadData();
         btnCommitChanges.Enabled = true;
     }

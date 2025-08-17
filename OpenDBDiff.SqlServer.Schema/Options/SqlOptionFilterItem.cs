@@ -13,17 +13,17 @@ public class SqlOptionFilterItem
 
     public SqlOptionFilterItem(ObjectType objectType, string filterPattern)
     {
-        this.ObjectType = objectType;
-        this.FilterPattern = filterPattern;
+        ObjectType = objectType;
+        FilterPattern = filterPattern;
     }
 
     public ObjectType ObjectType { get; set; }
 
     public string FilterPattern { get; set; }
 
-    public bool IsMatch(ISchemaBase item) => (item.ObjectType.Equals(this.ObjectType) && ValueSatisfiesCriteria(item.Name, this.FilterPattern)) || this.IsSchemaMatch(item);
+    public bool IsMatch(ISchemaBase item) => (item.ObjectType.Equals(ObjectType) && ValueSatisfiesCriteria(item.Name, FilterPattern)) || IsSchemaMatch(item);
 
-    private bool IsSchemaMatch(ISchemaBase item) => item.Owner != null && this.ObjectType.Equals(ObjectType.Schema) && ValueSatisfiesCriteria(item.Owner, this.FilterPattern);
+    private bool IsSchemaMatch(ISchemaBase item) => item.Owner != null && ObjectType.Equals(ObjectType.Schema) && ValueSatisfiesCriteria(item.Owner, FilterPattern);
 
     private static readonly Lazy<Dictionary<string, Tuple<string, string>>> patternReplacements =
         new(() =>
@@ -79,13 +79,13 @@ public class SqlOptionFilterItem
             return false;
         }
         var fi = obj as SqlOptionFilterItem;
-        return fi != null && this.ObjectType.Equals(fi.ObjectType) && this.FilterPattern.Equals(fi.FilterPattern, StringComparison.OrdinalIgnoreCase);
+        return fi != null && ObjectType.Equals(fi.ObjectType) && FilterPattern.Equals(fi.FilterPattern, StringComparison.OrdinalIgnoreCase);
     }
 
     public override int GetHashCode()
     {
         long hash = 13;
-        hash = hash + this.ObjectType.GetHashCode() + this.FilterPattern.ToLowerInvariant().GetHashCode();
+        hash = hash + ObjectType.GetHashCode() + FilterPattern.ToLowerInvariant().GetHashCode();
         return Convert.ToInt32(hash & 0x7fffffff);
     }
 

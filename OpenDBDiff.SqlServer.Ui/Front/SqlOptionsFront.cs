@@ -32,7 +32,7 @@ namespace OpenDBDiff.SqlServer.Ui
 
         public override void Load(IOption option)
         {
-            this.SQLOption = new SqlOption(option);
+            SQLOption = new SqlOption(option);
             txtBlob.Text = SQLOption.Defaults.DefaultBlobValue;
             txtDate.Text = SQLOption.Defaults.DefaultDateValue;
             txtDefaultInteger.Text = SQLOption.Defaults.DefaultIntegerValue;

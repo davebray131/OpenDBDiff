@@ -9,11 +9,9 @@ using OpenDBDiff.SqlServer.Schema.Model;
 
 namespace OpenDBDiff.SqlServer.Schema.Generates;
 
-public class GenerateViews
+public class GenerateViews(Generate root)
 {
-    private readonly Generate root;
-
-    public GenerateViews(Generate root) => this.root = root;
+    private readonly Generate root = root;
 
     public void Fill(Database database, string connectionString, List<MessageLog> messages)
     {

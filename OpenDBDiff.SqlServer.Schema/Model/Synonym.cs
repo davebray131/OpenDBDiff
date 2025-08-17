@@ -4,25 +4,17 @@ using OpenDBDiff.Abstractions.Schema.Model;
 
 namespace OpenDBDiff.SqlServer.Schema.Model;
 
-public class Synonym : SQLServerSchemaBase
+public class Synonym(ISchemaBase parent) : SQLServerSchemaBase(parent, ObjectType.Synonym)
 {
-    public Synonym(ISchemaBase parent)
-        : base(parent, ObjectType.Synonym)
-    {
-    }
-
-    public override ISchemaBase Clone(ISchemaBase parent)
-    {
-        var item = new Synonym(parent)
+    public override ISchemaBase Clone(ISchemaBase parent) =>
+        new Synonym(parent)
         {
-            Id = this.Id,
-            Name = this.Name,
-            Owner = this.Owner,
-            Value = this.Value,
-            Guid = this.Guid
+            Id = Id,
+            Name = Name,
+            Owner = Owner,
+            Value = Value,
+            Guid = Guid
         };
-        return item;
-    }
 
     public string Value { get; set; }
 
@@ -39,15 +31,15 @@ public class Synonym : SQLServerSchemaBase
     {
         var listDiff = new SQLScriptList();
 
-        if (this.Status == ObjectStatus.Drop)
+        if (Status == ObjectStatus.Drop)
         {
             listDiff.Add(ToSqlDrop(), 0, ScriptAction.DropSynonyms);
         }
-        if (this.Status == ObjectStatus.Create)
+        if (Status == ObjectStatus.Create)
         {
             listDiff.Add(ToSql(), 0, ScriptAction.AddSynonyms);
         }
-        if (this.Status == ObjectStatus.Alter)
+        if (Status == ObjectStatus.Alter)
         {
             listDiff.Add(ToSqlDrop(), 0, ScriptAction.DropSynonyms);
             listDiff.Add(ToSql(), 0, ScriptAction.AddSynonyms);
@@ -58,10 +50,7 @@ public class Synonym : SQLServerSchemaBase
     /// <summary>
     /// Compara dos Synonyms y devuelve true si son iguales, caso contrario, devuelve false.
     /// </summary>
-    public static bool Compare(Synonym origin, Synonym destination)
-    {
-        return destination == null
-            ? throw new ArgumentNullException("destination")
-            : origin == null ? throw new ArgumentNullException("origin") : origin.Value.Equals(destination.Value);
-    }
+    public static bool Compare(Synonym origin, Synonym destination) => destination == null
+            ? throw new ArgumentNullException(nameof(destination))
+            : origin == null ? throw new ArgumentNullException(nameof(origin)) : origin.Value.Equals(destination.Value);
 }

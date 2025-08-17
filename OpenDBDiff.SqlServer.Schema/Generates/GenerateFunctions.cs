@@ -7,11 +7,9 @@ using OpenDBDiff.SqlServer.Schema.Model;
 
 namespace OpenDBDiff.SqlServer.Schema.Generates;
 
-public class GenerateFunctions
+public class GenerateFunctions(Generate root)
 {
-    private readonly Generate root;
-
-    public GenerateFunctions(Generate root) => this.root = root;
+    private readonly Generate root = root;
 
     private static string GetSQLParameters() => SQLQueries.SQLQueryFactory.Get("GetParameters");
 

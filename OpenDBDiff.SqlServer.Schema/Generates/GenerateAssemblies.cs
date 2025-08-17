@@ -4,11 +4,9 @@ using OpenDBDiff.SqlServer.Schema.Model;
 
 namespace OpenDBDiff.SqlServer.Schema.Generates;
 
-public class GenerateAssemblies
+public class GenerateAssemblies(Generate root)
 {
-    private readonly Generate root;
-
-    public GenerateAssemblies(Generate root) => this.root = root;
+    private readonly Generate root = root;
 
     private static string GetSQLFiles() => SQLQueries.SQLQueryFactory.Get("GetAssemblyFiles");
 

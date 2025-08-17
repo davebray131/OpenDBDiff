@@ -3,11 +3,9 @@ using OpenDBDiff.SqlServer.Schema.Model;
 
 namespace OpenDBDiff.SqlServer.Schema.Generates;
 
-public class GeneratePartitionScheme
+public class GeneratePartitionScheme(Generate root)
 {
-    private readonly Generate root;
-
-    public GeneratePartitionScheme(Generate root) => this.root = root;
+    private readonly Generate root = root;
 
     private static string GetSQL() => SQLQueries.SQLQueryFactory.Get("GetPartitionSchemes");
 

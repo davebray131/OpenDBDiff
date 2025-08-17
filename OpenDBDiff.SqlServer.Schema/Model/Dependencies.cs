@@ -22,7 +22,7 @@ internal class Dependencies : List<Dependency>
             Type = constraint.ObjectType,
             DataTypeId = typeId
         };
-        this.Database = database;
+        Database = database;
         base.Add(dependency);
     }
 
@@ -34,7 +34,7 @@ internal class Dependencies : List<Dependency>
             FullName = objectSchema.FullName,
             Type = objectSchema.ObjectType
         };
-        this.Database = database;
+        Database = database;
         base.Add(dependency);
     }
 
@@ -46,7 +46,7 @@ internal class Dependencies : List<Dependency>
         try
         {
             List<ISchemaBase> cons = [];
-            this.ForEach(dependency =>
+            ForEach(dependency =>
             {
                 if (dependency.Type == type)
                 {
@@ -104,7 +104,7 @@ internal class Dependencies : List<Dependency>
         var count = 0;
         var putItem = false;
         int relationalTableId;
-        var constraints = this.FindNotOwner(tableId, type);
+        var constraints = FindNotOwner(tableId, type);
         for (var index = 0; index < constraints.Count; index++)
         {
             var cons = constraints[index];

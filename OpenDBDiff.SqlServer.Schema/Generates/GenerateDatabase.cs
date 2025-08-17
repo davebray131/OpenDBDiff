@@ -10,22 +10,16 @@ using OpenDBDiff.SqlServer.Schema.Options;
 
 namespace OpenDBDiff.SqlServer.Schema.Generates;
 
-public class GenerateDatabase
+/// <summary>
+/// Constructor de la clase.
+/// </summary>
+/// <param name="connectionString">Connection string de la base</param>
+public class GenerateDatabase(string connectionString, SqlOption filter)
 {
-    private readonly string connectioString;
-    private readonly SqlOption objectFilter;
+    private readonly string connectioString = connectionString;
+    private readonly SqlOption objectFilter = filter;
 
     public bool UseDefaultVersionOnVersionParseError { get; private set; }
-
-    /// <summary>
-    /// Constructor de la clase.
-    /// </summary>
-    /// <param name="connectioString">Connection string de la base</param>
-    public GenerateDatabase(string connectioString, SqlOption filter)
-    {
-        this.connectioString = connectioString;
-        this.objectFilter = filter;
-    }
 
     public DatabaseInfo Get(Database database)
     {

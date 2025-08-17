@@ -25,13 +25,13 @@ public partial class ProgressForm : Form
         Destination = null;
         originProgressControl.Maximum = originDatabase.Value.GetMaxValue();
         originProgressControl.DatabaseName = originDatabase.Key;
-        this.OriginGenerator = originDatabase.Value;
+        OriginGenerator = originDatabase.Value;
 
         destinationProgressControl.Maximum = destinationDatabase.Value.GetMaxValue();
         destinationProgressControl.DatabaseName = destinationDatabase.Key;
-        this.DestinationGenerator = destinationDatabase.Value;
+        DestinationGenerator = destinationDatabase.Value;
 
-        this.Comparer = comparer;
+        Comparer = comparer;
     }
 
     public Abstractions.Schema.Model.IDatabase Origin { get; private set; }
@@ -46,9 +46,9 @@ public partial class ProgressForm : Form
 
     private void BtnOK_Click(object sender, EventArgs e)
     {
-        this.Cursor = Cursors.WaitCursor;
-        this.Close();
-        this.Cursor = Cursors.Default;
+        Cursor = Cursors.WaitCursor;
+        Close();
+        Cursor = Cursors.Default;
     }
 
     private void ProgressForm_Activated(object sender, EventArgs e)
@@ -58,22 +58,22 @@ public partial class ProgressForm : Form
         {
             if (!IsProcessing)
             {
-                this.Refresh();
+                Refresh();
                 IsProcessing = false;
                 OriginGenerator.OnProgress += new ProgressEventHandler.ProgressHandler(GenData1_OnProgress);
                 DestinationGenerator.OnProgress += handler;
 
-                this.ErrorLocation = "Loading " + destinationProgressControl.DatabaseName;
+                ErrorLocation = "Loading " + destinationProgressControl.DatabaseName;
                 Origin = OriginGenerator.Process();
                 originProgressControl.Message = "Complete";
                 originProgressControl.Value = OriginGenerator.GetMaxValue();
 
-                this.ErrorLocation = "Loading " + originProgressControl.DatabaseName;
+                ErrorLocation = "Loading " + originProgressControl.DatabaseName;
                 Destination = DestinationGenerator.Process();
 
                 originClone = (IDatabase)Origin.Clone(null);
 
-                this.ErrorLocation = "Comparing Databases";
+                ErrorLocation = "Comparing Databases";
                 Destination = Comparer.Compare(Origin, Destination);
                 Origin = originClone;
 
@@ -83,13 +83,13 @@ public partial class ProgressForm : Form
         }
         catch (Exception err)
         {
-            this.Error = err;
+            Error = err;
         }
         finally
         {
             OriginGenerator.OnProgress -= handler;
             DestinationGenerator.OnProgress -= handler;
-            this.Close();
+            Close();
         }
     }
 
@@ -105,7 +105,7 @@ public partial class ProgressForm : Form
             destinationProgressControl.Message = e.Message;
         }
 
-        this.ErrorMostRecentProgress = e.Message;
+        ErrorMostRecentProgress = e.Message;
     }
 
     private void GenData1_OnProgress(ProgressEventArgs e)
@@ -120,6 +120,6 @@ public partial class ProgressForm : Form
             originProgressControl.Message = e.Message;
         }
 
-        this.ErrorMostRecentProgress = e.Message;
+        ErrorMostRecentProgress = e.Message;
     }
 }

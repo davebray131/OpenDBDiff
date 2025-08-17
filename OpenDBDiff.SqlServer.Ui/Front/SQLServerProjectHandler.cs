@@ -16,7 +16,7 @@ namespace OpenDBDiff.SqlServer.Ui
 
         public IFront CreateDestinationSelector()
         {
-            this.DestinationControl = new SqlServerConnectFront
+            DestinationControl = new SqlServerConnectFront
             {
                 ServerName = "(local)",
                 UseWindowsAuthentication = true,
@@ -30,12 +30,12 @@ namespace OpenDBDiff.SqlServer.Ui
                 Text = "DESTINATION DATABASE"
             };
 
-            return this.DestinationControl;
+            return DestinationControl;
         }
 
         public IFront CreateSourceSelector()
         {
-            this.SourceControl = new SqlServerConnectFront
+            SourceControl = new SqlServerConnectFront
             {
                 ServerName = "(local)",
                 UseWindowsAuthentication = true,
@@ -99,10 +99,10 @@ namespace OpenDBDiff.SqlServer.Ui
 
         public void Unload()
         {
-            this.SourceControl.Dispose();
-            this.DestinationControl.Dispose();
-            this.SourceControl = null;
-            this.DestinationControl = null;
+            SourceControl.Dispose();
+            DestinationControl.Dispose();
+            SourceControl = null;
+            DestinationControl = null;
         }
 
         public override string ToString() => "SQLServer 2005 or higher";

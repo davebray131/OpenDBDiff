@@ -3,30 +3,22 @@ using OpenDBDiff.Abstractions.Schema.Model;
 
 namespace OpenDBDiff.SqlServer.Schema.Model;
 
-public class Default : SQLServerSchemaBase
+public class Default(ISchemaBase parent) : SQLServerSchemaBase(parent, ObjectType.Default)
 {
-    public Default(ISchemaBase parent)
-        : base(parent, ObjectType.Default)
-    {
-    }
-
-    public new Default Clone(ISchemaBase parent)
-    {
-        var item = new Default(parent)
+    public new Default Clone(ISchemaBase parent) =>
+        new(parent)
         {
-            Id = this.Id,
-            Name = this.Name,
-            Owner = this.Owner,
-            Value = this.Value
+            Id = Id,
+            Name = Name,
+            Owner = Owner,
+            Value = Value
         };
-        return item;
-    }
 
     public string Value { get; set; }
 
-    public string ToSQLAddBind() => $"EXEC sp_bindefault N'{Name}', N'{this.Parent.Name}'\r\nGO\r\n";
+    public string ToSQLAddBind() => $"EXEC sp_bindefault N'{Name}', N'{Parent.Name}'\r\nGO\r\n";
 
-    public string ToSQLAddUnBind() => $"EXEC sp_unbindefault @objname=N'{this.Parent.Name}'\r\nGO\r\n";
+    public string ToSQLAddUnBind() => $"EXEC sp_unbindefault @objname=N'{Parent.Name}'\r\nGO\r\n";
 
     public override string ToSqlAdd() => ToSql();
 
@@ -41,15 +33,15 @@ public class Default : SQLServerSchemaBase
     {
         var listDiff = new SQLScriptList();
 
-        if (this.Status == ObjectStatus.Drop)
+        if (Status == ObjectStatus.Drop)
         {
             listDiff.Add(ToSqlDrop(), 0, ScriptAction.DropRule);
         }
-        if (this.Status == ObjectStatus.Create)
+        if (Status == ObjectStatus.Create)
         {
             listDiff.Add(ToSql(), 0, ScriptAction.AddRule);
         }
-        if (this.Status == ObjectStatus.Alter)
+        if (Status == ObjectStatus.Alter)
         {
             listDiff.Add(ToSqlDrop(), 0, ScriptAction.DropRule);
             listDiff.Add(ToSql(), 0, ScriptAction.AddRule);

@@ -7,44 +7,26 @@ using OpenDBDiff.SqlServer.Schema.Model;
 
 namespace OpenDBDiff.SqlServer.Schema.Generates;
 
-public class GenerateExtendedProperties
+public class GenerateExtendedProperties(Generate root)
 {
-    private readonly Generate root;
-
-    public GenerateExtendedProperties(Generate root) => this.root = root;
-
+    private readonly Generate root = root;
     private static string GetSQL() => SQLQueries.SQLQueryFactory.Get("GetExtendedProperties");
 
-    private static string GetTypeDescription(string type)
-    {
-        if (type.Equals("PC"))
-        {
-            return "PROCEDURE";
-        }
-
-        if (type.Equals("P"))
-        {
-            return "PROCEDURE";
-        }
-
-        if (type.Equals("V"))
-        {
-            return "VIEW";
-        }
-
-        if (type.Equals("U"))
-        {
-            return "TABLE";
-        }
-
-        return type.Equals("TR")
+    private static string GetTypeDescription(string type) => type.Equals("PC")
+            ? "PROCEDURE"
+            : type.Equals("P")
+            ? "PROCEDURE"
+            : type.Equals("V")
+            ? "VIEW"
+            : type.Equals("U")
+            ? "TABLE"
+            : type.Equals("TR")
             ? "TRIGGER"
             : type.Equals("TA")
             ? "TRIGGER"
             : type.Equals("FS")
             ? "FUNCTION"
             : type.Equals("FN") ? "FUNCTION" : type.Equals("IF") ? "FUNCTION" : type.Equals("TF") ? "FUNCTION" : "";
-    }
 
     public void Fill(Database database, string connectionString, List<MessageLog> messages)
     {

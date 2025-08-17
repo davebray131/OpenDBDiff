@@ -5,27 +5,24 @@ using OpenDBDiff.Abstractions.Schema.Model;
 
 namespace OpenDBDiff.SqlServer.Schema.Model;
 
-public class FullTextIndex : SQLServerSchemaBase
+public class FullTextIndex(ISchemaBase parent) : SQLServerSchemaBase(parent, ObjectType.FullTextIndex)
 {
-    public FullTextIndex(ISchemaBase parent)
-        : base(parent, ObjectType.FullTextIndex) => Columns = [];
-
     public override ISchemaBase Clone(ISchemaBase parent)
     {
         var index = new FullTextIndex(parent)
         {
-            ChangeTrackingState = this.ChangeTrackingState,
-            FullText = this.FullText,
-            Name = this.Name,
-            FileGroup = this.FileGroup,
-            Id = this.Id,
-            Index = this.Index,
-            IsDisabled = this.IsDisabled,
-            Status = this.Status,
-            Owner = this.Owner,
-            Columns = this.Columns
+            ChangeTrackingState = ChangeTrackingState,
+            FullText = FullText,
+            Name = Name,
+            FileGroup = FileGroup,
+            Id = Id,
+            Index = Index,
+            IsDisabled = IsDisabled,
+            Status = Status,
+            Owner = Owner,
+            Columns = Columns
         };
-        this.ExtendedProperties.ForEach(item => index.ExtendedProperties.Add(item));
+        ExtendedProperties.ForEach(index.ExtendedProperties.Add);
         return index;
     }
 
@@ -39,9 +36,9 @@ public class FullTextIndex : SQLServerSchemaBase
 
     public string ChangeTrackingState { get; set; }
 
-    public override string FullName => this.Name;
+    public override string FullName => Name;
 
-    public List<FullTextIndexColumn> Columns { get; set; }
+    public List<FullTextIndexColumn> Columns { get; set; } = [];
 
     public override SQLScript Create()
     {
@@ -49,7 +46,7 @@ public class FullTextIndex : SQLServerSchemaBase
         if (!GetWasInsertInDiffList(action))
         {
             SetWasInsertInDiffList(action);
-            return new SQLScript(this.ToSqlAdd(), Parent.DependenciesCount, action);
+            return new SQLScript(ToSqlAdd(), Parent.DependenciesCount, action);
         }
         else
         {
@@ -63,7 +60,7 @@ public class FullTextIndex : SQLServerSchemaBase
         if (!GetWasInsertInDiffList(action))
         {
             SetWasInsertInDiffList(action);
-            return new SQLScript(this.ToSqlDrop(), Parent.DependenciesCount, action);
+            return new SQLScript(ToSqlDrop(), Parent.DependenciesCount, action);
         }
         else
         {
@@ -73,89 +70,73 @@ public class FullTextIndex : SQLServerSchemaBase
 
     public override string ToSqlAdd()
     {
-        var sql = "CREATE FULLTEXT INDEX ON " + Parent.FullName + "( ";
-        Columns.ForEach(item => { sql += "[" + item.ColumnName + "] LANGUAGE [" + item.Language + "],"; });
+        var sql = $"CREATE FULLTEXT INDEX ON {Parent.FullName}( ";
+        Columns.ForEach(item => { sql += $"[{item.ColumnName}] LANGUAGE [{item.Language}],"; });
         sql = sql.Substring(0, sql.Length - 1);
         sql += ")\r\n";
-        if (((Database)this.RootParent).Info.Version == DatabaseInfo.SQLServerVersion.SQLServer2008)
+        if (((Database)RootParent).Info.Version == DatabaseInfo.SQLServerVersion.SQLServer2008)
         {
-            sql += "KEY INDEX " + Index + " ON ([" + FullText + "]";
-            sql += ", FILEGROUP [" + FileGroup + "]";
-            sql += ") WITH (CHANGE_TRACKING " + ChangeTrackingState + ")";
+            sql += $"KEY INDEX {Index} ON ([{FullText}]";
+            sql += $", FILEGROUP [{FileGroup}]";
+            sql += $") WITH (CHANGE_TRACKING {ChangeTrackingState})";
         }
         else
         {
-            sql += "KEY INDEX " + Index + " ON [" + FullText + "]";
-            sql += " WITH CHANGE_TRACKING " + ChangeTrackingState;
+            sql += $"KEY INDEX {Index} ON [{FullText}]";
+            sql += $" WITH CHANGE_TRACKING {ChangeTrackingState}";
         }
         sql += "\r\nGO\r\n";
-        if (!this.IsDisabled)
+        if (!IsDisabled)
         {
-            sql += "ALTER FULLTEXT INDEX ON " + Parent.FullName + " ENABLE\r\nGO\r\n";
+            sql += $"ALTER FULLTEXT INDEX ON {Parent.FullName} ENABLE\r\nGO\r\n";
         }
 
         return sql;
     }
 
-    public string ToSqlEnabled()
-    {
-        return this.IsDisabled
-            ? "ALTER FULLTEXT INDEX ON " + Parent.FullName + " DISABLE\r\nGO\r\n"
-            : "ALTER FULLTEXT INDEX ON " + Parent.FullName + " ENABLE\r\nGO\r\n";
-    }
+    public string ToSqlEnabled() => $"ALTER FULLTEXT INDEX ON {Parent.FullName} {OnOff(IsDisabled, "DISABLE", "ENABLE")}\r\nGO\r\n";
 
-    public override string ToSqlDrop() => "DROP FULLTEXT INDEX ON " + Parent.FullName + "\r\nGO\r\n";
+    public override string ToSqlDrop() => $"DROP FULLTEXT INDEX ON {Parent.FullName}\r\nGO\r\n";
 
     public override string ToSql() => ToSqlAdd();
 
     public override SQLScriptList ToSqlDiff(System.Collections.Generic.ICollection<ISchemaBase> schemas)
     {
         var list = new SQLScriptList();
-        if (this.Status != ObjectStatus.Original)
+        if (Status != ObjectStatus.Original)
         {
             RootParent.ActionMessage[Parent.FullName].Add(this);
         }
 
-        if (this.HasState(ObjectStatus.Drop))
+        if (HasState(ObjectStatus.Drop))
         {
             list.Add(Drop());
         }
 
-        if (this.HasState(ObjectStatus.Create))
+        if (HasState(ObjectStatus.Create))
         {
             list.Add(Create());
         }
 
-        if (this.HasState(ObjectStatus.Alter))
+        if (HasState(ObjectStatus.Alter))
         {
             list.Add(Drop());
             list.Add(Create());
         }
-        if (this.Status == ObjectStatus.Disabled)
+        if (Status == ObjectStatus.Disabled)
         {
-            list.Add(this.ToSqlEnabled(), Parent.DependenciesCount, ScriptAction.AlterFullTextIndex);
+            list.Add(ToSqlEnabled(), Parent.DependenciesCount, ScriptAction.AlterFullTextIndex);
         }
         /*if (this.Status == StatusEnum.ObjectStatusType.ChangeFileGroup)
         {
             listDiff.Add(this.ToSQLDrop(this.FileGroup), ((Table)Parent).DependenciesCount, StatusEnum.ScripActionType.DropIndex);
             listDiff.Add(this.ToSQLAdd(), ((Table)Parent).DependenciesCount, StatusEnum.ScripActionType.AddIndex);
         }*/
-        list.AddRange(this.ExtendedProperties.ToSqlDiff());
+        list.AddRange(ExtendedProperties.ToSqlDiff());
         return list;
     }
 
-    public bool Compare(FullTextIndex destination)
-    {
-        if (destination == null)
-        {
-            throw new ArgumentNullException("destination");
-        }
-
-        if (!this.ChangeTrackingState.Equals(destination.ChangeTrackingState))
-        {
-            return false;
-        }
-
-        return this.FullText.Equals(destination.FullText) && this.Index.Equals(destination.Index) && this.IsDisabled == destination.IsDisabled && Columns.Count == destination.Columns.Count && !this.Columns.Exists(item => { return !destination.Columns.Exists(item2 => item2.ColumnName.Equals(item.ColumnName)); }) && !destination.Columns.Exists(item => { return !this.Columns.Exists(item2 => item2.ColumnName.Equals(item.ColumnName)); });
-    }
+    public bool Compare(FullTextIndex destination) => destination == null
+            ? throw new ArgumentNullException(nameof(destination))
+            : ChangeTrackingState.Equals(destination.ChangeTrackingState) && FullText.Equals(destination.FullText) && Index.Equals(destination.Index) && IsDisabled == destination.IsDisabled && Columns.Count == destination.Columns.Count && !Columns.Exists(item => { return !destination.Columns.Exists(item2 => item2.ColumnName.Equals(item.ColumnName)); }) && !destination.Columns.Exists(item => { return !Columns.Exists(item2 => item2.ColumnName.Equals(item.ColumnName)); });
 }

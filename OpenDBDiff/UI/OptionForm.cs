@@ -22,18 +22,18 @@ public partial class OptionForm : Form
 
         InitializeComponent();
 
-        this.SuspendLayout();
+        SuspendLayout();
 
-        this.sqlOptionsFront1.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom
+        sqlOptionsFront1.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom
         | System.Windows.Forms.AnchorStyles.Left
         | System.Windows.Forms.AnchorStyles.Right;
-        this.sqlOptionsFront1.Location = new System.Drawing.Point(3, 3);
-        this.sqlOptionsFront1.Name = "sqlOptionsFront1";
-        this.sqlOptionsFront1.Size = new System.Drawing.Size(586, 440);
-        this.sqlOptionsFront1.TabIndex = 0;
-        this.Controls.Add(this.sqlOptionsFront1);
+        sqlOptionsFront1.Location = new System.Drawing.Point(3, 3);
+        sqlOptionsFront1.Name = "sqlOptionsFront1";
+        sqlOptionsFront1.Size = new System.Drawing.Size(586, 440);
+        sqlOptionsFront1.TabIndex = 0;
+        Controls.Add(sqlOptionsFront1);
 
-        this.ResumeLayout();
+        ResumeLayout();
     }
 
     private void SqlOptionsFront1_OptionSaved(IOption option) => OptionSaved?.Invoke(option);
@@ -41,8 +41,8 @@ public partial class OptionForm : Form
     private void BtnApply_Click(object sender, EventArgs e)
     {
         sqlOptionsFront1.Save();
-        this.Close();
+        Close();
     }
 
-    private void BtnCancel_Click(object sender, EventArgs e) => this.Close();
+    private void BtnCancel_Click(object sender, EventArgs e) => Close();
 }

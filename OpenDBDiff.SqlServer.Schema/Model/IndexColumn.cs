@@ -4,24 +4,19 @@ using OpenDBDiff.Abstractions.Schema.Model;
 
 namespace OpenDBDiff.SqlServer.Schema.Model;
 
-public class IndexColumn : SQLServerSchemaBase, IComparable<IndexColumn>
+public class IndexColumn(ISchemaBase parentObject) : SQLServerSchemaBase(parentObject, ObjectType.IndexColumn), IComparable<IndexColumn>
 {
-    public IndexColumn(ISchemaBase parentObject)
-        : base(parentObject, ObjectType.IndexColumn)
-    {
-    }
-
     public new IndexColumn Clone(ISchemaBase parent)
     {
         var column = new IndexColumn(parent)
         {
-            Id = this.Id,
-            IsIncluded = this.IsIncluded,
-            Name = this.Name,
-            Order = this.Order,
-            Status = this.Status,
-            KeyOrder = this.KeyOrder,
-            DataTypeId = this.DataTypeId
+            Id = Id,
+            IsIncluded = IsIncluded,
+            Name = Name,
+            Order = Order,
+            Status = Status,
+            KeyOrder = KeyOrder,
+            DataTypeId = DataTypeId
         };
         return column;
     }
@@ -34,14 +29,11 @@ public class IndexColumn : SQLServerSchemaBase, IComparable<IndexColumn>
 
     public bool Order { get; set; }
 
-    public static bool Compare(IndexColumn origin, IndexColumn destination)
-    {
-        return destination == null
-            ? throw new ArgumentNullException("destination")
+    public static bool Compare(IndexColumn origin, IndexColumn destination) => destination == null
+            ? throw new ArgumentNullException(nameof(destination))
             : origin == null
-            ? throw new ArgumentNullException("origin")
+            ? throw new ArgumentNullException(nameof(origin))
             : origin.IsIncluded == destination.IsIncluded && origin.Order == destination.Order && origin.KeyOrder == destination.KeyOrder;
-    }
 
     public override string ToSqlDrop() => string.Empty;
 
@@ -52,7 +44,7 @@ public class IndexColumn : SQLServerSchemaBase, IComparable<IndexColumn>
     public int CompareTo(IndexColumn other) =>
         /*if (other.Name.Equals(this.Name))
 {*/
-        other.IsIncluded == this.IsIncluded ? this.KeyOrder.CompareTo(other.KeyOrder) : other.IsIncluded.CompareTo(this.IsIncluded);/*}
+        other.IsIncluded == IsIncluded ? KeyOrder.CompareTo(other.KeyOrder) : other.IsIncluded.CompareTo(IsIncluded);/*}
 else
 return this.Name.CompareTo(other.Name);*/
 }

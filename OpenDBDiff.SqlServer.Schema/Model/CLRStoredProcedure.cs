@@ -4,16 +4,13 @@ using OpenDBDiff.Abstractions.Schema.Model;
 
 namespace OpenDBDiff.SqlServer.Schema.Model;
 
-public class CLRStoredProcedure : CLRCode
+public class CLRStoredProcedure(ISchemaBase parent) : CLRCode(parent, ObjectType.CLRStoredProcedure, ScriptAction.AddStoredProcedure, ScriptAction.DropStoredProcedure)
 {
-    public CLRStoredProcedure(ISchemaBase parent)
-        : base(parent, ObjectType.CLRStoredProcedure, ScriptAction.AddStoredProcedure, ScriptAction.DropStoredProcedure) => Parameters = [];
-
-    public List<Parameter> Parameters { get; set; }
+    public List<Parameter> Parameters { get; set; } = [];
 
     public override string ToSql()
     {
-        var sql = "CREATE PROCEDURE " + FullName + "\r\n";
+        var sql = $"CREATE PROCEDURE {FullName}\r\n";
         var param = "";
         Parameters.ForEach(item => param += "\t" + item.ToSql() + ",\r\n");
         if (!string.IsNullOrEmpty(param))
@@ -22,9 +19,9 @@ public class CLRStoredProcedure : CLRCode
         }
 
         sql += param;
-        sql += "WITH EXECUTE AS " + AssemblyExecuteAs + "\r\n";
+        sql += $"WITH EXECUTE AS {AssemblyExecuteAs}\r\n";
         sql += "AS\r\n";
-        sql += "EXTERNAL NAME [" + AssemblyName + "].[" + AssemblyClass + "].[" + AssemblyMethod + "]\r\n";
+        sql += $"EXTERNAL NAME [{AssemblyName}].[{AssemblyClass}].[{AssemblyMethod}]\r\n";
         sql += "GO\r\n";
         return sql;
     }
@@ -33,21 +30,21 @@ public class CLRStoredProcedure : CLRCode
     {
         var list = new SQLScriptList();
 
-        if (this.HasState(ObjectStatus.Drop))
+        if (HasState(ObjectStatus.Drop))
         {
             list.Add(Drop());
         }
 
-        if (this.HasState(ObjectStatus.Create))
+        if (HasState(ObjectStatus.Create))
         {
             list.Add(Create());
         }
 
-        if (this.Status == ObjectStatus.Alter)
+        if (Status == ObjectStatus.Alter)
         {
             list.AddRange(Rebuild());
         }
-        list.AddRange(this.ExtendedProperties.ToSqlDiff());
+        list.AddRange(ExtendedProperties.ToSqlDiff());
         return list;
     }
 }

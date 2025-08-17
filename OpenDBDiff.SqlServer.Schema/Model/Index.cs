@@ -1,11 +1,12 @@
 using System;
+using System.Collections.Generic;
 using System.Text;
 using OpenDBDiff.Abstractions.Schema;
 using OpenDBDiff.Abstractions.Schema.Model;
 
 namespace OpenDBDiff.SqlServer.Schema.Model;
 
-public class Index : SQLServerSchemaBase
+public class Index(ISchemaBase parent) : SQLServerSchemaBase(parent, ObjectType.Index)
 {
     public enum IndexTypeEnum
     {
@@ -16,37 +17,30 @@ public class Index : SQLServerSchemaBase
         GEO = 4
     }
 
-    public Index(ISchemaBase parent)
-        : base(parent, ObjectType.Index)
-    {
-        FilterDefintion = "";
-        Columns = new IndexColumns(parent);
-    }
-
     public override ISchemaBase Clone(ISchemaBase parent)
     {
         var index = new Index(parent)
         {
-            AllowPageLocks = this.AllowPageLocks,
-            AllowRowLocks = this.AllowRowLocks,
-            Columns = this.Columns.Clone(),
-            FillFactor = this.FillFactor,
-            FileGroup = this.FileGroup,
-            Id = this.Id,
-            IgnoreDupKey = this.IgnoreDupKey,
-            IsAutoStatistics = this.IsAutoStatistics,
-            IsDisabled = this.IsDisabled,
-            IsPadded = this.IsPadded,
-            IsPrimaryKey = this.IsPrimaryKey,
-            IsUniqueKey = this.IsUniqueKey,
-            Name = this.Name,
-            SortInTempDb = this.SortInTempDb,
-            Status = this.Status,
-            Type = this.Type,
-            Owner = this.Owner,
-            FilterDefintion = this.FilterDefintion
+            AllowPageLocks = AllowPageLocks,
+            AllowRowLocks = AllowRowLocks,
+            Columns = Columns.Clone(),
+            FillFactor = FillFactor,
+            FileGroup = FileGroup,
+            Id = Id,
+            IgnoreDupKey = IgnoreDupKey,
+            IsAutoStatistics = IsAutoStatistics,
+            IsDisabled = IsDisabled,
+            IsPadded = IsPadded,
+            IsPrimaryKey = IsPrimaryKey,
+            IsUniqueKey = IsUniqueKey,
+            Name = Name,
+            SortInTempDb = SortInTempDb,
+            Status = Status,
+            Type = Type,
+            Owner = Owner,
+            FilterDefintion = FilterDefintion
         };
-        ExtendedProperties.ForEach(item => index.ExtendedProperties.Add(item));
+        ExtendedProperties.ForEach(index.ExtendedProperties.Add);
         return index;
     }
 
@@ -54,9 +48,9 @@ public class Index : SQLServerSchemaBase
 
     public bool SortInTempDb { get; set; }
 
-    public string FilterDefintion { get; set; }
+    public string FilterDefintion { get; set; } = "";
 
-    public IndexColumns Columns { get; set; }
+    public IndexColumns Columns { get; set; } = new IndexColumns(parent);
 
     public bool IsAutoStatistics { get; set; }
 
@@ -83,66 +77,22 @@ public class Index : SQLServerSchemaBase
     /// <summary>
     /// Compara dos indices y devuelve true si son iguales, caso contrario, devuelve false.
     /// </summary>
-    public static bool Compare(Index origin, Index destination)
-    {
-        if (destination == null)
-        {
-            throw new ArgumentNullException("destination");
-        }
-
-        if (origin == null)
-        {
-            throw new ArgumentNullException("origin");
-        }
-
-        if (origin.AllowPageLocks != destination.AllowPageLocks)
-        {
-            return false;
-        }
-
-        if (origin.AllowRowLocks != destination.AllowRowLocks)
-        {
-            return false;
-        }
-
-        if (origin.FillFactor != destination.FillFactor)
-        {
-            return false;
-        }
-
-        if (origin.IgnoreDupKey != destination.IgnoreDupKey)
-        {
-            return false;
-        }
-
-        if (origin.IsAutoStatistics != destination.IsAutoStatistics)
-        {
-            return false;
-        }
-
-        if (origin.IsDisabled != destination.IsDisabled)
-        {
-            return false;
-        }
-
-        if (origin.IsPadded != destination.IsPadded)
-        {
-            return false;
-        }
-
-        return origin.IsPrimaryKey == destination.IsPrimaryKey && origin.IsUniqueKey == destination.IsUniqueKey && origin.Type == destination.Type && origin.SortInTempDb == destination.SortInTempDb && origin.FilterDefintion.Equals(destination.FilterDefintion) && IndexColumns.Compare(origin.Columns, destination.Columns) && CompareFileGroup(origin, destination);
-    }
+    public static bool Compare(Index origin, Index destination) => destination == null
+            ? throw new ArgumentNullException(nameof(destination))
+            : origin == null
+            ? throw new ArgumentNullException(nameof(origin))
+            : origin.AllowPageLocks == destination.AllowPageLocks && origin.AllowRowLocks == destination.AllowRowLocks && origin.FillFactor == destination.FillFactor && origin.IgnoreDupKey == destination.IgnoreDupKey && origin.IsAutoStatistics == destination.IsAutoStatistics && origin.IsDisabled == destination.IsDisabled && origin.IsPadded == destination.IsPadded && origin.IsPrimaryKey == destination.IsPrimaryKey && origin.IsUniqueKey == destination.IsUniqueKey && origin.Type == destination.Type && origin.SortInTempDb == destination.SortInTempDb && origin.FilterDefintion.Equals(destination.FilterDefintion) && IndexColumns.Compare(origin.Columns, destination.Columns) && CompareFileGroup(origin, destination);
 
     public static bool CompareExceptIsDisabled(Index origin, Index destination)
     {
         if (destination == null)
         {
-            throw new ArgumentNullException("destination");
+            throw new ArgumentNullException(nameof(destination));
         }
 
         if (origin == null)
         {
-            throw new ArgumentNullException("origin");
+            throw new ArgumentNullException(nameof(origin));
         }
 
         if (origin.AllowPageLocks != destination.AllowPageLocks)
@@ -212,12 +162,12 @@ public class Index : SQLServerSchemaBase
     {
         if (destination == null)
         {
-            throw new ArgumentNullException("destination");
+            throw new ArgumentNullException(nameof(destination));
         }
 
         if (origin == null)
         {
-            throw new ArgumentNullException("origin");
+            throw new ArgumentNullException(nameof(origin));
         }
 
         if (origin.FileGroup != null)
@@ -245,47 +195,47 @@ public class Index : SQLServerSchemaBase
         var includes = "";
         if ((Type == IndexTypeEnum.Clustered) && IsUniqueKey)
         {
-            _ = sql.Append("CREATE UNIQUE CLUSTERED ");
+            sql.Append("CREATE UNIQUE CLUSTERED ");
         }
 
         if ((Type == IndexTypeEnum.Clustered) && (!IsUniqueKey))
         {
-            _ = sql.Append("CREATE CLUSTERED ");
+            sql.Append("CREATE CLUSTERED ");
         }
 
         if ((Type == IndexTypeEnum.Nonclustered) && IsUniqueKey)
         {
-            _ = sql.Append("CREATE UNIQUE NONCLUSTERED ");
+            sql.Append("CREATE UNIQUE NONCLUSTERED ");
         }
 
         if ((Type == IndexTypeEnum.Nonclustered) && (!IsUniqueKey))
         {
-            _ = sql.Append("CREATE NONCLUSTERED ");
+            sql.Append("CREATE NONCLUSTERED ");
         }
 
         if (Type == IndexTypeEnum.XML)
         {
-            _ = sql.Append("CREATE PRIMARY XML ");
+            sql.Append("CREATE PRIMARY XML ");
         }
 
-        _ = sql.AppendLine("INDEX [" + Name + "] ON " + Parent.FullName + "\r\n(");
+        sql.AppendLine($"INDEX [{Name}] ON {Parent.FullName}\r\n(");
         /*Ordena la coleccion de campos del Indice en funcion de la propieda IsIncluded*/
         Columns.Sort();
         for (var j = 0; j < Columns.Count; j++)
         {
             if (!Columns[j].IsIncluded)
             {
-                _ = sql.Append("\t[" + Columns[j].Name + "]");
+                sql.Append("\t[" + Columns[j].Name + "]");
                 if (Type != IndexTypeEnum.XML)
                 {
                     _ = Columns[j].Order ? sql.Append(" DESC") : sql.Append(" ASC");
                 }
                 if (j < Columns.Count - 1)
                 {
-                    _ = sql.Append(",");
+                    sql.Append(",");
                 }
 
-                _ = sql.AppendLine();
+                sql.AppendLine();
             }
             else
             {
@@ -294,7 +244,7 @@ public class Index : SQLServerSchemaBase
                     includes = ") INCLUDE (";
                 }
 
-                includes += "[" + Columns[j].Name + "],";
+                includes += $"[{Columns[j].Name}],";
             }
         }
         if (!string.IsNullOrEmpty(includes))
@@ -302,59 +252,63 @@ public class Index : SQLServerSchemaBase
             includes = includes.Substring(0, includes.Length - 1);
         }
 
-        _ = sql.Append(includes);
-        _ = sql.Append(")");
+        sql.Append(includes);
+        sql.Append(")");
         if (!string.IsNullOrEmpty(FilterDefintion))
         {
-            _ = sql.AppendLine("\r\n WHERE " + FilterDefintion);
+            sql.AppendLine($"\r\n WHERE {FilterDefintion}");
         }
 
-        _ = sql.Append(" WITH (");
+        List<string> withList = [];
+
         if (Parent.ObjectType == ObjectType.TableType)
         {
-            _ = IgnoreDupKey && IsUniqueKey ? sql.Append("IGNORE_DUP_KEY = ON ") : sql.Append("IGNORE_DUP_KEY  = OFF ");
+            withList.Add($"IGNORE_DUP_KEY = {OnOff(IgnoreDupKey && IsUniqueKey)}");
         }
         else
         {
             if (!isAzure10)
             {
-                _ = IsPadded ? sql.Append("PAD_INDEX = ON, ") : sql.Append("PAD_INDEX  = OFF, ");
+                withList.Add($"PAD_INDEX = {OnOff(IsPadded)}");
             }
 
-            _ = IsAutoStatistics ? sql.Append("STATISTICS_NORECOMPUTE = ON") : sql.Append("STATISTICS_NORECOMPUTE  = OFF");
+            withList.Add($"STATISTICS_NORECOMPUTE = {OnOff(IsAutoStatistics)}");
 
             if (Type != IndexTypeEnum.XML)
             {
-                _ = IgnoreDupKey && IsUniqueKey ? sql.Append("IGNORE_DUP_KEY = ON, ") : sql.Append(", IGNORE_DUP_KEY  = OFF");
+                withList.Add($"IGNORE_DUP_KEY = {OnOff(IgnoreDupKey && IsUniqueKey)}");
             }
 
             if (!isAzure10)
             {
-                _ = AllowRowLocks ? sql.Append(", ALLOW_ROW_LOCKS = ON") : sql.Append(", ALLOW_ROW_LOCKS  = OFF");
-
-                _ = AllowPageLocks ? sql.Append(", ALLOW_PAGE_LOCKS = ON") : sql.Append(", ALLOW_PAGE_LOCKS  = OFF");
+                withList.Add($"ALLOW_ROW_LOCKS = {OnOff(AllowRowLocks)}");
+                withList.Add($"ALLOW_PAGE_LOCKS = {OnOff(AllowPageLocks)}");
 
                 if (FillFactor != 0)
                 {
-                    _ = sql.Append(", FILLFACTOR = " + FillFactor.ToString());
+                    withList.Add($"FILLFACTOR = {FillFactor}");
                 }
             }
         }
-        _ = sql.Append(")");
+        if (withList.Count > 0)
+        {
+            sql.Append($" WITH ({string.Join(", ", withList)})");
+        }
+
         if (!isAzure10)
         {
             if (!string.IsNullOrEmpty(FileGroup))
             {
-                _ = sql.Append(" ON [" + FileGroup + "]");
+                sql.Append($" ON [{FileGroup}]");
             }
         }
-        _ = sql.AppendLine("\r\nGO");
+        sql.AppendLine("\r\nGO");
         if (IsDisabled)
         {
-            _ = sql.AppendLine("ALTER INDEX [" + Name + "] ON " + ((Table)Parent).FullName + " DISABLE\r\nGO");
+            sql.AppendLine($"ALTER INDEX [{Name}] ON {((Table)Parent).FullName} DISABLE\r\nGO");
         }
 
-        _ = sql.Append(ExtendedProperties.ToSql());
+        sql.Append(ExtendedProperties.ToSql());
         return sql.ToString();
     }
 
@@ -364,13 +318,13 @@ public class Index : SQLServerSchemaBase
 
     private string ToSqlDrop(string FileGroupName)
     {
-        var sql = new StringBuilder("DROP INDEX [" + Name + "] ON " + Parent.FullName);
+        var sql = new StringBuilder($"DROP INDEX [{Name}] ON {Parent.FullName}");
         if (!string.IsNullOrEmpty(FileGroupName))
         {
-            _ = sql.Append(" WITH (MOVE TO [" + FileGroupName + "])");
+            sql.Append($" WITH (MOVE TO [{FileGroupName}])");
         }
 
-        _ = sql.AppendLine("\r\nGO");
+        sql.AppendLine("\r\nGO");
         return sql.ToString();
     }
 
@@ -396,12 +350,7 @@ public class Index : SQLServerSchemaBase
         return null;
     }
 
-    private string ToSqlEnabled()
-    {
-        return IsDisabled
-            ? "ALTER INDEX [" + Name + "] ON " + Parent.FullName + " DISABLE\r\nGO\r\n"
-            : "ALTER INDEX [" + Name + "] ON " + Parent.FullName + " REBUILD\r\nGO\r\n";
-    }
+    private string ToSqlEnabled() => $"ALTER INDEX [{Name}] ON {Parent.FullName} {OnOff(IsDisabled, "DISABLE", "REBUILD")}\r\nGO\r\n";
 
     public override SQLScriptList ToSqlDiff(System.Collections.Generic.ICollection<ISchemaBase> schemas)
     {

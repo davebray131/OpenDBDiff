@@ -10,19 +10,15 @@ using OpenDBDiff.SqlServer.Schema.Model;
 
 namespace OpenDBDiff.SqlServer.Schema.Generates;
 
-public class GenerateUserDataTypes
+public class GenerateUserDataTypes(Generate root)
 {
-    private readonly Generate root;
-
-    public GenerateUserDataTypes(Generate root) => this.root = root;
-
     private static string GetSQLColumnsDependencies() => SQLQueries.SQLQueryFactory.Get("GetSQLColumnsDependencies");
 
     private static void FillColumnsDependencies(SchemaList<UserDataType, Database> types, string connectionString)
     {
         if (types == null)
         {
-            throw new ArgumentNullException("types");
+            throw new ArgumentNullException(nameof(types));
         }
 
         using var conn = new SqlConnection(connectionString);

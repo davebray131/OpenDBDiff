@@ -4,17 +4,12 @@ using OpenDBDiff.Abstractions.Schema.Model;
 
 namespace OpenDBDiff.SqlServer.Schema.Model;
 
-public class Role : SQLServerSchemaBase
+public class Role(ISchemaBase parent) : SQLServerSchemaBase(parent, ObjectType.Role)
 {
     public enum RoleTypeEnum
     {
         ApplicationRole = 1,
         DatabaseRole = 2
-    }
-
-    public Role(ISchemaBase parent)
-        : base(parent, ObjectType.Role)
-    {
     }
 
     public override string FullName => $"[{Name}]";
@@ -45,15 +40,15 @@ public class Role : SQLServerSchemaBase
     {
         var listDiff = new SQLScriptList();
 
-        if (this.Status == ObjectStatus.Drop)
+        if (Status == ObjectStatus.Drop)
         {
             listDiff.Add(ToSqlDrop(), 0, ScriptAction.DropRole);
         }
-        if (this.Status == ObjectStatus.Create)
+        if (Status == ObjectStatus.Create)
         {
             listDiff.Add(ToSql(), 0, ScriptAction.AddRole);
         }
-        if ((this.Status & ObjectStatus.Alter) == ObjectStatus.Alter)
+        if ((Status & ObjectStatus.Alter) == ObjectStatus.Alter)
         {
             listDiff.Add(ToSqlDrop(), 0, ScriptAction.DropRole);
             listDiff.Add(ToSql(), 0, ScriptAction.AddRole);
@@ -62,10 +57,7 @@ public class Role : SQLServerSchemaBase
     }
 
 
-    public bool Compare(Role obj)
-    {
-        return obj == null
-            ? throw new ArgumentNullException("destination")
-            : this.Type == obj.Type && this.Password.Equals(obj.Password) && this.Owner.Equals(obj.Owner);
-    }
+    public bool Compare(Role obj) => obj == null
+            ? throw new ArgumentNullException(nameof(obj))
+            : Type == obj.Type && Password.Equals(obj.Password) && Owner.Equals(obj.Owner);
 }

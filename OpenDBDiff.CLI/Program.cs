@@ -22,7 +22,7 @@ public class Program
     {
         var completedSuccessfully = false;
 
-        _ = Parser.Default.ParseArguments<CommandlineOptions>(args)
+        Parser.Default.ParseArguments<CommandlineOptions>(args)
             .WithParsed(options =>
             {
                 try
@@ -38,7 +38,7 @@ public class Program
         if (Debugger.IsAttached)
         {
             Console.WriteLine("Press any key to continue...");
-            _ = Console.ReadKey(false);
+            Console.ReadKey(false);
         }
 
         return completedSuccessfully ? 0 : 1;
@@ -76,7 +76,7 @@ public class Program
                 Console.WriteLine("Comparing databases schemas...");
                 origin = Generate.Compare(origin, destination);
                 // temporary work-around: run twice just like GUI
-                _ = origin.ToSqlDiff([]);
+                origin.ToSqlDiff([]);
 
                 Console.WriteLine("Generating SQL file...");
                 var script = origin.ToSqlDiff([]).ToSQL();

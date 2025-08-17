@@ -7,11 +7,8 @@ using OpenDBDiff.SqlServer.Schema.Model;
 
 namespace OpenDBDiff.SqlServer.Schema.Generates;
 
-public class GenerateConstraint
+public class GenerateConstraint(Generate root)
 {
-    private readonly Generate root;
-
-    public GenerateConstraint(Generate root) => this.root = root;
 
     #region Check Functions...
     public void FillCheck(Database database, string connectionString)

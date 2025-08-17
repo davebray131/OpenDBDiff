@@ -14,7 +14,7 @@ using Constraint = OpenDBDiff.SqlServer.Schema.Model.Constraint;
 
 namespace OpenDBDiff.SqlServer.Schema.Generates;
 
-public class GenerateTables
+public class GenerateTables(Generate root)
 {
     private int colIDIndex = -1;
     private int colNameIndex = -1;
@@ -59,15 +59,11 @@ public class GenerateTables
     private int FileGroupTextIndex = -1;
     private int FileGroupStreamIndex = -1;
 
-    private readonly Generate root;
-
-    public GenerateTables(Generate root) => this.root = root;
-
     private void InitTableIndex(Database database, IDataRecord reader)
     {
         if (reader == null)
         {
-            throw new ArgumentNullException("reader");
+            throw new ArgumentNullException(nameof(reader));
         }
 
         if (TableIdIndex == -1)
@@ -95,7 +91,7 @@ public class GenerateTables
     {
         if (reader == null)
         {
-            throw new ArgumentNullException("reader");
+            throw new ArgumentNullException(nameof(reader));
         }
 
         if (colNameIndex == -1)

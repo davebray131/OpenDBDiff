@@ -3,11 +3,9 @@ using OpenDBDiff.SqlServer.Schema.Model;
 
 namespace OpenDBDiff.SqlServer.Schema.Generates;
 
-public class GenerateSchemas
+public class GenerateSchemas(Generate root)
 {
-    private readonly Generate root;
-
-    public GenerateSchemas(Generate root) => this.root = root;
+    private readonly Generate root = root;
 
     private static string GetSQL() => SQLQueries.SQLQueryFactory.Get("GetSchemas");
 

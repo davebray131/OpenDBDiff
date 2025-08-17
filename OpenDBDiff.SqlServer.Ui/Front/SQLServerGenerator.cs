@@ -14,12 +14,12 @@ namespace OpenDBDiff.SqlServer.Ui
 
         public SQLServerGenerator(string connectionString, IOption option)
         {
-            this.Generate = new Generate()
+            Generate = new Generate()
             {
                 ConnectionString = connectionString,
                 Options = new SqlOption(option)
             };
-            this.Generate.OnProgress += new ProgressEventHandler.ProgressHandler(args =>
+            Generate.OnProgress += new ProgressEventHandler.ProgressHandler(args =>
             {
                 OnProgress?.Invoke(args);
             });
@@ -28,6 +28,6 @@ namespace OpenDBDiff.SqlServer.Ui
 
         public int GetMaxValue() => Generate.MaxValue;
 
-        public IDatabase Process() => this.Generate.Process();
+        public IDatabase Process() => Generate.Process();
     }
 }

@@ -125,7 +125,7 @@ namespace OpenDBDiff.Tests.Utils
 
             if (assembly is null)
             {
-                throw new ArgumentNullException("assembly");
+                throw new ArgumentNullException(nameof(assembly));
             }
 
             #endregion Check

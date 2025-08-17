@@ -22,17 +22,17 @@ public class View : Code
     {
         var item = new View(parent)
         {
-            Text = this.Text,
-            Status = this.Status,
-            Name = this.Name,
-            Id = this.Id,
-            Owner = this.Owner,
-            IsSchemaBinding = this.IsSchemaBinding,
-            DependenciesIn = this.DependenciesIn,
-            DependenciesOut = this.DependenciesOut
+            Text = Text,
+            Status = Status,
+            Name = Name,
+            Id = Id,
+            Owner = Owner,
+            IsSchemaBinding = IsSchemaBinding,
+            DependenciesIn = DependenciesIn,
+            DependenciesOut = DependenciesOut
         };
-        item.Indexes = this.Indexes.Clone(item);
-        item.Triggers = this.Triggers.Clone(item);
+        item.Indexes = Indexes.Clone(item);
+        item.Triggers = Triggers.Clone(item);
         return item;
     }
 
@@ -50,7 +50,7 @@ public class View : Code
     public override string ToSqlAdd()
     {
         var sql = ToSql();
-        this.Indexes.ForEach(item =>
+        Indexes.ForEach(item =>
             {
                 if (item.Status != ObjectStatus.Drop)
                 {
@@ -59,7 +59,7 @@ public class View : Code
                 }
             }
         );
-        this.Triggers.ForEach(item =>
+        Triggers.ForEach(item =>
             {
                 if (item.Status != ObjectStatus.Drop)
                 {
@@ -69,7 +69,7 @@ public class View : Code
             }
         );
 
-        sql += this.ExtendedProperties.ToSql();
+        sql += ExtendedProperties.ToSql();
         return sql;
     }
 
@@ -83,39 +83,39 @@ public class View : Code
     public override SQLScriptList ToSqlDiff(System.Collections.Generic.ICollection<ISchemaBase> schemas)
     {
         var list = new SQLScriptList();
-        if (this.Status != ObjectStatus.Original)
+        if (Status != ObjectStatus.Original)
         {
             RootParent.ActionMessage.Add(this);
         }
 
-        if (this.HasState(ObjectStatus.Drop))
+        if (HasState(ObjectStatus.Drop))
         {
             list.Add(Drop());
         }
 
-        if (this.HasState(ObjectStatus.Create))
+        if (HasState(ObjectStatus.Create))
         {
             list.Add(Create());
         }
 
-        if (this.HasState(ObjectStatus.Alter))
+        if (HasState(ObjectStatus.Alter))
         {
-            if (this.HasState(ObjectStatus.RebuildDependencies))
+            if (HasState(ObjectStatus.RebuildDependencies))
             {
                 list.AddRange(RebuildDependencies());
             }
 
-            if (this.HasState(ObjectStatus.Rebuild))
+            if (HasState(ObjectStatus.Rebuild))
             {
                 list.Add(Drop());
                 list.Add(Create());
             }
-            if (this.HasState(ObjectStatus.AlterBody))
+            if (HasState(ObjectStatus.AlterBody))
             {
                 var iCount = DependenciesCount;
                 list.Add(ToSQLAlter(), iCount, ScriptAction.AlterView);
             }
-            if (!this.GetWasInsertInDiffList(ScriptAction.DropFunction) && (!this.GetWasInsertInDiffList(ScriptAction.AddFunction)))
+            if (!GetWasInsertInDiffList(ScriptAction.DropFunction) && (!GetWasInsertInDiffList(ScriptAction.AddFunction)))
             {
                 list.AddRange(Indexes.ToSqlDiff());
             }

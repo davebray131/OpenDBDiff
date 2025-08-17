@@ -128,9 +128,9 @@ public class Database : SQLServerSchemaBase, IDatabase
     public override ISchemaBase Clone(ISchemaBase parent)
     {
         //Get a list of all of the objects that are SchemaLists, so that we can clone them all.
-        var item = new Database() { AllObjects = this.AllObjects };
+        var item = new Database() { AllObjects = AllObjects };
 
-        var explicitProperties = (from properties in this.GetType().GetProperties(BindingFlags.DeclaredOnly | BindingFlags.Instance | BindingFlags.Public)
+        var explicitProperties = (from properties in GetType().GetProperties(BindingFlags.DeclaredOnly | BindingFlags.Instance | BindingFlags.Public)
                                   where properties.PropertyType.GetInterface(typeof(ISchemaList<Code, Database>).Name) != null
                                   select properties).ToList();
 
@@ -191,7 +191,7 @@ public class Database : SQLServerSchemaBase, IDatabase
 
     public override SQLScriptList ToSqlDiff(ICollection<ISchemaBase> schemas)
     {
-        var isAzure10 = this.Info.Version == DatabaseInfo.SQLServerVersion.SQLServerAzure10;
+        var isAzure10 = Info.Version == DatabaseInfo.SQLServerVersion.SQLServerAzure10;
 
         var listDiff = new SQLScriptList();
 

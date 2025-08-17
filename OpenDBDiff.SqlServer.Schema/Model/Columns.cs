@@ -4,11 +4,8 @@ using OpenDBDiff.Abstractions.Schema.Model;
 
 namespace OpenDBDiff.SqlServer.Schema.Model;
 
-public class Columns<T> : SchemaList<Column, T> where T : ISchemaBase
+public class Columns<T>(T parent) : SchemaList<Column, T>(parent) where T : ISchemaBase
 {
-    public Columns(T parent) : base(parent)
-    {
-    }
 
     /// <summary>
     /// Clona el objeto Columns en una nueva instancia.
@@ -16,23 +13,20 @@ public class Columns<T> : SchemaList<Column, T> where T : ISchemaBase
     public new Columns<T> Clone(T parentObject)
     {
         var columns = new Columns<T>(parentObject);
-        for (var index = 0; index < this.Count; index++)
+        for (var index = 0; index < Count; index++)
         {
             columns.Add(this[index].Clone(parentObject));
         }
         return columns;
     }
 
-    public override string ToSql()
-    {
-        return string.Join
+    public override string ToSql() => string.Join
         (
             ",\r\n",
             this
                 .Where(c => !c.HasState(ObjectStatus.Drop))
                 .Select(c => "\t" + c.ToSql(true))
         );
-    }
 
     public override SQLScriptList ToSqlDiff(System.Collections.Generic.ICollection<ISchemaBase> schemas)
     {
@@ -43,7 +37,7 @@ public class Columns<T> : SchemaList<Column, T> where T : ISchemaBase
         var list = new SQLScriptList();
         if (Parent.Status != ObjectStatus.Rebuild)
         {
-            this.ForEach(item =>
+            ForEach(item =>
             {
                 var isIncluded = schemas.Count == 0;
                 if (!isIncluded)
@@ -128,7 +122,7 @@ public class Columns<T> : SchemaList<Column, T> where T : ISchemaBase
         }
         else
         {
-            this.ForEach(item =>
+            ForEach(item =>
             {
                 if (item.Status != ObjectStatus.Original)
                 {

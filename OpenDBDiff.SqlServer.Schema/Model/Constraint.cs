@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Text;
 using OpenDBDiff.Abstractions.Schema;
@@ -26,10 +27,10 @@ public class Constraint : SQLServerSchemaBase
     public Constraint(ISchemaBase parent, bool hasIndex)
         : base(parent, ObjectType.Constraint)
     {
-        this.Columns = new ConstraintColumns(this);
+        Columns = new ConstraintColumns(this);
         if (hasIndex)
         {
-            this.Index = new Index(parent);
+            Index = new Index(parent);
         }
     }
 
@@ -40,21 +41,21 @@ public class Constraint : SQLServerSchemaBase
     {
         var col = new Constraint(parent)
         {
-            Id = this.Id,
-            Name = this.Name,
-            NotForReplication = this.NotForReplication,
-            RelationalTableFullName = this.RelationalTableFullName,
-            Status = this.Status,
-            Type = this.Type,
-            WithNoCheck = this.WithNoCheck,
-            OnDeleteCascade = this.OnDeleteCascade,
-            OnUpdateCascade = this.OnUpdateCascade,
-            Owner = this.Owner,
-            Columns = this.Columns.Clone(),
-            Index = (Index)this.Index?.Clone(parent),
-            IsDisabled = this.IsDisabled,
-            Definition = this.Definition,
-            Guid = this.Guid
+            Id = Id,
+            Name = Name,
+            NotForReplication = NotForReplication,
+            RelationalTableFullName = RelationalTableFullName,
+            Status = Status,
+            Type = Type,
+            WithNoCheck = WithNoCheck,
+            OnDeleteCascade = OnDeleteCascade,
+            OnUpdateCascade = OnUpdateCascade,
+            Owner = Owner,
+            Columns = Columns.Clone(),
+            Index = (Index)Index?.Clone(parent),
+            IsDisabled = IsDisabled,
+            Definition = Definition,
+            Guid = Guid
         };
         return col;
     }
@@ -132,12 +133,12 @@ public class Constraint : SQLServerSchemaBase
     {
         if (destination == null)
         {
-            throw new ArgumentNullException("destination");
+            throw new ArgumentNullException(nameof(destination));
         }
 
         if (origin == null)
         {
-            throw new ArgumentNullException("origin");
+            throw new ArgumentNullException(nameof(origin));
         }
 
         if (origin.NotForReplication != destination.NotForReplication)
@@ -194,69 +195,73 @@ public class Constraint : SQLServerSchemaBase
         var isAzure10 = database.Info.Version == DatabaseInfo.SQLServerVersion.SQLServerAzure10;
         //string typeConstraint = "";
         var sql = new StringBuilder();
-        _ = Parent.ObjectType != ObjectType.TableType ? sql.Append("CONSTRAINT [" + Name + "] ") : sql.Append("\t");
+        _ = Parent.ObjectType != ObjectType.TableType ? sql.Append($"CONSTRAINT [{Name}] ") : sql.Append("\t");
 
         _ = consType == ConstraintType.PrimaryKey ? sql.Append("PRIMARY KEY") : sql.Append("UNIQUE");
 
         if (Index != null)
         {
-            _ = sql.Append(" ");
-            _ = sql.Append(Index.Type.ToString().ToUpperInvariant());
+            sql.Append(" ");
+            sql.Append(Index.Type.ToString().ToUpperInvariant());
         }
 
-        _ = sql.Append("\r\n\t(\r\n");
+        sql.Append("\r\n\t(\r\n");
 
-        this.Columns.Sort();
+        Columns.Sort();
 
-        for (var j = 0; j < this.Columns.Count; j++)
+        for (var j = 0; j < Columns.Count; j++)
         {
-            _ = sql.Append("\t\t[" + this.Columns[j].Name + "]");
+            sql.Append("\t\t[" + Columns[j].Name + "]");
             _ = Columns[j].Order ? sql.Append(" DESC") : sql.Append(" ASC");
 
-            if (j != this.Columns.Count - 1)
+            if (j != Columns.Count - 1)
             {
-                _ = sql.Append(",");
+                sql.Append(",");
             }
 
-            _ = sql.AppendLine();
+            sql.AppendLine();
         }
-        _ = sql.Append("\t)");
+        sql.Append("\t)");
 
         if (Index != null)
         {
-            _ = sql.Append(" WITH (");
+            List<string> withList = [];
+
             if (Parent.ObjectType == ObjectType.TableType)
             {
-                _ = Index.IgnoreDupKey ? sql.Append("IGNORE_DUP_KEY = ON") : sql.Append("IGNORE_DUP_KEY  = OFF");
+                withList.Add($"IGNORE_DUP_KEY = {OnOff(Index.IgnoreDupKey)}");
             }
             else
             {
                 if (!isAzure10)
                 {
-                    _ = Index.IsPadded ? sql.Append("PAD_INDEX = ON, ") : sql.Append("PAD_INDEX  = OFF, ");
+                    withList.Add($"PAD_INDEX = {OnOff(Index.IsPadded)}");
                 }
-                _ = Index.IsAutoStatistics ? sql.Append("STATISTICS_NORECOMPUTE = ON") : sql.Append("STATISTICS_NORECOMPUTE  = OFF");
-
-                _ = Index.IgnoreDupKey ? sql.Append(", IGNORE_DUP_KEY = ON") : sql.Append(", IGNORE_DUP_KEY  = OFF");
+                withList.Add($"STATISTICS_NORECOMPUTE = {OnOff(Index.IsAutoStatistics)}");
+                withList.Add($"IGNORE_DUP_KEY = {OnOff(Index.IgnoreDupKey)}");
 
                 if (!isAzure10)
                 {
-                    _ = Index.AllowRowLocks ? sql.Append(", ALLOW_ROW_LOCKS = ON") : sql.Append(", ALLOW_ROW_LOCKS  = OFF");
-
-                    _ = Index.AllowPageLocks ? sql.Append(", ALLOW_PAGE_LOCKS = ON") : sql.Append(", ALLOW_PAGE_LOCKS  = OFF");
+                    withList.Add($"ALLOW_ROW_LOCKS = {OnOff(Index.AllowRowLocks)}");
+                    withList.Add($"ALLOW_PAGE_LOCKS = {OnOff(Index.AllowPageLocks)}");
 
                     if (Index.FillFactor != 0)
                     {
-                        _ = sql.Append(", FILLFACTOR = " + Index.FillFactor.ToString(CultureInfo.InvariantCulture));
+                        withList.Add($", FILLFACTOR = {Index.FillFactor.ToString(CultureInfo.InvariantCulture)}");
                     }
                 }
             }
-            _ = sql.Append(")");
+
+            if (withList.Count > 0)
+            {
+                sql.Append($" WITH ({string.Join(", ", withList)})");
+            }
+
             if (!isAzure10)
             {
                 if (!string.IsNullOrEmpty(Index.FileGroup))
                 {
-                    _ = sql.Append(" ON [" + Index.FileGroup + "]");
+                    sql.Append(" ON [" + Index.FileGroup + "]");
                 }
             }
         }
@@ -269,72 +274,73 @@ public class Constraint : SQLServerSchemaBase
     /// </summary>
     public override string ToSql()
     {
-        if (this.Type == ConstraintType.PrimaryKey)
+        if (Type == ConstraintType.PrimaryKey)
         {
             return ToSQLGeneric(ConstraintType.PrimaryKey);
         }
-        if (this.Type == ConstraintType.ForeignKey)
+        if (Type == ConstraintType.ForeignKey)
         {
             var sql = new StringBuilder();
             var sqlReference = new StringBuilder();
             var indexc = 0;
 
-            this.Columns.Sort();
-            _ = sql.Append("CONSTRAINT [" + Name + "] FOREIGN KEY\r\n\t(\r\n");
-            foreach (var column in this.Columns)
+            Columns.Sort();
+            sql.Append("CONSTRAINT [" + Name + "] FOREIGN KEY\r\n\t(\r\n");
+            foreach (var column in Columns)
             {
-                _ = sql.Append("\t\t[" + column.Name + "]");
-                _ = sqlReference.Append("\t\t[" + column.ColumnRelationalName + "]");
-                if (indexc != this.Columns.Count - 1)
+                sql.Append($"\t\t[{column.Name}]");
+                _ = sqlReference.Append($"\t\t[{column.ColumnRelationalName}]");
+                if (indexc != Columns.Count - 1)
                 {
-                    _ = sql.Append(",");
+                    sql.Append(",");
                     _ = sqlReference.Append(",");
                 }
-                _ = sql.AppendLine();
+                sql.AppendLine();
                 _ = sqlReference.AppendLine();
                 indexc++;
             }
-            _ = sql.Append("\t)\r\n");
-            _ = sql.Append("\tREFERENCES " + this.RelationalTableFullName + "\r\n\t(\r\n");
-            _ = sql.Append(sqlReference + "\t)");
+            sql.Append("\t)\r\n");
+            sql.Append($"\tREFERENCES {RelationalTableFullName}\r\n\t(\r\n");
+            sql.Append(sqlReference + "\t)");
+
             if (OnUpdateCascade == 1)
             {
-                _ = sql.Append(" ON UPDATE CASCADE");
+                sql.Append(" ON UPDATE CASCADE");
             }
 
             if (OnDeleteCascade == 1)
             {
-                _ = sql.Append(" ON DELETE CASCADE");
+                sql.Append(" ON DELETE CASCADE");
             }
 
             if (OnUpdateCascade == 2)
             {
-                _ = sql.Append(" ON UPDATE SET NULL");
+                sql.Append(" ON UPDATE SET NULL");
             }
 
             if (OnDeleteCascade == 2)
             {
-                _ = sql.Append(" ON DELETE SET NULL");
+                sql.Append(" ON DELETE SET NULL");
             }
 
             if (OnUpdateCascade == 3)
             {
-                _ = sql.Append(" ON UPDATE SET DEFAULT");
+                sql.Append(" ON UPDATE SET DEFAULT");
             }
 
             if (OnDeleteCascade == 3)
             {
-                _ = sql.Append(" ON DELETE SET DEFAULT");
+                sql.Append(" ON DELETE SET DEFAULT");
             }
 
-            _ = sql.Append(NotForReplication ? " NOT FOR REPLICATION" : "");
+            sql.Append(NotForReplication ? " NOT FOR REPLICATION" : "");
             return sql.ToString();
         }
-        if (this.Type == ConstraintType.Unique)
+        if (Type == ConstraintType.Unique)
         {
             return ToSQLGeneric(ConstraintType.Unique);
         }
-        if (this.Type == ConstraintType.Check)
+        if (Type == ConstraintType.Check)
         {
             var sqlcheck = "";
             if (Parent.ObjectType != ObjectType.TableType)
@@ -344,22 +350,22 @@ public class Constraint : SQLServerSchemaBase
 
             return sqlcheck + "CHECK " + (NotForReplication ? "NOT FOR REPLICATION" : "") + " (" + Definition + ")";
         }
-        return "";
+        return string.Empty;
     }
 
-    public override string ToSqlAdd() => $"ALTER TABLE " + Parent.FullName + (WithNoCheck ? " WITH NOCHECK" : "") + " ADD " + ToSql() + "\r\nGO\r\n";
+    public override string ToSqlAdd() => $"ALTER TABLE {Parent.FullName}" + (WithNoCheck ? " WITH NOCHECK" : "") + " ADD " + ToSql() + "\r\nGO\r\n";
 
     public override string ToSqlDrop() => ToSqlDrop(null);
 
     public override SQLScript Create()
     {
         var action = ScriptAction.AddConstraint;
-        if (this.Type == ConstraintType.ForeignKey)
+        if (Type == ConstraintType.ForeignKey)
         {
             action = ScriptAction.AddConstraintFK;
         }
 
-        if (this.Type == ConstraintType.PrimaryKey)
+        if (Type == ConstraintType.PrimaryKey)
         {
             action = ScriptAction.AddConstraintPK;
         }
@@ -367,7 +373,7 @@ public class Constraint : SQLServerSchemaBase
         if (!GetWasInsertInDiffList(action))
         {
             SetWasInsertInDiffList(action);
-            return new SQLScript(this.ToSqlAdd(), ((Table)Parent).DependenciesCount, action);
+            return new SQLScript(ToSqlAdd(), ((Table)Parent).DependenciesCount, action);
         }
         else
         {
@@ -378,12 +384,12 @@ public class Constraint : SQLServerSchemaBase
     public override SQLScript Drop()
     {
         var action = ScriptAction.DropConstraint;
-        if (this.Type == ConstraintType.ForeignKey)
+        if (Type == ConstraintType.ForeignKey)
         {
             action = ScriptAction.DropConstraintFK;
         }
 
-        if (this.Type == ConstraintType.PrimaryKey)
+        if (Type == ConstraintType.PrimaryKey)
         {
             action = ScriptAction.DropConstraintPK;
         }
@@ -391,7 +397,7 @@ public class Constraint : SQLServerSchemaBase
         if (!GetWasInsertInDiffList(action))
         {
             SetWasInsertInDiffList(action);
-            return new SQLScript(this.ToSqlDrop(), ((Table)Parent).DependenciesCount, action);
+            return new SQLScript(ToSqlDrop(), ((Table)Parent).DependenciesCount, action);
         }
         else
         {
@@ -411,41 +417,38 @@ public class Constraint : SQLServerSchemaBase
         return sql;
     }
 
-    public string ToSQLEnabledDisabled()
-    {
-        return this.IsDisabled
+    public string ToSQLEnabledDisabled() => IsDisabled
             ? $"ALTER TABLE {Parent.FullName} NOCHECK CONSTRAINT [{Name}\r\nGO\r\n"
             : $"ALTER TABLE {Parent.FullName} CHECK CONSTRAINT [{Name}]\r\nGO\r\n";
-    }
 
     public override SQLScriptList ToSqlDiff(System.Collections.Generic.ICollection<ISchemaBase> schemas)
     {
         var list = new SQLScriptList();
-        if (this.Status != ObjectStatus.Original)
+        if (Status != ObjectStatus.Original)
         {
             RootParent.ActionMessage[Parent.FullName].Add(this);
         }
 
-        if (this.HasState(ObjectStatus.Drop))
+        if (HasState(ObjectStatus.Drop))
         {
-            if (this.Parent.Status != ObjectStatus.Rebuild)
+            if (Parent.Status != ObjectStatus.Rebuild)
             {
                 list.Add(Drop());
             }
         }
-        if (this.HasState(ObjectStatus.Create))
+        if (HasState(ObjectStatus.Create))
         {
             list.Add(Create());
         }
 
-        if (this.HasState(ObjectStatus.Alter))
+        if (HasState(ObjectStatus.Alter))
         {
             list.Add(Drop());
             list.Add(Create());
         }
-        if (this.HasState(ObjectStatus.Disabled))
+        if (HasState(ObjectStatus.Disabled))
         {
-            list.Add(this.ToSQLEnabledDisabled(), ((Table)Parent).DependenciesCount, ScriptAction.AlterConstraint);
+            list.Add(ToSQLEnabledDisabled(), ((Table)Parent).DependenciesCount, ScriptAction.AlterConstraint);
         }
         /*if (this.Status == StatusEnum.ObjectStatusType.ChangeFileGroup)
         {

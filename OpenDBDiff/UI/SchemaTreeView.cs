@@ -49,7 +49,7 @@ public partial class SchemaTreeView : UserControl
         imageList1.Images.Add("Assembly", Resources.image13);
         imageList1.Images.Add("PartitionFunction", Resources.image14);
         imageList1.Images.Add("PartitionScheme", Resources.image15);
-        this.treeView1.ImageList = imageList1;
+        treeView1.ImageList = imageList1;
 
 
 
@@ -243,7 +243,7 @@ public partial class SchemaTreeView : UserControl
 
         treeView1.EndUpdate();
         busy = false;
-        _ = treeView1.Focus();
+        treeView1.Focus();
     }
 
     private bool CanNodeAdd(ISchemaBase item)
@@ -416,5 +416,5 @@ public partial class SchemaTreeView : UserControl
         }
     }
 
-    public string SelectedNode => treeView1.SelectedNode == null ? null : !(treeView1.SelectedNode.Tag is ISchemaBase item) ? null : item.FullName;
+    public string SelectedNode => treeView1.SelectedNode == null ? null : treeView1.SelectedNode.Tag is not ISchemaBase item ? null : item.FullName;
 }

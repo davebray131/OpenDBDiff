@@ -5,17 +5,15 @@ using System.Text;
 
 namespace OpenDBDiff.SqlServer.Schema.Model;
 
-public class FileGroupFiles : List<FileGroupFile>
+/// <summary>
+/// Constructor de la clase.
+/// </summary>
+/// <param name="parent">
+/// Objeto Database padre.
+/// </param>
+public class FileGroupFiles(FileGroup parent) : List<FileGroupFile>
 {
     private readonly Hashtable hash = [];
-
-    /// <summary>
-    /// Constructor de la clase.
-    /// </summary>
-    /// <param name="parent">
-    /// Objeto Database padre.
-    /// </param>
-    public FileGroupFiles(FileGroup parent) => this.Parent = parent;
 
     /// <summary>
     /// Clona el objeto FileGroups en una nueva instancia.
@@ -23,7 +21,7 @@ public class FileGroupFiles : List<FileGroupFile>
     public FileGroupFiles Clone(FileGroup parentObject)
     {
         var columns = new FileGroupFiles(parentObject);
-        for (var index = 0; index < this.Count; index++)
+        for (var index = 0; index < Count; index++)
         {
             columns.Add((FileGroupFile)this[index].Clone(parentObject));
         }
@@ -51,7 +49,7 @@ public class FileGroupFiles : List<FileGroupFile>
         }
         else
         {
-            throw new ArgumentNullException("file");
+            throw new ArgumentNullException(nameof(file));
         }
     }
 
@@ -75,14 +73,14 @@ public class FileGroupFiles : List<FileGroupFile>
     /// <summary>
     /// Devuelve la tabla perteneciente a la coleccion de campos.
     /// </summary>
-    public FileGroup Parent { get; private set; }
+    public FileGroup Parent { get; private set; } = parent;
 
     public string ToSQL()
     {
         var sql = new StringBuilder();
-        for (var index = 0; index < this.Count; index++)
+        for (var index = 0; index < Count; index++)
         {
-            _ = sql.Append(this[index].ToSql());
+            sql.Append(this[index].ToSql());
         }
         return sql.ToString();
     }
@@ -90,9 +88,9 @@ public class FileGroupFiles : List<FileGroupFile>
     public string ToSQLDrop()
     {
         var sql = new StringBuilder();
-        for (var index = 0; index < this.Count; index++)
+        for (var index = 0; index < Count; index++)
         {
-            _ = sql.Append(this[index].ToSqlDrop());
+            sql.Append(this[index].ToSqlDrop());
         }
         return sql.ToString();
     }

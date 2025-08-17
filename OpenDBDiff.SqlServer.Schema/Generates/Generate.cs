@@ -48,17 +48,17 @@ public class Generate
 
     public void RaiseOnReading(ProgressEventArgs e)
     {
-        this.currentlyReading = e;
+        currentlyReading = e;
         OnReading?.Invoke(e);
     }
 
     public void RaiseOnReadingOne(object name)
     {
-        if (name != null && this.OnReading != null && this.currentlyReading != null)
+        if (name != null && OnReading != null && currentlyReading != null)
         {
-            var eOne = new ProgressEventArgs(this.currentlyReading.Message, this.currentlyReading.Progress);
+            var eOne = new ProgressEventArgs(currentlyReading.Message, currentlyReading.Progress);
             eOne.Message = eOne.Message.Replace("...", string.Format(": [{0}]", name));
-            this.OnReading(eOne);
+            OnReading(eOne);
         }
     }
 

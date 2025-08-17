@@ -13,14 +13,14 @@ public class FileGroup : SQLServerSchemaBase
     {
         var file = new FileGroup(parent)
         {
-            IsDefaultFileGroup = this.IsDefaultFileGroup,
-            IsReadOnly = this.IsReadOnly,
-            Name = this.Name,
-            Id = this.Id
+            IsDefaultFileGroup = IsDefaultFileGroup,
+            IsReadOnly = IsReadOnly,
+            Name = Name,
+            Id = Id
         };
-        file.Files = this.Files.Clone(file);
-        file.Guid = this.Guid;
-        file.IsFileStream = this.IsFileStream;
+        file.Files = Files.Clone(file);
+        file.Guid = Guid;
+        file.IsFileStream = IsFileStream;
         return file;
     }
 
@@ -32,19 +32,16 @@ public class FileGroup : SQLServerSchemaBase
 
     public bool IsReadOnly { get; set; }
 
-    public static bool Compare(FileGroup origin, FileGroup destination)
-    {
-        return destination == null
-            ? throw new ArgumentNullException("destination")
+    public static bool Compare(FileGroup origin, FileGroup destination) => destination == null
+            ? throw new ArgumentNullException(nameof(destination))
             : origin == null
-            ? throw new ArgumentNullException("origin")
+            ? throw new ArgumentNullException(nameof(origin))
             : origin.IsReadOnly == destination.IsReadOnly && origin.IsDefaultFileGroup == destination.IsDefaultFileGroup && origin.IsFileStream == destination.IsFileStream;
-    }
 
     private string ToSQL(string action)
     {
-        var sql = "ALTER DATABASE [" + Parent.Name + "] " + action + " ";
-        sql += "FILEGROUP [" + Name + "]";
+        var sql = $"ALTER DATABASE [{Parent.Name}] {action} ";
+        sql += $"FILEGROUP [{Name}]";
         if (action.Equals("MODIFY"))
         {
             if (IsDefaultFileGroup)
@@ -52,8 +49,7 @@ public class FileGroup : SQLServerSchemaBase
                 sql += " DEFAULT";
             }
         }
-        else
-            if (IsFileStream)
+        else if (IsFileStream)
         {
             sql += " CONTAINS FILESTREAM";
         }
@@ -70,7 +66,7 @@ public class FileGroup : SQLServerSchemaBase
     public override string ToSql()
     {
         var sql = ToSQL("ADD");
-        foreach (var file in this.Files)
+        foreach (var file in Files)
         {
             sql += file.ToSql();
         }
@@ -86,7 +82,7 @@ public class FileGroup : SQLServerSchemaBase
     public override string ToSqlAdd()
     {
         var sql = ToSQL("ADD");
-        foreach (var file in this.Files)
+        foreach (var file in Files)
         {
             sql += file.ToSqlAdd();
         }
@@ -104,26 +100,26 @@ public class FileGroup : SQLServerSchemaBase
     public override string ToSqlDrop()
     {
         var sql = Files.ToSQLDrop();
-        return sql + "ALTER DATABASE [" + Parent.Name + "] REMOVE FILEGROUP [" + Name + "]\r\nGO\r\n\r\n";
+        return $"{sql}ALTER DATABASE [{Parent.Name}] REMOVE FILEGROUP [{Name}]\r\nGO\r\n\r\n";
     }
 
     public override SQLScriptList ToSqlDiff(System.Collections.Generic.ICollection<ISchemaBase> schemas)
     {
         var listDiff = new SQLScriptList();
 
-        if (this.Status == ObjectStatus.Drop)
+        if (Status == ObjectStatus.Drop)
         {
-            listDiff.Add(this.ToSqlDrop(), 1, ScriptAction.DropFileGroup);
+            listDiff.Add(ToSqlDrop(), 1, ScriptAction.DropFileGroup);
         }
 
-        if (this.Status == ObjectStatus.Create)
+        if (Status == ObjectStatus.Create)
         {
-            listDiff.Add(this.ToSqlAdd(), 1, ScriptAction.AddFileGroup);
+            listDiff.Add(ToSqlAdd(), 1, ScriptAction.AddFileGroup);
         }
 
-        if (this.Status == ObjectStatus.Alter)
+        if (Status == ObjectStatus.Alter)
         {
-            listDiff.Add(this.ToSQLAlter(), 1, ScriptAction.AlterFileGroup);
+            listDiff.Add(ToSQLAlter(), 1, ScriptAction.AlterFileGroup);
         }
 
         return listDiff;

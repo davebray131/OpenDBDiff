@@ -63,7 +63,7 @@ public class DatabaseInfo
         {
             versionNumber = value;
 
-            var version = this.Version;
+            var version = Version;
 
             // https://buildnumbers.wordpress.com/sqlserver/
             if (versionNumber >= 8)
@@ -121,17 +121,17 @@ public class DatabaseInfo
                 version = SQLServerVersion.SQLServer2022;
             }
 
-            this.Version = version;
+            Version = version;
         }
     }
 
     public void SetEdition(SQLServerEdition edition)
     {
-        this.Edition = edition;
+        Edition = edition;
 
         if (edition == SQLServerEdition.Azure)
         {
-            this.Version = SQLServerVersion.SQLServerAzure10;
+            Version = SQLServerVersion.SQLServerAzure10;
         }
     }
 }
