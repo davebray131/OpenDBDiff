@@ -23,7 +23,6 @@ namespace OpenDBDiff.SqlServer.Ui
             {
                 OnProgress?.Invoke(args);
             });
-
         }
 
         public int GetMaxValue() => Generate.MaxValue;

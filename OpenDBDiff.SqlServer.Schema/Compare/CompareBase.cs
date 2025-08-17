@@ -11,7 +11,6 @@ internal abstract class CompareBase<T> where T : ISchemaBase
 {
     protected virtual void DoUpdate<Root>(SchemaList<T, Root> originFields, T node) where Root : ISchemaBase
     {
-
     }
 
     protected virtual void DoNew<Root>(SchemaList<T, Root> originFields, T node) where Root : ISchemaBase

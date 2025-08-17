@@ -6,7 +6,6 @@ namespace OpenDBDiff.SqlServer.Schema.Options;
 
 public class SqlOptionComparison : IOptionComparison
 {
-
     public enum CaseSensityOptions
     {
         Automatic = 0,
@@ -31,7 +30,6 @@ public class SqlOptionComparison : IOptionComparison
 
     public bool IgnoreWhiteSpacesInCode { get; set; }
     public bool ReloadComparisonOnUpdate { get; set; }
-
 
     public CaseSensityOptions CaseSensityInCode { get; set; }
 

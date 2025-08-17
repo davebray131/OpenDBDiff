@@ -71,15 +71,7 @@ namespace OpenDBDiff.SqlServer.Ui
 
         public string GetSourceServerName() => SourceControl.ServerName;
 
-        public IOption GetDefaultProjectOptions()
-        {
-            if (Option == null)
-            {
-                Option = new SqlOption();
-            }
-            return Option;
-        }
-
+        public IOption GetDefaultProjectOptions() => Option ??= new SqlOption();
         public void SetProjectOptions(IOption option)
         {
             if (option == null)

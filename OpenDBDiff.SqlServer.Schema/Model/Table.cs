@@ -64,9 +64,6 @@ public class Table : SQLServerSchemaBase, IComparable<Table>, ITable<Table>
 
     public SchemaList<TableOption, Table> Options { get; set; }
 
-    /// <summary>
-    /// Indica si la tabla tiene alguna columna que sea Identity.
-    /// </summary>
     public bool HasIdentityColumn => Columns.Any(r => r.IsIdentity);
 
     public bool HasFileStream
@@ -80,10 +77,6 @@ public class Table : SQLServerSchemaBase, IComparable<Table>, ITable<Table>
 
     public bool HasBlobColumn => Columns.Any(r => r.IsBLOB);
 
-    /// <summary>
-    /// Indica la cantidad de Constraints dependientes de otra tabla (FK) que tiene
-    /// la tabla.
-    /// </summary>
     public override int DependenciesCount
     {
         get
@@ -99,11 +92,6 @@ public class Table : SQLServerSchemaBase, IComparable<Table>, ITable<Table>
 
     #region IComparable<Table> Members
 
-    /// <summary>
-    /// Compara en primer orden por la operacion
-    /// (Primero van los Drops, luego los Create y finalesmente los Alter).
-    /// Si la operacion es la misma, ordena por cantidad de tablas dependientes.
-    /// </summary>
     public int CompareTo(Table other) => other == null
             ? throw new ArgumentNullException(nameof(other))
             : Status == other.Status ? DependenciesCount.CompareTo(other.DependenciesCount) : other.Status.CompareTo(Status);
@@ -112,17 +100,12 @@ public class Table : SQLServerSchemaBase, IComparable<Table>, ITable<Table>
 
     #region ITable<Table> Members
 
-    /// <summary>
-    /// Coleccion de campos de la tabla.
-    /// </summary>
+
     [SchemaNode("Columns", "Column")]
     public Columns<Table> Columns { get; set; }
 
     #endregion ITable<Table> Members
 
-    /// <summary>
-    /// Clona el objeto Table en una nueva instancia.
-    /// </summary>
     public override ISchemaBase Clone(ISchemaBase objectParent)
     {
         var table = new Table(objectParent)
@@ -153,9 +136,6 @@ public class Table : SQLServerSchemaBase, IComparable<Table>, ITable<Table>
 
     public override string ToSql() => ToSql(true);
 
-    /// <summary>
-    /// Devuelve el schema de la tabla en formato SQL.
-    /// </summary>
     public string ToSql(bool showFK)
     {
         Database database = null;
@@ -311,9 +291,6 @@ public class Table : SQLServerSchemaBase, IComparable<Table>, ITable<Table>
             }
     */
 
-    /// <summary>
-    /// Devuelve el schema de diferencias de la tabla en formato SQL.
-    /// </summary>
     public override SQLScriptList ToSqlDiff(ICollection<ISchemaBase> schemas)
     {
         var listDiff = new SQLScriptList();

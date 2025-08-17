@@ -10,34 +10,33 @@ internal class CompareTables : CompareBase<Table>
     {
         if (node.Status != ObjectStatus.Drop)
         {
-            var tablaOriginal = originFields[node.FullName];
-            tablaOriginal.OriginalTable = (Table)originFields[node.FullName].Clone((Database)tablaOriginal.Parent);
-            new CompareColumns().GenerateDifferences<Table>(tablaOriginal.Columns, node.Columns);
-            new CompareConstraints().GenerateDifferences<Table>(tablaOriginal.Constraints, node.Constraints);
-            new CompareIndexes().GenerateDifferences<Table>(tablaOriginal.Indexes, node.Indexes);
-            new CompareTablesOptions().GenerateDifferences<Table>(tablaOriginal.Options, node.Options);
-            new CompareTriggers().GenerateDifferences<Table>(tablaOriginal.Triggers, node.Triggers);
-            new CompareCLRTriggers().GenerateDifferences<Table>(tablaOriginal.CLRTriggers, node.CLRTriggers);
-            new CompareFullTextIndex().GenerateDifferences<Table>(tablaOriginal.FullTextIndex, node.FullTextIndex);
-            if (!Table.CompareFileGroup(tablaOriginal, node))
+            var tableOriginal = originFields[node.FullName];
+            tableOriginal.OriginalTable = (Table)originFields[node.FullName].Clone((Database)tableOriginal.Parent);
+            new CompareColumns().GenerateDifferences<Table>(tableOriginal.Columns, node.Columns);
+            new CompareConstraints().GenerateDifferences<Table>(tableOriginal.Constraints, node.Constraints);
+            new CompareIndexes().GenerateDifferences<Table>(tableOriginal.Indexes, node.Indexes);
+            new CompareTablesOptions().GenerateDifferences<Table>(tableOriginal.Options, node.Options);
+            new CompareTriggers().GenerateDifferences<Table>(tableOriginal.Triggers, node.Triggers);
+            new CompareCLRTriggers().GenerateDifferences<Table>(tableOriginal.CLRTriggers, node.CLRTriggers);
+            new CompareFullTextIndex().GenerateDifferences<Table>(tableOriginal.FullTextIndex, node.FullTextIndex);
+            if (!Table.CompareFileGroup(tableOriginal, node))
             {
-                tablaOriginal.FileGroup = node.FileGroup;
-                /*Esto solo aplica a las tablas heap, el resto hace el campo en el filegroup del indice clustered*/
-                if (!tablaOriginal.HasClusteredIndex)
+                tableOriginal.FileGroup = node.FileGroup;
+                if (!tableOriginal.HasClusteredIndex)
                 {
-                    tablaOriginal.Status = ObjectStatus.Rebuild;
+                    tableOriginal.Status = ObjectStatus.Rebuild;
                 }
             }
-            if (!Table.CompareFileGroupText(tablaOriginal, node))
+            if (!Table.CompareFileGroupText(tableOriginal, node))
             {
-                tablaOriginal.FileGroupText = node.FileGroupText;
-                tablaOriginal.Status = ObjectStatus.Rebuild;
+                tableOriginal.FileGroupText = node.FileGroupText;
+                tableOriginal.Status = ObjectStatus.Rebuild;
             }
-            if (node.HasChangeTracking != tablaOriginal.HasChangeTracking)
+            if (node.HasChangeTracking != tableOriginal.HasChangeTracking)
             {
-                tablaOriginal.HasChangeTracking = node.HasChangeTracking;
-                tablaOriginal.HasChangeTrackingTrackColumn = node.HasChangeTrackingTrackColumn;
-                tablaOriginal.Status += (int)ObjectStatus.Disabled;
+                tableOriginal.HasChangeTracking = node.HasChangeTracking;
+                tableOriginal.HasChangeTrackingTrackColumn = node.HasChangeTrackingTrackColumn;
+                tableOriginal.Status += (int)ObjectStatus.Disabled;
             }
         }
     }

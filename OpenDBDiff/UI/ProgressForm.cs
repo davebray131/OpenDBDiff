@@ -34,9 +34,9 @@ public partial class ProgressForm : Form
         Comparer = comparer;
     }
 
-    public Abstractions.Schema.Model.IDatabase Origin { get; private set; }
+    public IDatabase Origin { get; private set; }
 
-    public Abstractions.Schema.Model.IDatabase Destination { get; private set; }
+    public IDatabase Destination { get; private set; }
 
     public string ErrorLocation { get; private set; }
 

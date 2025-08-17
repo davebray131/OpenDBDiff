@@ -53,7 +53,7 @@ namespace OpenDBDiff.SqlServer.Ui
             this.groupBox1.ForeColor = System.Drawing.SystemColors.HotTrack;
             this.groupBox1.Location = new System.Drawing.Point(7, 3);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(310, 71);
+            this.groupBox1.Size = new System.Drawing.Size(346, 83);
             this.groupBox1.TabIndex = 0;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Filter";
@@ -62,7 +62,7 @@ namespace OpenDBDiff.SqlServer.Ui
             // 
             this.label2.AutoSize = true;
             this.label2.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.label2.Location = new System.Drawing.Point(7, 43);
+            this.label2.Location = new System.Drawing.Point(13, 52);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(68, 13);
             this.label2.TabIndex = 3;
@@ -74,25 +74,25 @@ namespace OpenDBDiff.SqlServer.Ui
             | System.Windows.Forms.AnchorStyles.Right)));
             this.cboObjects.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cboObjects.FormattingEnabled = true;
-            this.cboObjects.Location = new System.Drawing.Point(82, 40);
+            this.cboObjects.Location = new System.Drawing.Point(88, 49);
             this.cboObjects.Name = "cboObjects";
-            this.cboObjects.Size = new System.Drawing.Size(223, 21);
+            this.cboObjects.Size = new System.Drawing.Size(247, 21);
             this.cboObjects.TabIndex = 2;
             // 
             // txtFilter
             // 
             this.txtFilter.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.txtFilter.Location = new System.Drawing.Point(82, 13);
+            this.txtFilter.Location = new System.Drawing.Point(88, 19);
             this.txtFilter.Name = "txtFilter";
-            this.txtFilter.Size = new System.Drawing.Size(222, 20);
+            this.txtFilter.Size = new System.Drawing.Size(247, 20);
             this.txtFilter.TabIndex = 1;
             // 
             // label1
             // 
             this.label1.AutoSize = true;
             this.label1.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.label1.Location = new System.Drawing.Point(6, 16);
+            this.label1.Location = new System.Drawing.Point(12, 22);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(69, 13);
             this.label1.TabIndex = 0;
@@ -101,7 +101,7 @@ namespace OpenDBDiff.SqlServer.Ui
             // ApplyButton
             // 
             this.ApplyButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.ApplyButton.Location = new System.Drawing.Point(242, 80);
+            this.ApplyButton.Location = new System.Drawing.Point(278, 92);
             this.ApplyButton.Name = "ApplyButton";
             this.ApplyButton.Size = new System.Drawing.Size(75, 23);
             this.ApplyButton.TabIndex = 1;
@@ -113,7 +113,7 @@ namespace OpenDBDiff.SqlServer.Ui
             // 
             this.CancelFormButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.CancelFormButton.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this.CancelFormButton.Location = new System.Drawing.Point(161, 80);
+            this.CancelFormButton.Location = new System.Drawing.Point(197, 92);
             this.CancelFormButton.Name = "CancelFormButton";
             this.CancelFormButton.Size = new System.Drawing.Size(75, 23);
             this.CancelFormButton.TabIndex = 2;
@@ -127,7 +127,7 @@ namespace OpenDBDiff.SqlServer.Ui
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.CancelButton = this.CancelFormButton;
-            this.ClientSize = new System.Drawing.Size(324, 107);
+            this.ClientSize = new System.Drawing.Size(360, 119);
             this.ControlBox = false;
             this.Controls.Add(this.CancelFormButton);
             this.Controls.Add(this.ApplyButton);

@@ -40,31 +40,15 @@ public class FullText(ISchemaBase parent) : SQLServerSchemaBase(parent, ObjectTy
         return sql + "GO\r\n";
     }
 
-    private string ToSqlAlterDefault()
-    {
-        if (IsDefault)
-        {
-            var sql = $"ALTER FULLTEXT CATALOG {FullName}\r\n";
-            sql += "AS DEFAULT";
-            sql += "\r\nGO\r\n";
-            return sql;
-        }
-        return string.Empty;
-    }
-
-    private string ToSqlAlterOwner()
-    {
-
-        var sql = $"ALTER AUTHORIZATION ON FULLTEXT CATALOG::{FullName}\r\n";
-        sql += $"TO [{Owner}]\r\nGO\r\n";
-        return sql;
-    }
+    private string ToSqlAlterDefault() =>
+        IsDefault ? $"ALTER FULLTEXT CATALOG {FullName} AS DEFAULT\r\nGO\r\n" : string.Empty;
+    private string ToSqlAlterOwner() =>
+        $"ALTER AUTHORIZATION ON FULLTEXT CATALOG::{FullName}\r\nTO [{Owner}]\r\nGO\r\n";
 
     private string ToSqlAlter()
     {
         var sql = $"ALTER FULLTEXT CATALOG {FullName}\r\n";
-        sql += "REBUILD WITH ACCENT_SENSITIVITY = ";
-        sql += IsAccentSensity ? "ON" : "OFF";
+        sql += $"REBUILD WITH ACCENT_SENSITIVITY = {OnOff(IsAccentSensity)}";
         sql += "\r\nGO\r\n";
         return sql;
     }

@@ -19,14 +19,13 @@ public class GenerateRules(Generate root)
             using var reader = command.ExecuteReader();
             while (reader.Read())
             {
-                var item = new Rule(database)
+                database.Rules.Add(new Rule(database)
                 {
                     Id = (int)reader["object_id"],
                     Name = reader["Name"].ToString(),
                     Owner = reader["Owner"].ToString(),
                     Text = reader["Definition"].ToString()
-                };
-                database.Rules.Add(item);
+                });
             }
         }
     }

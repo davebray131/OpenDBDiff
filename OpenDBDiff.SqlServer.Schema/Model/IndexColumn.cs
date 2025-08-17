@@ -42,9 +42,5 @@ public class IndexColumn(ISchemaBase parentObject) : SQLServerSchemaBase(parentO
     public override string ToSql() => string.Empty;
 
     public int CompareTo(IndexColumn other) =>
-        /*if (other.Name.Equals(this.Name))
-{*/
-        other.IsIncluded == IsIncluded ? KeyOrder.CompareTo(other.KeyOrder) : other.IsIncluded.CompareTo(IsIncluded);/*}
-else
-return this.Name.CompareTo(other.Name);*/
+        other.IsIncluded == IsIncluded ? KeyOrder.CompareTo(other.KeyOrder) : other.IsIncluded.CompareTo(IsIncluded);
 }

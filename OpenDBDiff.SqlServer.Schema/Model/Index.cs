@@ -95,62 +95,18 @@ public class Index(ISchemaBase parent) : SQLServerSchemaBase(parent, ObjectType.
             throw new ArgumentNullException(nameof(origin));
         }
 
-        if (origin.AllowPageLocks != destination.AllowPageLocks)
-        {
-            return false;
-        }
-
-        if (origin.AllowRowLocks != destination.AllowRowLocks)
-        {
-            return false;
-        }
-
-        if (origin.FillFactor != destination.FillFactor)
-        {
-            return false;
-        }
-
-        if (origin.IgnoreDupKey != destination.IgnoreDupKey)
-        {
-            return false;
-        }
-
-        if (origin.IsAutoStatistics != destination.IsAutoStatistics)
-        {
-            return false;
-        }
-
-        if (origin.IsPadded != destination.IsPadded)
-        {
-            return false;
-        }
-
-        if (origin.IsPrimaryKey != destination.IsPrimaryKey)
-        {
-            return false;
-        }
-
-        if (origin.IsUniqueKey != destination.IsUniqueKey)
-        {
-            return false;
-        }
-
-        if (origin.Type != destination.Type)
-        {
-            return false;
-        }
-
-        if (origin.SortInTempDb != destination.SortInTempDb)
-        {
-            return false;
-        }
-
-        if (!origin.FilterDefintion.Equals(destination.FilterDefintion))
-        {
-            return false;
-        }
-
-        if (!IndexColumns.Compare(origin.Columns, destination.Columns))
+        if (origin.AllowPageLocks != destination.AllowPageLocks ||
+           origin.AllowRowLocks != destination.AllowRowLocks ||
+           origin.FillFactor != destination.FillFactor ||
+           origin.IgnoreDupKey != destination.IgnoreDupKey ||
+           origin.IsAutoStatistics != destination.IsAutoStatistics ||
+           origin.IsPadded != destination.IsPadded ||
+           origin.IsPrimaryKey != destination.IsPrimaryKey ||
+           origin.IsUniqueKey != destination.IsUniqueKey ||
+           origin.Type != destination.Type ||
+           origin.SortInTempDb != destination.SortInTempDb ||
+           !origin.FilterDefintion.Equals(destination.FilterDefintion) ||
+           !IndexColumns.Compare(origin.Columns, destination.Columns))
         {
             return false;
         }
@@ -192,7 +148,7 @@ public class Index(ISchemaBase parent) : SQLServerSchemaBase(parent, ObjectType.
         var isAzure10 = database.Info.Version == DatabaseInfo.SQLServerVersion.SQLServerAzure10;
 
         var sql = new StringBuilder();
-        var includes = "";
+        var includes = string.Empty;
         if ((Type == IndexTypeEnum.Clustered) && IsUniqueKey)
         {
             sql.Append("CREATE UNIQUE CLUSTERED ");

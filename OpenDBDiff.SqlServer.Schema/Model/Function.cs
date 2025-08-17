@@ -22,8 +22,8 @@ public class Function(ISchemaBase parent) : Code(parent, ObjectType.Function, Sc
             Guid = Guid,
             IsSchemaBinding = IsSchemaBinding
         };
-        DependenciesIn.ForEach(dep => item.DependenciesIn.Add(dep));
-        DependenciesOut.ForEach(dep => item.DependenciesOut.Add(dep));
+        DependenciesIn.ForEach(item.DependenciesIn.Add);
+        DependenciesOut.ForEach(item.DependenciesOut.Add);
         return item;
     }
 
