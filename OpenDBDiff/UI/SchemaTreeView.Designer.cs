@@ -36,17 +36,19 @@ namespace OpenDBDiff.UI
             this.chkNew = new System.Windows.Forms.CheckBox();
             this.chkDifferent = new System.Windows.Forms.CheckBox();
             this.chkShowUnchangedItems = new System.Windows.Forms.CheckBox();
+            this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
+            this.tableLayoutPanel1.SuspendLayout();
             this.SuspendLayout();
             // 
             // treeView1
             // 
-            this.treeView1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
+            this.treeView1.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.treeView1.CheckBoxes = true;
-            this.treeView1.Location = new System.Drawing.Point(0, 50);
+            this.tableLayoutPanel1.SetColumnSpan(this.treeView1, 2);
+            this.treeView1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.treeView1.Location = new System.Drawing.Point(3, 51);
             this.treeView1.Name = "treeView1";
-            this.treeView1.Size = new System.Drawing.Size(262, 150);
+            this.treeView1.Size = new System.Drawing.Size(245, 59);
             this.treeView1.TabIndex = 0;
             this.treeView1.AfterCheck += new System.Windows.Forms.TreeViewEventHandler(this.TreeView1_AfterCheck);
             this.treeView1.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.TreeView1_AfterSelect);
@@ -56,7 +58,8 @@ namespace OpenDBDiff.UI
             this.chkOld.AutoSize = true;
             this.chkOld.Checked = true;
             this.chkOld.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.chkOld.Location = new System.Drawing.Point(141, 27);
+            this.chkOld.Location = new System.Drawing.Point(128, 26);
+            this.chkOld.Margin = new System.Windows.Forms.Padding(3, 3, 3, 5);
             this.chkOld.Name = "chkOld";
             this.chkOld.Size = new System.Drawing.Size(117, 17);
             this.chkOld.TabIndex = 1;
@@ -69,7 +72,8 @@ namespace OpenDBDiff.UI
             this.chkNew.AutoSize = true;
             this.chkNew.Checked = true;
             this.chkNew.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.chkNew.Location = new System.Drawing.Point(4, 27);
+            this.chkNew.Location = new System.Drawing.Point(3, 26);
+            this.chkNew.Margin = new System.Windows.Forms.Padding(3, 3, 3, 5);
             this.chkNew.Name = "chkNew";
             this.chkNew.Size = new System.Drawing.Size(103, 17);
             this.chkNew.TabIndex = 2;
@@ -82,9 +86,9 @@ namespace OpenDBDiff.UI
             this.chkDifferent.AutoSize = true;
             this.chkDifferent.Checked = true;
             this.chkDifferent.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.chkDifferent.Location = new System.Drawing.Point(141, 4);
+            this.chkDifferent.Location = new System.Drawing.Point(128, 3);
             this.chkDifferent.Name = "chkDifferent";
-            this.chkDifferent.Size = new System.Drawing.Size(125, 17);
+            this.chkDifferent.Size = new System.Drawing.Size(120, 17);
             this.chkDifferent.TabIndex = 3;
             this.chkDifferent.Text = "Show changed items";
             this.chkDifferent.UseVisualStyleBackColor = true;
@@ -95,27 +99,44 @@ namespace OpenDBDiff.UI
             this.chkShowUnchangedItems.AutoSize = true;
             this.chkShowUnchangedItems.Checked = true;
             this.chkShowUnchangedItems.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.chkShowUnchangedItems.Location = new System.Drawing.Point(3, 4);
+            this.chkShowUnchangedItems.Location = new System.Drawing.Point(3, 3);
             this.chkShowUnchangedItems.Name = "chkShowUnchangedItems";
-            this.chkShowUnchangedItems.Size = new System.Drawing.Size(137, 17);
+            this.chkShowUnchangedItems.Size = new System.Drawing.Size(119, 17);
             this.chkShowUnchangedItems.TabIndex = 4;
             this.chkShowUnchangedItems.Text = "Show unchanged items";
             this.chkShowUnchangedItems.UseVisualStyleBackColor = true;
             this.chkShowUnchangedItems.CheckedChanged += new System.EventHandler(this.FilterCheckbox_CheckedChanged);
             // 
+            // tableLayoutPanel1
+            // 
+            this.tableLayoutPanel1.ColumnCount = 2;
+            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
+            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.tableLayoutPanel1.Controls.Add(this.chkShowUnchangedItems, 0, 0);
+            this.tableLayoutPanel1.Controls.Add(this.treeView1, 0, 2);
+            this.tableLayoutPanel1.Controls.Add(this.chkOld, 1, 1);
+            this.tableLayoutPanel1.Controls.Add(this.chkNew, 0, 1);
+            this.tableLayoutPanel1.Controls.Add(this.chkDifferent, 1, 0);
+            this.tableLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.tableLayoutPanel1.Location = new System.Drawing.Point(0, 0);
+            this.tableLayoutPanel1.Name = "tableLayoutPanel1";
+            this.tableLayoutPanel1.RowCount = 3;
+            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
+            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
+            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
+            this.tableLayoutPanel1.Size = new System.Drawing.Size(251, 113);
+            this.tableLayoutPanel1.TabIndex = 5;
+            // 
             // SchemaTreeView
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.Controls.Add(this.chkShowUnchangedItems);
-            this.Controls.Add(this.chkDifferent);
-            this.Controls.Add(this.chkNew);
-            this.Controls.Add(this.chkOld);
-            this.Controls.Add(this.treeView1);
+            this.Controls.Add(this.tableLayoutPanel1);
             this.Name = "SchemaTreeView";
-            this.Size = new System.Drawing.Size(266, 203);
+            this.Size = new System.Drawing.Size(251, 113);
+            this.tableLayoutPanel1.ResumeLayout(false);
+            this.tableLayoutPanel1.PerformLayout();
             this.ResumeLayout(false);
-            this.PerformLayout();
 
         }
 
@@ -126,5 +147,6 @@ namespace OpenDBDiff.UI
         private CheckBox chkNew;
         private CheckBox chkDifferent;
         private CheckBox chkShowUnchangedItems;
+        private TableLayoutPanel tableLayoutPanel1;
     }
 }

@@ -264,13 +264,13 @@ public partial class MainForm : Form
             Cursor = Cursors.WaitCursor;
             _selectedSchemas = schemaTree.GetCheckedSchemas();
             StartComparison();
-            //schemaTreeView1.SetCheckedSchemas(_selectedSchemas);  // If you want to recall last schemas
-            schemaTree.SelectAllSchemas(); // If you want to select all schemas after a compare
+            schemaTree.SetCheckedSchemas(_selectedSchemas);  // If you want to recall last schemas
+            //schemaTree.SelectAllSchemas(); // If you want to select all schemas after a compare
             errorLocation = "Saving Connections";
             Project.SaveLastConfiguration(LeftDatabaseSelector.ConnectionString, RightDatabaseSelector.ConnectionString);
 
             // Auto select the script tab
-            tabControl1.SelectedIndex = 1;
+            //tabControl1.SelectedIndex = 1;
         }
         catch (Exception ex)
         {
