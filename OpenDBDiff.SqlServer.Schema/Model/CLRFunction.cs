@@ -15,7 +15,7 @@ public class CLRFunction(ISchemaBase parent) : CLRCode(parent, ObjectType.CLRFun
     {
         var sql = new StringBuilder();
         sql.Append($"CREATE FUNCTION {FullName}");
-        var param = "";
+        var param = string.Empty;
         Parameters.ForEach(item => param += item.ToSql() + ",");
         if (!string.IsNullOrEmpty(param))
         {

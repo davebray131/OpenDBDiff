@@ -48,7 +48,7 @@ public class Index(ISchemaBase parent) : SQLServerSchemaBase(parent, ObjectType.
 
     public bool SortInTempDb { get; set; }
 
-    public string FilterDefintion { get; set; } = "";
+    public string FilterDefintion { get; set; } = string.Empty;
 
     public IndexColumns Columns { get; set; } = new IndexColumns(parent);
 

@@ -11,8 +11,8 @@ public class Column : SQLServerSchemaBase, IComparable<Column>
     public Column(ISchemaBase parent)
         : base(parent, ObjectType.Column)
     {
-        ComputedFormula = "";
-        Collation = "";
+        ComputedFormula = string.Empty;
+        Collation = string.Empty;
         Default = new Default(this);
         Rule = new Rule(this);
         DefaultConstraint = null;
@@ -243,7 +243,7 @@ public class Column : SQLServerSchemaBase, IComparable<Column>
     /// </summary>
     public string ToXML()
     {
-        /*string xml = "";
+        /*string xml = string.Empty;
         xml += "<COLUMN name=\"" + Name + "\" HasIndexDependencies=\"" + (hasIndexDependencies ? "1" : "0") + "\" HasComputedDependencies=\"" + (hasComputedDependencies ? "1" : "0") + "\" IsRowGuid=\"" + (isRowGuid ? "1" : "0") + "\" IsComputed=\"" + (isComputed ? "1" : "0") + "\" computedFormula=\"" + computedFormula + "\">\n";
         xml += "<TYPE>" + type + "</TYPE>";
         xml += "<ORIGINALTYPE>" + OriginalType + "</ORIGINALTYPE>";
@@ -350,9 +350,9 @@ public class Column : SQLServerSchemaBase, IComparable<Column>
 
     public string ToSQLRedefine(string type, int size, string xmlSchema)
     {
-        var originalType = "";
+        var originalType = string.Empty;
         var originalSize = 0;
-        var originalXMLSchema = "";
+        var originalXMLSchema = string.Empty;
 
         string sql;
 
@@ -396,7 +396,7 @@ public class Column : SQLServerSchemaBase, IComparable<Column>
     /// </summary>
     public string ToSql(bool sqlConstraint)
     {
-        var sql = "";
+        var sql = string.Empty;
         sql += $"[{Name}] ";
         if (!IsComputed)
         {

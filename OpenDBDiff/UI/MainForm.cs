@@ -566,7 +566,7 @@ public partial class MainForm : Form
         {
             scintilla.InitializeScintillaControls();
         }
-        txtSyncScript.Text = "";
+        txtSyncScript.Text = string.Empty;
         txtSyncScript.SetMarginWidth();
     }
 
@@ -652,8 +652,8 @@ public partial class MainForm : Form
             if ((ActiveProject?.Id).HasValue && ActiveProject.Id == itemSelected.Id)
             {
                 ActiveProject = null;
-                LeftDatabaseSelector.ConnectionString = "";
-                RightDatabaseSelector.ConnectionString = "";
+                LeftDatabaseSelector.ConnectionString = string.Empty;
+                RightDatabaseSelector.ConnectionString = string.Empty;
             }
         }
         catch (Exception ex)

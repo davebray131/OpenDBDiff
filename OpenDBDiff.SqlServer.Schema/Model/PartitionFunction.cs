@@ -95,7 +95,7 @@ public class PartitionFunction(ISchemaBase parent) : SQLServerSchemaBase(parent,
 
         sql += " FOR VALUES (";
 
-        var sqlvalues = "";
+        var sqlvalues = string.Empty;
         var valueType = ValueItem(Type);
 
         if (valueType == IS_STRING)

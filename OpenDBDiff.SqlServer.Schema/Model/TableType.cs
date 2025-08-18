@@ -43,7 +43,7 @@ public class TableType : SQLServerSchemaBase, ITable<TableType>
 
     public override string ToSql()
     {
-        var sql = "";
+        var sql = string.Empty;
         if (Columns.Any())
         {
             sql += "CREATE TYPE " + FullName + " AS TABLE\r\n(\r\n";

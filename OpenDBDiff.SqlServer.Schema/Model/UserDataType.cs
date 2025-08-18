@@ -176,7 +176,7 @@ public class UserDataType : SQLServerSchemaBase
 
     private string ToSQLAddBinds()
     {
-        var sql = "";
+        var sql = string.Empty;
         if (!string.IsNullOrEmpty(Default.Name))
         {
             sql += Default.ToSQLAddBind();

@@ -114,8 +114,8 @@ public partial class SqlServerConnectFront : UserControl, IFront
                 UseWindowsAuthentication = builder.IntegratedSecurity;
                 if (UseWindowsAuthentication)
                 {
-                    UserName = "";
-                    Password = "";
+                    UserName = string.Empty;
+                    Password = string.Empty;
                 }
                 else
                 {
@@ -127,10 +127,10 @@ public partial class SqlServerConnectFront : UserControl, IFront
             else
             {
                 cboAuthentication.SelectedIndex = 1;
-                UserName = "";
-                Password = "";
+                UserName = string.Empty;
+                Password = string.Empty;
                 ServerName = "(local)";
-                DatabaseName = "";
+                DatabaseName = string.Empty;
             }
         }
     }

@@ -63,7 +63,7 @@ public class Generate
     /// </summary>
     public Database Process()
     {
-        var error = "";
+        var error = string.Empty;
         var databaseSchema = new Database
         {
             //tables.OnTableProgress += new Progress.ProgressHandler(tables_OnTableProgress);

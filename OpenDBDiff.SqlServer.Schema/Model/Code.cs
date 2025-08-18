@@ -12,7 +12,7 @@ namespace OpenDBDiff.SqlServer.Schema.Model;
 public abstract class Code : SQLServerSchemaBase, ICode
 {
     protected string sql = null;
-    protected string typeName = "";
+    protected string typeName = string.Empty;
     private readonly int deepMax = 0;
     private readonly int deepMin = 0;
     private readonly ScriptAction addAction;

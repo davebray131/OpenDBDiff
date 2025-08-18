@@ -38,7 +38,7 @@ public class FileGroupFile(ISchemaBase parent) : SQLServerSchemaBase(parent, Obj
 
     private string GetNameNewFileGroup(string path)
     {
-        var result = "";
+        var result = string.Empty;
         var flies = path.Split('\\');
         for (var index = 0; index < flies.Length - 1; index++)
         {

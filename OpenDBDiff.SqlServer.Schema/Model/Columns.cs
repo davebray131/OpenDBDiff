@@ -30,10 +30,10 @@ public class Columns<T>(T parent) : SchemaList<Column, T>(parent) where T : ISch
 
     public override SQLScriptList ToSqlDiff(System.Collections.Generic.ICollection<ISchemaBase> schemas)
     {
-        var sqlDrop = "";
-        var sqlAdd = "";
-        var sqlCons = "";
-        var sqlBinds = "";
+        var sqlDrop = string.Empty;
+        var sqlAdd = string.Empty;
+        var sqlCons = string.Empty;
+        var sqlBinds = string.Empty;
         var list = new SQLScriptList();
         if (Parent.Status != ObjectStatus.Rebuild)
         {

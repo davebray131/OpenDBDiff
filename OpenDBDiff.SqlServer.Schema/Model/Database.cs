@@ -168,7 +168,7 @@ public class Database : SQLServerSchemaBase, IDatabase
 
     public override string ToSql()
     {
-        var sql = "";
+        var sql = string.Empty;
         sql += FileGroups.ToSql();
         sql += Schemas.ToSql();
         sql += XmlSchemas.ToSql();
@@ -279,7 +279,7 @@ public class Database : SQLServerSchemaBase, IDatabase
             var type = typeVal.Value;
 
 
-            var parentName = "";
+            var parentName = string.Empty;
 
             switch (type)
             {

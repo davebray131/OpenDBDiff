@@ -11,7 +11,7 @@ public class CLRStoredProcedure(ISchemaBase parent) : CLRCode(parent, ObjectType
     public override string ToSql()
     {
         var sql = $"CREATE PROCEDURE {FullName}\r\n";
-        var param = "";
+        var param = string.Empty;
         Parameters.ForEach(item => param += "\t" + item.ToSql() + ",\r\n");
         if (!string.IsNullOrEmpty(param))
         {

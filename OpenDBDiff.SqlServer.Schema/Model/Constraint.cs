@@ -193,7 +193,7 @@ public class Constraint : SQLServerSchemaBase
             current = current.Parent;
         }
         var isAzure10 = database.Info.Version == DatabaseInfo.SQLServerVersion.SQLServerAzure10;
-        //string typeConstraint = "";
+        //string typeConstraint = string.Empty;
         var sql = new StringBuilder();
         _ = Parent.ObjectType != ObjectType.TableType ? sql.Append($"CONSTRAINT [{Name}] ") : sql.Append("\t");
 
@@ -342,7 +342,7 @@ public class Constraint : SQLServerSchemaBase
         }
         if (Type == ConstraintType.Check)
         {
-            var sqlcheck = "";
+            var sqlcheck = string.Empty;
             if (Parent.ObjectType != ObjectType.TableType)
             {
                 sqlcheck = $"CONSTRAINT [{Name}] ";
