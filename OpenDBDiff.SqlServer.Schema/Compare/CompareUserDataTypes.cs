@@ -13,7 +13,7 @@ internal class CompareUserDataTypes : CompareBase<UserDataType>
         var HasAssembly = originFields.Exists(item => item.AssemblyFullName.Equals(node.AssemblyFullName) && item.IsAssembly);
         if (HasAssembly)
         {
-            newNode.Status += (int)ObjectStatus.DropOlder;
+            newNode.Status |= ObjectStatus.DropOlder;
         }
 
         originFields.Add(newNode);
@@ -29,7 +29,6 @@ internal class CompareUserDataTypes : CompareBase<UserDataType>
             if (!UserDataType.CompareDefault(node, originFields[node.FullName]))
             {
                 newNode.Default.Status = !string.IsNullOrEmpty(node.Default.Name) ? ObjectStatus.Create : ObjectStatus.Drop;
-
                 newNode.Status = ObjectStatus.Alter;
             }
             else
@@ -37,7 +36,6 @@ internal class CompareUserDataTypes : CompareBase<UserDataType>
                 if (!UserDataType.CompareRule(node, originFields[node.FullName]))
                 {
                     newNode.Rule.Status = !string.IsNullOrEmpty(node.Rule.Name) ? ObjectStatus.Create : ObjectStatus.Drop;
-
                     newNode.Status = ObjectStatus.Alter;
                 }
                 else

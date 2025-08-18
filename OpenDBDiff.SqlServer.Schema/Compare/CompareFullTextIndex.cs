@@ -20,11 +20,11 @@ internal class CompareFullTextIndex : CompareBase<FullTextIndex>
             var newNode = (FullTextIndex)node.Clone(originFields.Parent);
             if (node.IsDisabled != originFields[node.FullName].IsDisabled)
             {
-                newNode.Status += (int)ObjectStatus.Disabled;
+                newNode.Status |= ObjectStatus.Disabled;
             }
             else
             {
-                newNode.Status += (int)ObjectStatus.Alter;
+                newNode.Status |= ObjectStatus.Alter;
             }
 
             originFields[node.FullName] = newNode;

@@ -36,7 +36,7 @@ internal class CompareTables : CompareBase<Table>
             {
                 tableOriginal.HasChangeTracking = node.HasChangeTracking;
                 tableOriginal.HasChangeTrackingTrackColumn = node.HasChangeTrackingTrackColumn;
-                tableOriginal.Status += (int)ObjectStatus.Disabled;
+                tableOriginal.Status |= ObjectStatus.Disabled;
             }
         }
     }

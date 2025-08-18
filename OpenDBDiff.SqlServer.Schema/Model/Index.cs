@@ -148,68 +148,50 @@ public class Index(ISchemaBase parent) : SQLServerSchemaBase(parent, ObjectType.
         var isAzure10 = database.Info.Version == DatabaseInfo.SQLServerVersion.SQLServerAzure10;
 
         var sql = new StringBuilder();
-        var includes = string.Empty;
-        if ((Type == IndexTypeEnum.Clustered) && IsUniqueKey)
-        {
-            sql.Append("CREATE UNIQUE CLUSTERED ");
-        }
+        List<string> includes = [];
+        List<string> indexColumns = [];
 
-        if ((Type == IndexTypeEnum.Clustered) && (!IsUniqueKey))
-        {
-            sql.Append("CREATE CLUSTERED ");
-        }
+        var unique = IsUniqueKey ? "UNIQUE " : string.Empty;
 
-        if ((Type == IndexTypeEnum.Nonclustered) && IsUniqueKey)
+        sql.Append(Type switch
         {
-            sql.Append("CREATE UNIQUE NONCLUSTERED ");
-        }
+            IndexTypeEnum.Clustered => $"CREATE {unique}CLUSTERED ",
+            IndexTypeEnum.Nonclustered => $"CREATE {unique}NONCLUSTERED ",
+            IndexTypeEnum.XML => "CREATE PRIMARY XML",
+            _ => throw new NotImplementedException()
+        });
 
-        if ((Type == IndexTypeEnum.Nonclustered) && (!IsUniqueKey))
-        {
-            sql.Append("CREATE NONCLUSTERED ");
-        }
+        sql.AppendLine($"INDEX [{Name}] ON {Parent.FullName}");
+        sql.AppendLine("(");
 
-        if (Type == IndexTypeEnum.XML)
-        {
-            sql.Append("CREATE PRIMARY XML ");
-        }
-
-        sql.AppendLine($"INDEX [{Name}] ON {Parent.FullName}\r\n(");
-        /*Ordena la coleccion de campos del Indice en funcion de la propieda IsIncluded*/
         Columns.Sort();
         for (var j = 0; j < Columns.Count; j++)
         {
+            var columnName = $"[{Columns[j].Name}]";
+
             if (!Columns[j].IsIncluded)
             {
-                sql.Append("\t[" + Columns[j].Name + "]");
+                var order = Columns[j].Order ? "DESC" : "ASC";
+
                 if (Type != IndexTypeEnum.XML)
                 {
-                    _ = Columns[j].Order ? sql.Append(" DESC") : sql.Append(" ASC");
+                    indexColumns.Add($"\t{columnName} {order}");
                 }
-                if (j < Columns.Count - 1)
-                {
-                    sql.Append(",");
-                }
-
-                sql.AppendLine();
             }
             else
             {
-                if (string.IsNullOrEmpty(includes))
-                {
-                    includes = ") INCLUDE (";
-                }
-
-                includes += $"[{Columns[j].Name}],";
+                includes.Add(columnName);
             }
         }
-        if (!string.IsNullOrEmpty(includes))
-        {
-            includes = includes.Substring(0, includes.Length - 1);
-        }
 
-        sql.Append(includes);
+        sql.AppendLine(string.Join("\r\n", indexColumns));
+
+        if (includes.Count > 0)
+        {
+            sql.Append(") INCLUDE (").Append(string.Join(",", includes));
+        }
         sql.Append(")");
+
         if (!string.IsNullOrEmpty(FilterDefintion))
         {
             sql.AppendLine($"\r\n WHERE {FilterDefintion}");
@@ -251,12 +233,9 @@ public class Index(ISchemaBase parent) : SQLServerSchemaBase(parent, ObjectType.
             sql.Append($" WITH ({string.Join(", ", withList)})");
         }
 
-        if (!isAzure10)
+        if (!isAzure10 && !string.IsNullOrEmpty(FileGroup))
         {
-            if (!string.IsNullOrEmpty(FileGroup))
-            {
-                sql.Append($" ON [{FileGroup}]");
-            }
+            sql.Append($" ON [{FileGroup}]");
         }
         sql.AppendLine("\r\nGO");
         if (IsDisabled)

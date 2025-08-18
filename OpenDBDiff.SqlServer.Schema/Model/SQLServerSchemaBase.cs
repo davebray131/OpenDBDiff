@@ -5,6 +5,7 @@ namespace OpenDBDiff.SqlServer.Schema.Model;
 
 public abstract class SQLServerSchemaBase : SchemaBase, ISQLServerSchemaBase
 {
+    protected const string GO = "GO\r\n";
     protected SQLServerSchemaBase(ISchemaBase parent, ObjectType objectType) : base("[", "]", objectType)
     {
         Parent = parent;

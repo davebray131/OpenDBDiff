@@ -74,7 +74,6 @@ public class Assembly : Code
         {
             access = "UNSAFE";
         }
-
         if (PermissionSet.Equals("SAFE_ACCESS"))
         {
             access = "SAFE";

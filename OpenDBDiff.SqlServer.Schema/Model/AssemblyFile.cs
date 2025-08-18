@@ -1,4 +1,5 @@
-﻿using OpenDBDiff.Abstractions.Schema;
+﻿using System.Text;
+using OpenDBDiff.Abstractions.Schema;
 using OpenDBDiff.Abstractions.Schema.Model;
 
 namespace OpenDBDiff.SqlServer.Schema.Model;
@@ -26,20 +27,18 @@ public class AssemblyFile : SQLServerSchemaBase
 
     public override string ToSqlAdd()
     {
-        var sql = $"ALTER ASSEMBLY {Parent.FullName}\r\n";
-        sql += $"ADD FILE FROM {Content}\r\n";
-        sql += $"AS N'{Name}'\r\n";
-        return $"{sql}GO\r\n";
+        var sql = new StringBuilder();
+        sql.AppendLine($"ALTER ASSEMBLY {Parent.FullName}");
+        sql.AppendLine($"ADD FILE FROM {Content}");
+        sql.AppendLine($"AS N'{Name}'");
+        sql.AppendLine(GO);
+        return sql.ToString();
     }
 
     public override string ToSql() => ToSqlAdd();
 
-    public override string ToSqlDrop()
-    {
-        var sql = $"ALTER ASSEMBLY {Parent.FullName}\r\n";
-        sql += $"DROP FILE N'{Name}'\r\n";
-        return $"{sql}GO\r\n";
-    }
+    public override string ToSqlDrop() =>
+        $"ALTER ASSEMBLY {Parent.FullName}\r\nDROP FILE N'{Name}'\r\n{GO}";
 
     public override SQLScriptList ToSqlDiff(System.Collections.Generic.ICollection<ISchemaBase> schemas)
     {

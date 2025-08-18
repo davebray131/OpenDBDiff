@@ -1,4 +1,6 @@
-﻿using OpenDBDiff.Abstractions.Schema;
+﻿using System.Linq;
+using System.Text;
+using OpenDBDiff.Abstractions.Schema;
 using OpenDBDiff.Abstractions.Schema.Attributes;
 using OpenDBDiff.Abstractions.Schema.Model;
 using OpenDBDiff.SqlServer.Schema.Model.Util;
@@ -15,9 +17,6 @@ public class View : Code
         CLRTriggers = new SchemaList<CLRTrigger, View>(this, ((Database)parent).AllObjects);
     }
 
-    /// <summary>
-    /// Clona el objeto en una nueva instancia.
-    /// </summary>
     public override ISchemaBase Clone(ISchemaBase parent)
     {
         var item = new View(parent)
@@ -49,28 +48,21 @@ public class View : Code
 
     public override string ToSqlAdd()
     {
-        var sql = ToSql();
-        Indexes.ForEach(item =>
-            {
-                if (item.Status != ObjectStatus.Drop)
-                {
-                    item.SetWasInsertInDiffList(ScriptAction.AddIndex);
-                    sql += item.ToSql();
-                }
-            }
-        );
-        Triggers.ForEach(item =>
-            {
-                if (item.Status != ObjectStatus.Drop)
-                {
-                    item.SetWasInsertInDiffList(ScriptAction.AddTrigger);
-                    sql += item.ToSql();
-                }
-            }
-        );
+        var sql = new StringBuilder();
+        sql.Append(ToSql());
+        foreach (var item in Indexes.Where(r => r.Status != ObjectStatus.Drop))
+        {
+            item.SetWasInsertInDiffList(ScriptAction.AddIndex);
+            sql.Append(item.ToSql());
+        }
+        foreach (var item in Triggers.Where(r => r.Status != ObjectStatus.Drop))
+        {
+            item.SetWasInsertInDiffList(ScriptAction.AddTrigger);
+            sql.Append(item.ToSql());
+        }
 
-        sql += ExtendedProperties.ToSql();
-        return sql;
+        sql.Append(ExtendedProperties.ToSql());
+        return sql.ToString();
     }
 
     public string ToSQLAlter() => ToSQLAlter(false);

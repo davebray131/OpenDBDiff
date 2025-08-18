@@ -36,16 +36,16 @@ internal class CompareFunctions : CompareBase<Function>
             newNode.Status = ObjectStatus.Alter;
             if (newNode.IsSchemaBinding)
             {
-                newNode.Status += (int)ObjectStatus.RebuildDependencies;
+                newNode.Status |= ObjectStatus.RebuildDependencies;
             }
 
             if (newNode.HasToRebuild)
             {
-                newNode.Status += (int)ObjectStatus.Rebuild;
+                newNode.Status |= ObjectStatus.Rebuild;
             }
             else
             {
-                newNode.Status += (int)ObjectStatus.AlterBody;
+                newNode.Status |= ObjectStatus.AlterBody;
             }
 
             originFields[node.FullName] = newNode;

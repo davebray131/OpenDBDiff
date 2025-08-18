@@ -84,7 +84,7 @@ public class SQLScriptList
             for (var j = 0; j < list.Count; j++)
             {
                 //if ((list[j].IsDropAction) || (!list[j].IsAddAction))
-                sql.Append(list[j].SQL); //ToSqlDown(list[j]);
+                sql.AppendLine(list[j].SQL); //ToSqlDown(list[j]);
             }
             /*for (int j = list.Count-1; j >= 0; j--)
             {

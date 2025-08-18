@@ -13,15 +13,9 @@ internal static class FullTextIndexSQLCommand
     private static string Get2005() =>
         """
         SELECT 
-         FI.object_id, 
-         T.Name AS TableName,  
-         FC.name AS FullTextCatalogName, 
-         I.name AS IndexName, 
-         FI.is_enabled, 
-         '['+ S.name + '].['+ T.name + '].[' + FC.name + ']' AS Name, 
-         C.name as ColumnName, 
-         FI.change_tracking_state_desc AS ChangeTracking, 
-         FL.name AS LanguageName 
+          FI.object_id, T.Name AS TableName, FC.name AS FullTextCatalogName, I.name AS IndexName, 
+          FI.is_enabled, '['+ S.name + '].['+ T.name + '].[' + FC.name + ']' AS Name, 
+          C.name as ColumnName, FI.change_tracking_state_desc AS ChangeTracking, FL.name AS LanguageName 
         FROM sys.fulltext_indexes FI 
         INNER JOIN sys.fulltext_catalogs FC ON FC.fulltext_catalog_id = FI.fulltext_catalog_id  
         INNER JOIN sys.indexes I ON I.index_id = FI.unique_index_id and I.object_id = FI.object_id  
@@ -36,16 +30,9 @@ internal static class FullTextIndexSQLCommand
     private static string Get2008() =>
         """
         SELECT 
-         FI.object_id, 
-         T.Name AS TableName,  
-         FC.name AS FullTextCatalogName, 
-         I.name AS IndexName, 
-         FI.is_enabled, 
-         '['+ S.name + '].['+ T.name + '].[' + FC.name + ']' AS Name, 
-         C.name as ColumnName, 
-         FL.name AS LanguageName,
-         DS.name AS FileGroupName, 
-         FI.change_tracking_state_desc AS ChangeTracking 
+          FI.object_id, T.Name AS TableName, FC.name AS FullTextCatalogName, I.name AS IndexName, FI.is_enabled, 
+         '['+ S.name + '].['+ T.name + '].[' + FC.name + ']' AS Name, C.name as ColumnName, FL.name AS LanguageName,
+         DS.name AS FileGroupName, FI.change_tracking_state_desc AS ChangeTracking 
         FROM sys.fulltext_indexes FI 
         INNER JOIN sys.fulltext_catalogs FC ON FC.fulltext_catalog_id = FI.fulltext_catalog_id  
         INNER JOIN sys.indexes I ON I.index_id = FI.unique_index_id and I.object_id = FI.object_id  

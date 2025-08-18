@@ -52,13 +52,12 @@ public class CompareColumns
                 {
                     if (Column.CompareIdentity(originField, node))
                     {
-
                         if (node.HasToRebuildOnlyConstraint)
                         {
                             node.Status = ObjectStatus.Alter;
                             if (originField.IsNullable && (!node.IsNullable))
                             {
-                                node.Status += (int)ObjectStatus.Update;
+                                node.Status |= ObjectStatus.Update;
                             }
                         }
                         else
@@ -74,7 +73,7 @@ public class CompareColumns
                                     node.Status = ObjectStatus.Alter;
                                     if (originField.IsNullable && (!node.IsNullable))
                                     {
-                                        node.Status += (int)ObjectStatus.Update;
+                                        node.Status |= ObjectStatus.Update;
                                     }
                                 }
                             }
@@ -83,7 +82,7 @@ public class CompareColumns
                         {
                             if (!Column.CompareRule(originField, node))
                             {
-                                node.Status += (int)ObjectStatus.Bind;
+                                node.Status |= ObjectStatus.Bind;
                             }
                         }
                     }

@@ -407,7 +407,7 @@ public class Constraint : SQLServerSchemaBase
 
     public string ToSqlDrop(string FileGroupName)
     {
-        var sql = $"ALTER TABLE {((Table)Parent).FullName} DROP CONSTRAINT [{Name}]";
+        var sql = $"ALTER TABLE {Parent.FullName} DROP CONSTRAINT [{Name}]";
         if (!string.IsNullOrEmpty(FileGroupName))
         {
             sql += $" WITH (MOVE TO [{FileGroupName}])";
@@ -417,11 +417,9 @@ public class Constraint : SQLServerSchemaBase
         return sql;
     }
 
-    public string ToSQLEnabledDisabled() => IsDisabled
-            ? $"ALTER TABLE {Parent.FullName} NOCHECK CONSTRAINT [{Name}\r\nGO\r\n"
-            : $"ALTER TABLE {Parent.FullName} CHECK CONSTRAINT [{Name}]\r\nGO\r\n";
+    public string ToSQLEnabledDisabled() => $"ALTER TABLE {Parent.FullName} {OnOff(IsDisabled, "NOCHECK", "CHECK")} CONSTRAINT [{Name}\r\nGO\r\n";
 
-    public override SQLScriptList ToSqlDiff(System.Collections.Generic.ICollection<ISchemaBase> schemas)
+    public override SQLScriptList ToSqlDiff(ICollection<ISchemaBase> schemas)
     {
         var list = new SQLScriptList();
         if (Status != ObjectStatus.Original)

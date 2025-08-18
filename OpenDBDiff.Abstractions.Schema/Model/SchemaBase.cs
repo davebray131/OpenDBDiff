@@ -194,8 +194,6 @@ public abstract class SchemaBase(string nameCharacterOpen, string nameCharacterC
                 return;
             }
 
-            // Si el estado de la tabla era el original, lo cambia, sino deja el actual estado.
-            // If the state of the table was the original, it changes it, but leaves the current state. (Google translated)
             if (Parent.Status == ObjectStatus.Original
                 || value == ObjectStatus.Rebuild
                 || value == ObjectStatus.RebuildDependencies)

@@ -38,11 +38,11 @@ namespace OpenDBDiff.UI
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.tabPage2 = new System.Windows.Forms.TabPage();
             this.tabControl2 = new System.Windows.Forms.TabControl();
-            this.tabPage4 = new System.Windows.Forms.TabPage();
+            this.tabNewObject = new System.Windows.Forms.TabPage();
             this.txtNewObject = new ScintillaNET.Scintilla();
-            this.tabPage5 = new System.Windows.Forms.TabPage();
+            this.tabOldObject = new System.Windows.Forms.TabPage();
             this.txtOldObject = new ScintillaNET.Scintilla();
-            this.tabPage6 = new System.Windows.Forms.TabPage();
+            this.tabDiff = new System.Windows.Forms.TabPage();
             this.txtDiff = new ScintillaNET.Scintilla();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.label3 = new System.Windows.Forms.Label();
@@ -56,7 +56,7 @@ namespace OpenDBDiff.UI
             this.panel1 = new System.Windows.Forms.Panel();
             this.txtSyncScript = new ScintillaNET.Scintilla();
             this.tabPage3 = new System.Windows.Forms.TabPage();
-            this.textBox1 = new System.Windows.Forms.TextBox();
+            this.textActionReport = new System.Windows.Forms.TextBox();
             this.saveFileDialog1 = new System.Windows.Forms.SaveFileDialog();
             this.LeftDatabasePanel = new System.Windows.Forms.Panel();
             this.RightDatabasePanel = new System.Windows.Forms.Panel();
@@ -87,9 +87,9 @@ namespace OpenDBDiff.UI
             this.tabControl1.SuspendLayout();
             this.tabPage2.SuspendLayout();
             this.tabControl2.SuspendLayout();
-            this.tabPage4.SuspendLayout();
-            this.tabPage5.SuspendLayout();
-            this.tabPage6.SuspendLayout();
+            this.tabNewObject.SuspendLayout();
+            this.tabOldObject.SuspendLayout();
+            this.tabDiff.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.groupBox1.SuspendLayout();
             this.tabPage1.SuspendLayout();
@@ -109,7 +109,7 @@ namespace OpenDBDiff.UI
             this.lblMessage.AutoSize = true;
             this.lblMessage.Location = new System.Drawing.Point(6, 528);
             this.lblMessage.Name = "lblMessage";
-            this.lblMessage.Size = new System.Drawing.Size(0, 13);
+            this.lblMessage.Size = new System.Drawing.Size(0, 15);
             this.lblMessage.TabIndex = 4;
             // 
             // tabControl1
@@ -118,6 +118,7 @@ namespace OpenDBDiff.UI
             this.tabControl1.Controls.Add(this.tabPage1);
             this.tabControl1.Controls.Add(this.tabPage3);
             this.tabControl1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.tabControl1.Font = new System.Drawing.Font("Calibri", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.tabControl1.Location = new System.Drawing.Point(3, 3);
             this.tabControl1.Name = "tabControl1";
             this.tabControl1.SelectedIndex = 0;
@@ -130,13 +131,13 @@ namespace OpenDBDiff.UI
             this.tabPage2.Controls.Add(this.tabControl2);
             this.tabPage2.Controls.Add(this.groupBox2);
             this.tabPage2.Controls.Add(this.groupBox1);
-            this.tabPage2.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.tabPage2.Location = new System.Drawing.Point(4, 22);
+            this.tabPage2.Font = new System.Drawing.Font("Calibri", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.tabPage2.Location = new System.Drawing.Point(4, 32);
             this.tabPage2.Name = "tabPage2";
             this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage2.Size = new System.Drawing.Size(910, 529);
+            this.tabPage2.Size = new System.Drawing.Size(910, 519);
             this.tabPage2.TabIndex = 1;
-            this.tabPage2.Text = "Schema";
+            this.tabPage2.Text = "   Schema   ";
             this.tabPage2.UseVisualStyleBackColor = true;
             // 
             // tabControl2
@@ -144,71 +145,70 @@ namespace OpenDBDiff.UI
             this.tabControl2.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.tabControl2.Controls.Add(this.tabPage4);
-            this.tabControl2.Controls.Add(this.tabPage5);
-            this.tabControl2.Controls.Add(this.tabPage6);
+            this.tabControl2.Controls.Add(this.tabNewObject);
+            this.tabControl2.Controls.Add(this.tabOldObject);
+            this.tabControl2.Controls.Add(this.tabDiff);
+            this.tabControl2.Font = new System.Drawing.Font("Calibri", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.tabControl2.Location = new System.Drawing.Point(350, 50);
             this.tabControl2.Name = "tabControl2";
             this.tabControl2.SelectedIndex = 0;
-            this.tabControl2.Size = new System.Drawing.Size(676, 474);
+            this.tabControl2.Size = new System.Drawing.Size(676, 464);
             this.tabControl2.TabIndex = 3;
             // 
-            // tabPage4
+            // tabNewObject
             // 
-            this.tabPage4.Controls.Add(this.txtNewObject);
-            this.tabPage4.Location = new System.Drawing.Point(4, 22);
-            this.tabPage4.Name = "tabPage4";
-            this.tabPage4.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage4.Size = new System.Drawing.Size(668, 448);
-            this.tabPage4.TabIndex = 0;
-            this.tabPage4.Text = "New object";
-            this.tabPage4.UseVisualStyleBackColor = true;
+            this.tabNewObject.Controls.Add(this.txtNewObject);
+            this.tabNewObject.Location = new System.Drawing.Point(4, 28);
+            this.tabNewObject.Name = "tabNewObject";
+            this.tabNewObject.Size = new System.Drawing.Size(668, 432);
+            this.tabNewObject.TabIndex = 0;
+            this.tabNewObject.Text = "   New object   ";
+            this.tabNewObject.UseVisualStyleBackColor = true;
             // 
             // txtNewObject
             // 
             this.txtNewObject.Dock = System.Windows.Forms.DockStyle.Fill;
             this.txtNewObject.Font = new System.Drawing.Font("Courier New", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.txtNewObject.Location = new System.Drawing.Point(3, 3);
+            this.txtNewObject.Location = new System.Drawing.Point(0, 0);
             this.txtNewObject.Name = "txtNewObject";
-            this.txtNewObject.Size = new System.Drawing.Size(662, 442);
+            this.txtNewObject.Size = new System.Drawing.Size(668, 432);
             this.txtNewObject.TabIndex = 0;
             // 
-            // tabPage5
+            // tabOldObject
             // 
-            this.tabPage5.Controls.Add(this.txtOldObject);
-            this.tabPage5.Location = new System.Drawing.Point(4, 22);
-            this.tabPage5.Name = "tabPage5";
-            this.tabPage5.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage5.Size = new System.Drawing.Size(668, 448);
-            this.tabPage5.TabIndex = 1;
-            this.tabPage5.Text = "Old object";
-            this.tabPage5.UseVisualStyleBackColor = true;
+            this.tabOldObject.Controls.Add(this.txtOldObject);
+            this.tabOldObject.Location = new System.Drawing.Point(4, 28);
+            this.tabOldObject.Name = "tabOldObject";
+            this.tabOldObject.Size = new System.Drawing.Size(668, 432);
+            this.tabOldObject.TabIndex = 1;
+            this.tabOldObject.Text = "   Old object   ";
+            this.tabOldObject.UseVisualStyleBackColor = true;
             // 
             // txtOldObject
             // 
             this.txtOldObject.Dock = System.Windows.Forms.DockStyle.Fill;
             this.txtOldObject.Font = new System.Drawing.Font("Courier New", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.txtOldObject.Location = new System.Drawing.Point(3, 3);
+            this.txtOldObject.Location = new System.Drawing.Point(0, 0);
             this.txtOldObject.Name = "txtOldObject";
-            this.txtOldObject.Size = new System.Drawing.Size(662, 442);
+            this.txtOldObject.Size = new System.Drawing.Size(668, 432);
             this.txtOldObject.TabIndex = 0;
             // 
-            // tabPage6
+            // tabDiff
             // 
-            this.tabPage6.Controls.Add(this.txtDiff);
-            this.tabPage6.Location = new System.Drawing.Point(4, 22);
-            this.tabPage6.Name = "tabPage6";
-            this.tabPage6.Size = new System.Drawing.Size(668, 448);
-            this.tabPage6.TabIndex = 2;
-            this.tabPage6.Text = "Diff";
-            this.tabPage6.UseVisualStyleBackColor = true;
+            this.tabDiff.Controls.Add(this.txtDiff);
+            this.tabDiff.Location = new System.Drawing.Point(4, 28);
+            this.tabDiff.Name = "tabDiff";
+            this.tabDiff.Size = new System.Drawing.Size(668, 432);
+            this.tabDiff.TabIndex = 2;
+            this.tabDiff.Text = "   Diff   ";
+            this.tabDiff.UseVisualStyleBackColor = true;
             // 
             // txtDiff
             // 
             this.txtDiff.Dock = System.Windows.Forms.DockStyle.Fill;
             this.txtDiff.Location = new System.Drawing.Point(0, 0);
             this.txtDiff.Name = "txtDiff";
-            this.txtDiff.Size = new System.Drawing.Size(668, 448);
+            this.txtDiff.Size = new System.Drawing.Size(668, 432);
             this.txtDiff.TabIndex = 0;
             // 
             // groupBox2
@@ -232,7 +232,7 @@ namespace OpenDBDiff.UI
             this.label3.AutoSize = true;
             this.label3.Location = new System.Drawing.Point(345, 16);
             this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(62, 13);
+            this.label3.Size = new System.Drawing.Size(71, 15);
             this.label3.TabIndex = 5;
             this.label3.Text = "Drop object";
             // 
@@ -241,7 +241,7 @@ namespace OpenDBDiff.UI
             this.label2.AutoSize = true;
             this.label2.Location = new System.Drawing.Point(195, 16);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(77, 13);
+            this.label2.Size = new System.Drawing.Size(91, 15);
             this.label2.TabIndex = 4;
             this.label2.Text = "Alter old object";
             // 
@@ -250,7 +250,7 @@ namespace OpenDBDiff.UI
             this.label1.AutoSize = true;
             this.label1.Location = new System.Drawing.Point(45, 16);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(93, 13);
+            this.label1.Size = new System.Drawing.Size(104, 15);
             this.label1.TabIndex = 3;
             this.label1.Text = "Create new object";
             // 
@@ -288,7 +288,7 @@ namespace OpenDBDiff.UI
             this.groupBox1.Controls.Add(this.schemaTreeView1);
             this.groupBox1.Location = new System.Drawing.Point(6, 4);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(335, 517);
+            this.groupBox1.Size = new System.Drawing.Size(335, 507);
             this.groupBox1.TabIndex = 1;
             this.groupBox1.TabStop = false;
             // 
@@ -296,12 +296,13 @@ namespace OpenDBDiff.UI
             // 
             this.tabPage1.Controls.Add(this.panel1);
             this.tabPage1.Controls.Add(this.lblMessage);
-            this.tabPage1.Location = new System.Drawing.Point(4, 22);
+            this.tabPage1.Font = new System.Drawing.Font("Calibri", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.tabPage1.Location = new System.Drawing.Point(4, 32);
             this.tabPage1.Name = "tabPage1";
             this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage1.Size = new System.Drawing.Size(910, 529);
+            this.tabPage1.Size = new System.Drawing.Size(910, 519);
             this.tabPage1.TabIndex = 0;
-            this.tabPage1.Text = "Synchronized script";
+            this.tabPage1.Text = "   Synchronized script   ";
             this.tabPage1.UseVisualStyleBackColor = true;
             // 
             // panel1
@@ -313,7 +314,7 @@ namespace OpenDBDiff.UI
             this.panel1.Controls.Add(this.txtSyncScript);
             this.panel1.Location = new System.Drawing.Point(9, 6);
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(895, 607);
+            this.panel1.Size = new System.Drawing.Size(895, 597);
             this.panel1.TabIndex = 6;
             // 
             // txtSyncScript
@@ -322,32 +323,33 @@ namespace OpenDBDiff.UI
             this.txtSyncScript.Location = new System.Drawing.Point(0, 0);
             this.txtSyncScript.Name = "txtSyncScript";
             this.txtSyncScript.ReadOnly = true;
-            this.txtSyncScript.Size = new System.Drawing.Size(891, 603);
+            this.txtSyncScript.Size = new System.Drawing.Size(891, 593);
             this.txtSyncScript.TabIndex = 0;
             // 
             // tabPage3
             // 
-            this.tabPage3.Controls.Add(this.textBox1);
-            this.tabPage3.Location = new System.Drawing.Point(4, 22);
+            this.tabPage3.Controls.Add(this.textActionReport);
+            this.tabPage3.Font = new System.Drawing.Font("Calibri", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.tabPage3.Location = new System.Drawing.Point(4, 32);
             this.tabPage3.Name = "tabPage3";
             this.tabPage3.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage3.Size = new System.Drawing.Size(910, 529);
+            this.tabPage3.Size = new System.Drawing.Size(910, 519);
             this.tabPage3.TabIndex = 2;
-            this.tabPage3.Text = "Action report";
+            this.tabPage3.Text = "   Action report   ";
             this.tabPage3.UseVisualStyleBackColor = true;
             // 
-            // textBox1
+            // textActionReport
             // 
-            this.textBox1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            this.textActionReport.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.textBox1.Font = new System.Drawing.Font("Courier New", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.textBox1.Location = new System.Drawing.Point(9, 6);
-            this.textBox1.Multiline = true;
-            this.textBox1.Name = "textBox1";
-            this.textBox1.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.textBox1.Size = new System.Drawing.Size(895, 607);
-            this.textBox1.TabIndex = 0;
+            this.textActionReport.Font = new System.Drawing.Font("Courier New", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.textActionReport.Location = new System.Drawing.Point(9, 6);
+            this.textActionReport.Multiline = true;
+            this.textActionReport.Name = "textActionReport";
+            this.textActionReport.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
+            this.textActionReport.Size = new System.Drawing.Size(895, 507);
+            this.textActionReport.TabIndex = 0;
             // 
             // saveFileDialog1
             // 
@@ -703,7 +705,7 @@ namespace OpenDBDiff.UI
             this.schemaTreeView1.ShowMissingItems = true;
             this.schemaTreeView1.ShowNewItems = true;
             this.schemaTreeView1.ShowUnchangedItems = true;
-            this.schemaTreeView1.Size = new System.Drawing.Size(322, 501);
+            this.schemaTreeView1.Size = new System.Drawing.Size(322, 491);
             this.schemaTreeView1.TabIndex = 0;
             // 
             // MainForm
@@ -723,9 +725,9 @@ namespace OpenDBDiff.UI
             this.tabControl1.ResumeLayout(false);
             this.tabPage2.ResumeLayout(false);
             this.tabControl2.ResumeLayout(false);
-            this.tabPage4.ResumeLayout(false);
-            this.tabPage5.ResumeLayout(false);
-            this.tabPage6.ResumeLayout(false);
+            this.tabNewObject.ResumeLayout(false);
+            this.tabOldObject.ResumeLayout(false);
+            this.tabDiff.ResumeLayout(false);
             this.groupBox2.ResumeLayout(false);
             this.groupBox2.PerformLayout();
             this.groupBox1.ResumeLayout(false);
@@ -761,7 +763,7 @@ namespace OpenDBDiff.UI
         private SchemaTreeView schemaTreeView1;
         private GroupBox groupBox1;
         private TabPage tabPage3;
-        private TextBox textBox1;
+        private TextBox textActionReport;
         private Panel panel1;
         private Scintilla txtSyncScript;
         private Panel LeftDatabasePanel;
@@ -774,15 +776,15 @@ namespace OpenDBDiff.UI
         private Label label3;
         private Label label2;
         private TabControl tabControl2;
-        private TabPage tabPage4;
-        private TabPage tabPage5;
+        private TabPage tabNewObject;
+        private TabPage tabOldObject;
         private Scintilla txtNewObject;
         private Scintilla txtOldObject;
         private Button btnSaveProject;
         private Button btnProject;
         private Button btnNewProject;
         private Button btnCompareTableData;
-        private TabPage tabPage6;
+        private TabPage tabDiff;
         private Scintilla txtDiff;
         private ToolStrip toolMenu;
         private ToolStripButton toolOpenProject;

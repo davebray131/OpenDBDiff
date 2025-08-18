@@ -8,7 +8,8 @@ public partial class DatabaseProgressControl : UserControl
 
     public string DatabaseName
     {
-        get => lblDatabase.Text; set => lblDatabase.Text = value;
+        get => lblDatabase.Text;
+        set => lblDatabase.Text = value;
     }
 
     public string Message
@@ -23,7 +24,8 @@ public partial class DatabaseProgressControl : UserControl
 
     public int Maximum
     {
-        get => progressBar1.Maximum; set => progressBar1.Maximum = value;
+        get => progressBar1.Maximum;
+        set => progressBar1.Maximum = value;
     }
 
     public int Value

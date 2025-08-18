@@ -102,7 +102,7 @@ public partial class MainForm : Form
 
                 schemaTreeView1.OnSelectItem += new SchemaTreeView.SchemaHandler(SchemaTreeView1_OnSelectItem);
                 SchemaTreeView1_OnSelectItem(schemaTreeView1.SelectedNode);
-                textBox1.Text = progress.Origin.ActionMessage.Message;
+                textActionReport.Text = progress.Origin.ActionMessage.Message;
 
                 btnCopy.Enabled = true;
                 btnSaveAs.Enabled = true;
@@ -268,6 +268,9 @@ public partial class MainForm : Form
             schemaTreeView1.SelectAllSchemas(); // If you want to select all schemas after a compare
             errorLocation = "Saving Connections";
             Project.SaveLastConfiguration(LeftDatabaseSelector.ConnectionString, RightDatabaseSelector.ConnectionString);
+
+            // Auto select the script tab
+            tabControl1.SelectedIndex = 1;
         }
         catch (Exception ex)
         {
@@ -678,8 +681,8 @@ public partial class MainForm : Form
 
     private void BtnNewProject_Click(object sender, EventArgs e)
     {
-        LeftDatabaseSelector.ConnectionString = "";
-        RightDatabaseSelector.ConnectionString = "";
+        LeftDatabaseSelector.ConnectionString = string.Empty;
+        RightDatabaseSelector.ConnectionString = string.Empty;
         ActiveProject = null;
     }
 

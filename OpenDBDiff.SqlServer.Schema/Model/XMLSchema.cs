@@ -13,20 +13,16 @@ public class XMLSchema(ISchemaBase parent) : SQLServerSchemaBase(parent, ObjectT
     /// <summary>
     /// Clona el objeto en una nueva instancia.
     /// </summary>
-    public new XMLSchema Clone(ISchemaBase parent)
+    public new XMLSchema Clone(ISchemaBase parent) => new(parent)
     {
-        var item = new XMLSchema(parent)
-        {
-            Text = Text,
-            Status = Status,
-            Name = Name,
-            Id = Id,
-            Owner = Owner,
-            Guid = Guid,
-            Dependencies = Dependencies
-        };
-        return item;
-    }
+        Text = Text,
+        Status = Status,
+        Name = Name,
+        Id = Id,
+        Owner = Owner,
+        Guid = Guid,
+        Dependencies = Dependencies
+    };
 
     public List<ObjectDependency> Dependencies { get; set; } = [];
 
@@ -36,8 +32,8 @@ public class XMLSchema(ISchemaBase parent) : SQLServerSchemaBase(parent, ObjectT
     {
         var sql = new StringBuilder();
         sql.Append("CREATE XML SCHEMA COLLECTION ");
-        sql.Append(FullName + " AS ");
-        sql.Append("N'" + Text + "'");
+        sql.Append($"{FullName} AS ");
+        sql.Append($"N'{Text}'");
         sql.Append("\r\nGO\r\n");
         return sql.ToString();
     }
@@ -72,7 +68,7 @@ public class XMLSchema(ISchemaBase parent) : SQLServerSchemaBase(parent, ObjectT
                             }
 
                             list.AddRange(column.RebuildConstraint(true));
-                            list.Add("ALTER TABLE " + column.Parent.FullName + " ALTER COLUMN " + column.ToSQLRedefine(null, 0, "") + "\r\nGO\r\n", 0, ScriptAction.AlterColumn);
+                            list.Add($"ALTER TABLE {column.Parent.FullName} ALTER COLUMN {column.ToSQLRedefine(null, 0, "")}\r\nGO\r\n", 0, ScriptAction.AlterColumn);
                             /*Si la columna va a ser eliminada o la tabla va a ser reconstruida, no restaura la columna*/
                             if ((column.Status != ObjectStatus.Drop) && (column.Parent.Status != ObjectStatus.Rebuild))
                             {

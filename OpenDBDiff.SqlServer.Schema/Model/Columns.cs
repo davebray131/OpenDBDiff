@@ -39,19 +39,7 @@ public class Columns<T>(T parent) : SchemaList<Column, T>(parent) where T : ISch
         {
             ForEach(item =>
             {
-                var isIncluded = schemas.Count == 0;
-                if (!isIncluded)
-                {
-                    foreach (var selectedSchema in schemas)
-                    {
-                        if (selectedSchema.Id == item.Id)
-                        {
-                            isIncluded = true;
-                            break;
-                        }
-                    }
-                }
-                if (isIncluded)
+                if (schemas.Count == 0 || schemas.Any(r => r.Id == item.Id))
                 {
                     if (item.HasState(ObjectStatus.Drop))
                     {
@@ -59,16 +47,14 @@ public class Columns<T>(T parent) : SchemaList<Column, T>(parent) where T : ISch
                         {
                             list.Add(item.DefaultConstraint.Drop());
                         }
-                        /*Si la columna formula debe ser eliminada y ya fue efectuada la operacion en otro momento, no
-* se borra nuevamente*/
                         if (!item.GetWasInsertInDiffList(ScriptAction.AlterColumnFormula))
                         {
-                            sqlDrop += "[" + item.Name + "],";
+                            sqlDrop += $"[{item.Name}],";
                         }
                     }
                     if (item.HasState(ObjectStatus.Create))
                     {
-                        sqlAdd += "\r\n" + item.ToSql(true) + ",";
+                        sqlAdd += $"\r\n{item.ToSql(true)},";
                     }
 
                     if (item.HasState(ObjectStatus.Alter) || item.HasState(ObjectStatus.RebuildDependencies))
@@ -84,7 +70,7 @@ public class Columns<T>(T parent) : SchemaList<Column, T>(parent) where T : ISch
                     }
                     if (item.HasState(ObjectStatus.Update))
                     {
-                        list.Add("UPDATE " + Parent.FullName + " SET [" + item.Name + "] = " + item.DefaultForceValue + " WHERE [" + item.Name + "] IS NULL\r\nGO\r\n", 0, ScriptAction.UpdateTable);
+                        list.Add($"UPDATE {Parent.FullName} SET [{item.Name}] = {item.DefaultForceValue} WHERE [{item.Name}] IS NULL\r\nGO\r\n", 0, ScriptAction.UpdateTable);
                     }
 
                     if (item.HasState(ObjectStatus.Bind))
@@ -107,12 +93,12 @@ public class Columns<T>(T parent) : SchemaList<Column, T>(parent) where T : ISch
             });
             if (!string.IsNullOrEmpty(sqlDrop))
             {
-                sqlDrop = "ALTER TABLE " + Parent.FullName + " DROP COLUMN " + sqlDrop.Substring(0, sqlDrop.Length - 1) + "\r\nGO\r\n";
+                sqlDrop = $"ALTER TABLE {Parent.FullName} DROP COLUMN {sqlDrop.Substring(0, sqlDrop.Length - 1)}\r\nGO\r\n";
             }
 
             if (!string.IsNullOrEmpty(sqlAdd))
             {
-                sqlAdd = "ALTER TABLE " + Parent.FullName + " ADD " + sqlAdd.Substring(0, sqlAdd.Length - 1) + "\r\nGO\r\n";
+                sqlAdd = $"ALTER TABLE {Parent.FullName} ADD {sqlAdd.Substring(0, sqlAdd.Length - 1)}\r\nGO\r\n";
             }
 
             if (!string.IsNullOrEmpty(sqlDrop + sqlAdd + sqlCons + sqlBinds))

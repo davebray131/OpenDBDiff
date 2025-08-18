@@ -13,17 +13,17 @@ internal class CompareFullText : CompareBase<FullText>
             var newNode = node; //.Clone(originFields.Parent);
             if (node.IsDefault != originFields[node.FullName].IsDefault)
             {
-                newNode.Status += (int)ObjectStatus.Disabled;
+                newNode.Status |= ObjectStatus.Disabled;
             }
 
             if (!node.Owner.Equals(originFields[node.FullName].Owner))
             {
-                newNode.Status += (int)ObjectStatus.ChangeOwner;
+                newNode.Status |= ObjectStatus.ChangeOwner;
             }
 
             if (node.IsAccentSensity != originFields[node.FullName].IsAccentSensity)
             {
-                newNode.Status += (int)ObjectStatus.Alter;
+                newNode.Status |= ObjectStatus.Alter;
             }
 
             originFields[node.FullName] = newNode;

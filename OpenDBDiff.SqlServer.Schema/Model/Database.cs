@@ -195,28 +195,29 @@ public class Database : SQLServerSchemaBase, IDatabase
 
         var listDiff = new SQLScriptList();
 
-        var header = $@"/*
+        var header =
+          $"""
+          /*
+            OpenDBDiff {System.Reflection.Assembly.GetExecutingAssembly().GetName().Version}
+            https://github.com/OpenDBDiff/OpenDBDiff
 
-    OpenDBDiff {System.Reflection.Assembly.GetExecutingAssembly().GetName().Version}
-    https://github.com/OpenDBDiff/OpenDBDiff
+            Script created by {Environment.UserDomainName}\{Environment.UserName} on {DateTime.Now.ToShortDateString()} at {DateTime.Now.ToLongTimeString()}.
 
-    Script created by {Environment.UserDomainName}\{Environment.UserName} on {DateTime.Now.ToShortDateString()} at {DateTime.Now.ToLongTimeString()}.
+            Created on:  {Environment.MachineName}
+            Source:      {SourceInfo?.Database ?? "Unknown"} on {SourceInfo?.Server ?? "Unknown"}
+            Destination: {Info?.Database ?? "Unknown"} on {Info?.Server ?? "Unknown"}
 
-    Created on:  {Environment.MachineName}
-    Source:      {SourceInfo?.Database ?? "Unknown"} on {SourceInfo?.Server ?? "Unknown"}
-    Destination: {Info?.Database ?? "Unknown"} on {Info?.Server ?? "Unknown"}
+            ### This script performs actions to change the Destination schema to the Source schema. ###
 
-    ### This script performs actions to change the Destination schema to the Source schema. ###
+          */
 
-*/
-
-";
+          """;
 
         listDiff.Add(new SQLScript(header, 0, ScriptAction.None));
 
         if (!isAzure10)
         {
-            listDiff.Add("USE [" + Name + "]\r\nGO\r\n\r\n", 0, ScriptAction.UseDatabase);
+            listDiff.Add("USE [" + Name + "]\r\nGO\r\n", 0, ScriptAction.UseDatabase);
             listDiff.AddRange(Assemblies.ToSqlDiff(schemas));
             listDiff.AddRange(UserTypes.ToSqlDiff(schemas));
         }
@@ -371,16 +372,6 @@ public class Database : SQLServerSchemaBase, IDatabase
         }
     }
 
-    /*private SQLScriptList CleanScripts(SQLScriptList listDiff)
-    {
-        SQLScriptList alters = listDiff.FindAlter();
-        for (int j = 0; j < alters.Count; j++)
-        {
-            //alters[j].
-        }
-        return null;
-    }*/
-
     public void BuildDependency()
     {
         ISchemaBase schema;
@@ -434,10 +425,7 @@ public class Database : SQLServerSchemaBase, IDatabase
     #region Nested type: DatabaseChangeStatus
 
     private enum DatabaseChangeStatus
-    {
-        AlterChangeTracking = 1,
-        AlterCollation = 2
-    }
+    { AlterChangeTracking = 1, AlterCollation = 2 }
 
     #endregion
 }

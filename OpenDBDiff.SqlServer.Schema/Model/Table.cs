@@ -154,39 +154,24 @@ public class Table : SQLServerSchemaBase, IComparable<Table>, ITable<Table>
         var isAzure10 = database.Info.Version == DatabaseInfo.SQLServerVersion.SQLServerAzure10;
 
         var sql = new StringBuilder();
-        var sqlPK = "";
-        var sqlUC = "";
-        var sqlFK = "";
+
         if (Columns.Any())
         {
-            sql.AppendLine($"CREATE TABLE {FullName}\r\n(");
+            sql.AppendLine($"CREATE TABLE {FullName}");
+            sql.AppendLine("(");
             sql.Append(Columns.ToSql());
             if (Constraints.Any())
             {
-                sql.AppendLine(",");
-                Constraints.AsQueryable()
-                    // Add the constraint if it's not in DropStatus
-                    .Where(c => !c.HasState(ObjectStatus.Drop))
-                    .ToList()
-                    .ForEach(item =>
+                List<string> keys = [];
+                foreach (var itemType in (List<Constraint.ConstraintType>)[Constraint.ConstraintType.PrimaryKey, Constraint.ConstraintType.Unique, Constraint.ConstraintType.ForeignKey])
+                {
+                    foreach (var item in Constraints.Where(c => !c.HasState(ObjectStatus.Drop) && c.Type == itemType))
                     {
-                        if (item.Type == Constraint.ConstraintType.PrimaryKey)
-                        {
-                            sqlPK += $"\t{item.ToSql()},\r\n";
-                        }
-
-                        if (item.Type == Constraint.ConstraintType.Unique)
-                        {
-                            sqlUC += $"\t{item.ToSql()},\r\n";
-                        }
-
-                        if (showFK && item.Type == Constraint.ConstraintType.ForeignKey)
-                        {
-                            sqlFK += $"\t{item.ToSql()},\r\n";
-                        }
-                    });
-                sql.Append(sqlPK + sqlUC + sqlFK);
-                sql = new StringBuilder(sql.ToString(0, sql.Length - 3)).AppendLine();
+                        keys.Add($"\t{item.ToSql()}");
+                    }
+                }
+                sql.AppendLine(",");
+                sql.AppendLine(string.Join(",", keys));
             }
             else
             {
@@ -220,7 +205,10 @@ public class Table : SQLServerSchemaBase, IComparable<Table>, ITable<Table>
             sql.AppendLine();
             sql.AppendLine("GO");
 
-            Constraints.Where(r => r.Type == Constraint.ConstraintType.Check).ToList().ForEach(item => sql.AppendLine(item.ToSqlAdd()));
+            foreach (var item in Constraints.Where(r => r.Type == Constraint.ConstraintType.Check))
+            {
+                sql.AppendLine(item.ToSqlAdd());
+            }
 
             if (HasChangeTracking)
             {
@@ -484,12 +472,13 @@ public class Table : SQLServerSchemaBase, IComparable<Table>, ITable<Table>
             sql.Append($"ALTER TABLE {FullName} DROP CONSTRAINT [{column.DefaultConstraint.Name}]\r\n");
         }
 
-        if (!string.IsNullOrWhiteSpace(sql.ToString()))
+        if (sql.Length > 0)
         {
             sql.AppendLine();
         }
 
-        sql.AppendLine($"CREATE TABLE [{Owner}].[{TableName}]\r\n(");
+        sql.AppendLine($"CREATE TABLE [{Owner}].[{TableName}]");
+        sql.AppendLine("(");
 
         Columns.Sort();
 
@@ -508,7 +497,8 @@ public class Table : SQLServerSchemaBase, IComparable<Table>, ITable<Table>
         }
         if (HasFileStream)
         {
-            sql = new StringBuilder(sql.ToString(0, sql.Length - 2));
+            sql.Remove(sql.Length - 2, 2);
+            //sql = new StringBuilder(sql.ToString(0, sql.Length - 2));
             sql.AppendLine(",");
             Constraints.ForEach(item =>
             {
@@ -521,7 +511,9 @@ public class Table : SQLServerSchemaBase, IComparable<Table>, ITable<Table>
                     item.Name = item.Name.Substring(8, item.Name.Length - 8);
                 }
             });
-            sql = new StringBuilder(sql.ToString(0, sql.Length - 3)).AppendLine();
+            sql.Remove(sql.Length - 3, 3);
+            sql.AppendLine();
+            //sql = new StringBuilder(sql.ToString(0, sql.Length - 3)).AppendLine();
         }
         else
         {

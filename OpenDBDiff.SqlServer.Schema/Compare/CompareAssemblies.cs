@@ -17,12 +17,12 @@ internal class CompareAssemblies : CompareBase<Assembly>
             {
                 if (!node.PermissionSet.Equals(originFields[node.FullName].PermissionSet))
                 {
-                    newNode.Status += (int)ObjectStatus.PermissionSet;
+                    newNode.Status |= ObjectStatus.PermissionSet;
                 }
 
                 if (!node.Owner.Equals(originFields[node.FullName].Owner))
                 {
-                    newNode.Status += (int)ObjectStatus.ChangeOwner;
+                    newNode.Status |= ObjectStatus.ChangeOwner;
                 }
             }
             else

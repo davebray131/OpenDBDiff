@@ -71,10 +71,7 @@ public class Generate
             Name = Name
         };
         databaseSchema.Info = new GenerateDatabase(ConnectionString, Options).Get(databaseSchema);
-        /*Thread t1 = new Thread(delegate()
-            {
-                try
-                {*/
+
         new GenerateRules(this).Fill(databaseSchema, ConnectionString);
         new GenerateTables(this).Fill(databaseSchema, ConnectionString, messages);
         new GenerateViews(this).Fill(databaseSchema, ConnectionString, messages);
@@ -87,16 +84,6 @@ public class Generate
         new GenerateUserDataTypes(this).Fill(databaseSchema, ConnectionString, messages);
         new GenerateXMLSchemas(this).Fill(databaseSchema, ConnectionString);
         new GenerateSchemas(this).Fill(databaseSchema, ConnectionString);
-        /*}
-                catch (Exception ex)
-                {
-                    error = ex.StackTrace;
-                }
-            });
-            Thread t2 = new Thread(delegate()
-            {
-                try
-                {*/
 
         //not supported in azure yet
         if (databaseSchema.Info.Version != DatabaseInfo.SQLServerVersion.SQLServerAzure10)
@@ -115,36 +102,15 @@ public class Generate
             new GenerateAssemblies(this).Fill(databaseSchema, ConnectionString);
             new GenerateFullText(this).Fill(databaseSchema, ConnectionString);
         }
-        /*}
-                catch (Exception ex)
-                {
-                    error = ex.StackTrace;
-                }
-            });
-            Thread t3 = new Thread(delegate()
-            {
-                try
-                {*/
+
         new GenerateStoredProcedures(this).Fill(databaseSchema, ConnectionString);
         new GenerateFunctions(this).Fill(databaseSchema, ConnectionString);
         new GenerateTriggers(this).Fill(databaseSchema, ConnectionString, messages);
         new GenerateTextObjects(this).Fill(databaseSchema, ConnectionString);
         new GenerateUsers(this).Fill(databaseSchema, ConnectionString);
-        /*}
-                catch (Exception ex)
-                {
-                    error = ex.StackTrace;
-                }
-            });
-            t1.Start();
-            t2.Start();
-            t3.Start();
-            t1.Join();
-            t2.Join();
-            t3.Join();*/
+
         if (string.IsNullOrEmpty(error))
         {
-            /*Las propiedades extendidas deben ir despues de haber capturado el resto de los objetos de la base*/
             new GenerateExtendedProperties(this).Fill(databaseSchema, ConnectionString, messages);
             databaseSchema.BuildDependency();
             return databaseSchema;
@@ -168,9 +134,6 @@ public class Generate
     /// <param name="origin">The Origin schema is the schema before our generated actions are applied.</param>
     /// <param name="destination">The Destination schema is the schema after our actions are applied.</param>
     /// <returns></returns>
-    public static Database Compare(Database origin, Database destination)
-    {
-        var merge = CompareDatabase.GenerateDifferences(origin, destination);
-        return merge;
-    }
+    public static Database Compare(Database origin, Database destination) =>
+        CompareDatabase.GenerateDifferences(origin, destination);
 }

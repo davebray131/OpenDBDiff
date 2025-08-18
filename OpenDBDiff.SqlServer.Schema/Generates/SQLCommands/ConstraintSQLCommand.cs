@@ -31,7 +31,9 @@ internal static class ConstraintSQLCommand
 
     private static string GetUniqueKeyAzure() =>
         """
-        SELECT O.type as ObjectType, S.Name as Owner, I.object_Id AS id,'' as FileGroup, C.user_type_id, C.column_id, I.Index_id, C.Name AS ColumnName, I.Name, I.type, I.fill_factor, I.is_padded, I.allow_row_locks, I.allow_page_locks, I.ignore_dup_key, I.is_disabled, IC.is_descending_key, IC.is_included_column
+        SELECT 
+          O.type as ObjectType, S.Name as Owner, I.object_Id AS id,'' as FileGroup, C.user_type_id, C.column_id, I.Index_id, C.Name AS ColumnName, 
+          I.Name, I.type, I.fill_factor, I.is_padded, I.allow_row_locks, I.allow_page_locks, I.ignore_dup_key, I.is_disabled, IC.is_descending_key, IC.is_included_column
         FROM sys.indexes I
         INNER JOIN sys.objects O ON O.object_id = I.object_id
         INNER JOIN sys.schemas S ON S.schema_id = O.schema_id
@@ -73,18 +75,8 @@ internal static class ConstraintSQLCommand
     private static string GetCheck2008() =>
         """
         SELECT
-        CC.parent_object_id,
-        O.type as ObjectType,
-        CC.object_id AS ID,
-        CC.parent_column_id,
-        CC.name,
-        CC.type,
-        CC.definition,
-        CC.is_disabled,
-        CC.is_not_trusted AS WithCheck,
-        CC.is_not_for_replication,
-        0,
-        schema_name(CC.schema_id) AS Owner
+          CC.parent_object_id, O.type as ObjectType, CC.object_id AS ID, CC.parent_column_id, CC.name,
+          CC.type, CC.definition, CC.is_disabled, CC.is_not_trusted AS WithCheck, CC.is_not_for_replication, 0, schema_name(CC.schema_id) AS Owner
         FROM sys.check_constraints CC
         INNER JOIN sys.objects O ON O.object_id = CC.parent_object_id
         ORDER BY CC.parent_object_id,CC.name
@@ -93,18 +85,8 @@ internal static class ConstraintSQLCommand
     private static string GetCheck2005() =>
         """
         SELECT 
-        CC.parent_object_id,
-        O.Type as ObjectType,
-        CC.object_id AS ID,
-        CC.parent_column_id,
-        CC.name,
-        CC.type,
-        CC.definition,
-        CC.is_disabled,
-        CC.is_not_trusted AS WithCheck,
-        CC.is_not_for_replication,
-        0,
-        schema_name(CC.schema_id) AS Owner
+          CC.parent_object_id, O.Type as ObjectType, CC.object_id AS ID, CC.parent_column_id, CC.name, CC.type,
+          CC.definition, CC.is_disabled, CC.is_not_trusted AS WithCheck, CC.is_not_for_replication, 0, schema_name(CC.schema_id) AS Owner
         FROM sys.check_constraints CC
         INNER JOIN sys.objects O ON O.object_id = CC.parent_object_id
         ORDER BY CC.parent_object_id,CC.name
@@ -129,7 +111,8 @@ internal static class ConstraintSQLCommand
         """
         SELECT 
            O.type as ObjectType, S.Name as Owner, IC.key_ordinal, C.user_type_id, I.object_id AS ID, dsidx.Name AS FileGroup, C.column_id, I.Index_id, C.Name AS ColumnName, 
-           I.Name, I.type, I.fill_factor, I.is_padded, I.allow_row_locks, I.allow_page_locks, I.ignore_dup_key, I.is_disabled, IC.is_descending_key, IC.is_included_column, CONVERT(bit,INDEXPROPERTY(I.object_id,I.name,'IsAutoStatistics')) AS IsAutoStatistics
+           I.Name, I.type, I.fill_factor, I.is_padded, I.allow_row_locks, I.allow_page_locks, I.ignore_dup_key, I.is_disabled, IC.is_descending_key, IC.is_included_column, 
+           CONVERT(bit,INDEXPROPERTY(I.object_id,I.name,'IsAutoStatistics')) AS IsAutoStatistics
         FROM sys.indexes I
         INNER JOIN sys.objects O ON O.object_id = I.object_id
         INNER JOIN sys.schemas S ON S.schema_id = O.schema_id
@@ -143,7 +126,8 @@ internal static class ConstraintSQLCommand
         """
         "SELECT 
            O.type as ObjectType, S.Name as Owner, IC.key_ordinal, C.user_type_id, I.object_id AS ID, dsidx.Name AS FileGroup, C.column_id, I.Index_id, C.Name AS ColumnName, 
-           I.Name, I.type, I.fill_factor, I.is_padded, I.allow_row_locks, I.allow_page_locks, I.ignore_dup_key, I.is_disabled, IC.is_descending_key, IC.is_included_column, CONVERT(bit,INDEXPROPERTY(I.object_id,I.name,'IsAutoStatistics')) AS IsAutoStatistics
+           I.Name, I.type, I.fill_factor, I.is_padded, I.allow_row_locks, I.allow_page_locks, I.ignore_dup_key, I.is_disabled, IC.is_descending_key, IC.is_included_column, 
+           CONVERT(bit,INDEXPROPERTY(I.object_id,I.name,'IsAutoStatistics')) AS IsAutoStatistics
         FROM sys.indexes I
         INNER JOIN sys.objects O ON O.object_id = I.object_id
         INNER JOIN sys.schemas S ON S.schema_id = O.schema_id

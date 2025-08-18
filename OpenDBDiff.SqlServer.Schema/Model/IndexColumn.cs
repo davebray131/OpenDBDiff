@@ -6,20 +6,16 @@ namespace OpenDBDiff.SqlServer.Schema.Model;
 
 public class IndexColumn(ISchemaBase parentObject) : SQLServerSchemaBase(parentObject, ObjectType.IndexColumn), IComparable<IndexColumn>
 {
-    public new IndexColumn Clone(ISchemaBase parent)
+    public new IndexColumn Clone(ISchemaBase parent) => new(parent)
     {
-        var column = new IndexColumn(parent)
-        {
-            Id = Id,
-            IsIncluded = IsIncluded,
-            Name = Name,
-            Order = Order,
-            Status = Status,
-            KeyOrder = KeyOrder,
-            DataTypeId = DataTypeId
-        };
-        return column;
-    }
+        Id = Id,
+        IsIncluded = IsIncluded,
+        Name = Name,
+        Order = Order,
+        Status = Status,
+        KeyOrder = KeyOrder,
+        DataTypeId = DataTypeId
+    };
 
     public int DataTypeId { get; set; }
 

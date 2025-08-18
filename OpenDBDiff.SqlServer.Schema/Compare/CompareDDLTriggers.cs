@@ -18,7 +18,7 @@ internal class CompareDDLTriggers : CompareBase<Trigger>
 
             if (node.IsDisabled != originFields[node.FullName].IsDisabled)
             {
-                newNode.Status += (int)ObjectStatus.Disabled;
+                newNode.Status |= ObjectStatus.Disabled;
             }
 
             originFields[node.FullName] = newNode;

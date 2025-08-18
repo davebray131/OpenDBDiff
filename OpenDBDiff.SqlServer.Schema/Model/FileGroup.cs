@@ -16,11 +16,11 @@ public class FileGroup : SQLServerSchemaBase
             IsDefaultFileGroup = IsDefaultFileGroup,
             IsReadOnly = IsReadOnly,
             Name = Name,
-            Id = Id
+            Id = Id,
+            Guid = Guid,
+            IsFileStream = IsFileStream,
         };
         file.Files = Files.Clone(file);
-        file.Guid = Guid;
-        file.IsFileStream = IsFileStream;
         return file;
     }
 
@@ -66,26 +66,19 @@ public class FileGroup : SQLServerSchemaBase
     public override string ToSql()
     {
         var sql = ToSQL("ADD");
-        foreach (var file in Files)
-        {
-            sql += file.ToSql();
-        }
 
+        Files.ForEach(file => sql += file.ToSql());
         if (IsDefaultFileGroup)
         {
             sql += ToSQL("MODIFY");
         }
-
         return sql;
     }
 
     public override string ToSqlAdd()
     {
         var sql = ToSQL("ADD");
-        foreach (var file in Files)
-        {
-            sql += file.ToSqlAdd();
-        }
+        Files.ForEach(file => sql += file.ToSqlAdd());
 
         if (IsDefaultFileGroup)
         {
@@ -97,29 +90,24 @@ public class FileGroup : SQLServerSchemaBase
 
     public string ToSQLAlter() => ToSQL("MODIFY");
 
-    public override string ToSqlDrop()
-    {
-        var sql = Files.ToSQLDrop();
-        return $"{sql}ALTER DATABASE [{Parent.Name}] REMOVE FILEGROUP [{Name}]\r\nGO\r\n\r\n";
-    }
+    public override string ToSqlDrop() =>
+       $"{Files.ToSQLDrop()}ALTER DATABASE [{Parent.Name}] REMOVE FILEGROUP [{Name}]\r\nGO\r\n\r\n";
 
     public override SQLScriptList ToSqlDiff(System.Collections.Generic.ICollection<ISchemaBase> schemas)
     {
         var listDiff = new SQLScriptList();
 
-        if (Status == ObjectStatus.Drop)
+        switch (Status)
         {
-            listDiff.Add(ToSqlDrop(), 1, ScriptAction.DropFileGroup);
-        }
-
-        if (Status == ObjectStatus.Create)
-        {
-            listDiff.Add(ToSqlAdd(), 1, ScriptAction.AddFileGroup);
-        }
-
-        if (Status == ObjectStatus.Alter)
-        {
-            listDiff.Add(ToSQLAlter(), 1, ScriptAction.AlterFileGroup);
+            case ObjectStatus.Drop:
+                listDiff.Add(ToSqlDrop(), 1, ScriptAction.DropFileGroup);
+                break;
+            case ObjectStatus.Create:
+                listDiff.Add(ToSqlAdd(), 1, ScriptAction.AddFileGroup);
+                break;
+            case ObjectStatus.Alter:
+                listDiff.Add(ToSQLAlter(), 1, ScriptAction.AlterFileGroup);
+                break;
         }
 
         return listDiff;
