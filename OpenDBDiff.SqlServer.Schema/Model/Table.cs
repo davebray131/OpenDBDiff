@@ -138,6 +138,11 @@ public class Table : SQLServerSchemaBase, IComparable<Table>, ITable<Table>
 
     public string ToSql(bool showFK)
     {
+        List<Constraint.ConstraintType> constraintTypes = [Constraint.ConstraintType.PrimaryKey, Constraint.ConstraintType.Unique];
+        if (showFK)
+        {
+            constraintTypes.Add(Constraint.ConstraintType.ForeignKey);
+        }
         Database database = null;
         ISchemaBase current = this;
         while (database == null && current.Parent != null)
@@ -160,10 +165,10 @@ public class Table : SQLServerSchemaBase, IComparable<Table>, ITable<Table>
             sql.AppendLine($"CREATE TABLE {FullName}");
             sql.AppendLine("(");
             sql.Append(Columns.ToSql());
-            if (Constraints.Any())
+            if (Constraints.Any(r => constraintTypes.Contains(r.Type)))
             {
                 List<string> keys = [];
-                foreach (var itemType in (List<Constraint.ConstraintType>)[Constraint.ConstraintType.PrimaryKey, Constraint.ConstraintType.Unique, Constraint.ConstraintType.ForeignKey])
+                foreach (var itemType in constraintTypes)
                 {
                     foreach (var item in Constraints.Where(c => !c.HasState(ObjectStatus.Drop) && c.Type == itemType))
                     {

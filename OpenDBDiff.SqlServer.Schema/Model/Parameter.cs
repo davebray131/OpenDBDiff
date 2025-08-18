@@ -18,21 +18,14 @@ public class Parameter
 
     public string ToSql()
     {
-        var sql = Name + " [" + Type + "]";
+        var sql = $"{Name} [{Type}]";
         if (Type.Equals("binary") || Type.Equals("varbinary") || Type.Equals("varchar") || Type.Equals("char") || Type.Equals("nchar") || Type.Equals("nvarchar"))
         {
-            if (Size == -1)
-            {
-                sql += "(max)";
-            }
-            else
-            {
-                sql += "(" + Size.ToString(CultureInfo.InvariantCulture) + ")";
-            }
+            sql += (Size == -1) ? "(max)" : $"({Size.ToString(CultureInfo.InvariantCulture)})";
         }
         if (Type.Equals("numeric") || Type.Equals("decimal"))
         {
-            sql += "(" + Precision.ToString(CultureInfo.InvariantCulture) + "," + Scale.ToString(CultureInfo.InvariantCulture) + ")";
+            sql += $"({Precision.ToString(CultureInfo.InvariantCulture)},{Scale.ToString(CultureInfo.InvariantCulture)})";
         }
 
         if (Output)

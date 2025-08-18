@@ -184,7 +184,7 @@ public class Index(ISchemaBase parent) : SQLServerSchemaBase(parent, ObjectType.
             }
         }
 
-        sql.AppendLine(string.Join("\r\n", indexColumns));
+        sql.AppendLine(string.Join(",\r\n", indexColumns));
 
         if (includes.Count > 0)
         {

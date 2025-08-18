@@ -97,11 +97,11 @@ public partial class MainForm : Form
                 txtSyncScript.SetMarginWidth();
 
                 // Notice again that left is destination, because we generated scripts to migrate the right database to the left.
-                schemaTreeView1.LeftDatabase = progress.Destination;
-                schemaTreeView1.RightDatabase = progress.Origin;
+                schemaTree.LeftDatabase = progress.Destination;
+                schemaTree.RightDatabase = progress.Origin;
 
-                schemaTreeView1.OnSelectItem += new SchemaTreeView.SchemaHandler(SchemaTreeView1_OnSelectItem);
-                SchemaTreeView1_OnSelectItem(schemaTreeView1.SelectedNode);
+                schemaTree.OnSelectItem += new SchemaTreeView.SchemaHandler(SchemaTreeView1_OnSelectItem);
+                SchemaTreeView1_OnSelectItem(schemaTree.SelectedNode);
                 textActionReport.Text = progress.Origin.ActionMessage.Message;
 
                 btnCopy.Enabled = true;
@@ -141,7 +141,7 @@ public partial class MainForm : Form
                 return;
             }
 
-            var database = (IDatabase)schemaTreeView1.LeftDatabase;
+            var database = (IDatabase)schemaTree.LeftDatabase;
 
             ObjectStatus? status;
 
@@ -154,7 +154,7 @@ public partial class MainForm : Form
                 btnCompareTableData.Enabled = database.Find(nodeFullName).ObjectType == ObjectType.Table;
             }
 
-            database = (IDatabase)schemaTreeView1.RightDatabase;
+            database = (IDatabase)schemaTree.RightDatabase;
             status = database.Find(nodeFullName)?.Status;
             if (status.HasValue && status.Value != ObjectStatus.Create)
             {
@@ -238,9 +238,9 @@ public partial class MainForm : Form
             return;
         }
 
-        if (schemaTreeView1.LeftDatabase is IDatabase db)
+        if (schemaTree.LeftDatabase is IDatabase db)
         {
-            _selectedSchemas = schemaTreeView1.GetCheckedSchemas();
+            _selectedSchemas = schemaTree.GetCheckedSchemas();
             txtSyncScript.ReadOnly = false;
             txtSyncScript.Text = db.ToSqlDiff(_selectedSchemas).ToSQL();
             txtSyncScript.ReadOnly = true;
@@ -250,7 +250,7 @@ public partial class MainForm : Form
 
     private void BtnCompareTableData_Click(object sender, EventArgs e)
     {
-        var tree = (TreeView)schemaTreeView1.Controls.Find("treeView1", true)[0];
+        var tree = (TreeView)schemaTree.Controls.Find("treeView1", true)[0];
         var selected = (ISchemaBase)tree.SelectedNode.Tag;
         var dataCompare = new DataCompareForm(selected, LeftDatabaseSelector.ConnectionString, RightDatabaseSelector.ConnectionString);
         dataCompare.ShowDialog();
@@ -262,10 +262,10 @@ public partial class MainForm : Form
         try
         {
             Cursor = Cursors.WaitCursor;
-            _selectedSchemas = schemaTreeView1.GetCheckedSchemas();
+            _selectedSchemas = schemaTree.GetCheckedSchemas();
             StartComparison();
             //schemaTreeView1.SetCheckedSchemas(_selectedSchemas);  // If you want to recall last schemas
-            schemaTreeView1.SelectAllSchemas(); // If you want to select all schemas after a compare
+            schemaTree.SelectAllSchemas(); // If you want to select all schemas after a compare
             errorLocation = "Saving Connections";
             Project.SaveLastConfiguration(LeftDatabaseSelector.ConnectionString, RightDatabaseSelector.ConnectionString);
 
@@ -350,10 +350,10 @@ public partial class MainForm : Form
             saveFileDialog1.ShowDialog(this);
             if (!string.IsNullOrEmpty(saveFileDialog1.FileName))
             {
-                if (schemaTreeView1.LeftDatabase is IDatabase db)
+                if (schemaTree.LeftDatabase is IDatabase db)
                 {
                     using var writer = new StreamWriter(saveFileDialog1.FileName, false);
-                    _selectedSchemas = schemaTreeView1.GetCheckedSchemas();
+                    _selectedSchemas = schemaTree.GetCheckedSchemas();
                     writer.Write(db.ToSqlDiff(_selectedSchemas).ToSQL());
                     writer.Close();
                 }
@@ -380,7 +380,7 @@ public partial class MainForm : Form
 
     private void BtnUpdate_Click(object sender, EventArgs e)
     {
-        var tree = (TreeView)schemaTreeView1.Controls.Find("treeView1", true)[0];
+        var tree = (TreeView)schemaTree.Controls.Find("treeView1", true)[0];
         var dbArm = tree.Nodes[0];
         var sb = new StringBuilder();
 
@@ -395,7 +395,7 @@ public partial class MainForm : Form
                         //ISchemaBase selected = (ISchemaBase)tree.SelectedNode.Tag;
                         var selected = (ISchemaBase)subnode.Tag;
 
-                        var database = (IDatabase)schemaTreeView1.LeftDatabase;
+                        var database = (IDatabase)schemaTree.LeftDatabase;
 
                         if (database.Find(selected.FullName) != null)
                         {
@@ -483,7 +483,7 @@ public partial class MainForm : Form
     {
         if (MessageBox.Show("Are you sure you want to update all?", "Confirm update", MessageBoxButtons.OKCancel) == DialogResult.OK)
         {
-            var tree = (TreeView)schemaTreeView1.Controls.Find("treeView1", true)[0];
+            var tree = (TreeView)schemaTree.Controls.Find("treeView1", true)[0];
             var database = tree.Nodes[0];
             var sb = new StringBuilder();
             foreach (TreeNode tn in database.Nodes)
