@@ -39,7 +39,7 @@ public class GenerateUsers(Generate root)
                         Id = (int)reader["principal_id"],
                         Name = reader["name"].ToString(),
                         Owner = reader["default_schema_name"].ToString(),
-                        Password = "",
+                        Password = string.Empty,
                         IsSystem = (bool)reader["is_fixed_role"],
                         Type = type.Equals("A") ? Role.RoleTypeEnum.ApplicationRole : Role.RoleTypeEnum.DatabaseRole
                     };

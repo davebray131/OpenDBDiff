@@ -25,7 +25,7 @@ public class SqlOptionDefault : IOptionsContainer<string>
     {
     }
 
-    public string DefaultXml { get; set; } = "";
+    public string DefaultXml { get; set; } = string.Empty;
 
     public string DefaultTime { get; set; } = "00:00:00";
 

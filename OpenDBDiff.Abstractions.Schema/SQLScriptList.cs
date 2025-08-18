@@ -50,7 +50,7 @@ public class SQLScriptList
 
     /*private string ToSqlDown(SQLScript item)
     {
-        string sql = "";
+        string sql = string.Empty;
         for (int i = 0; i < item.Childs.Count; i++)
         {
             for (int k = 0; k < item.Childs[i].Childs.Count; k++)

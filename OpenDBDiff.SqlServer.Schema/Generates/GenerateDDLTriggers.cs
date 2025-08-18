@@ -28,7 +28,7 @@ public class GenerateDDLTriggers(Generate root)
                     IsDisabled = (bool)reader["is_disabled"],
                     IsDDLTrigger = true,
                     NotForReplication = (bool)reader["is_not_for_replication"],
-                    Owner = ""
+                    Owner = string.Empty
                 };
                 database.DDLTriggers.Add(trigger);
             }

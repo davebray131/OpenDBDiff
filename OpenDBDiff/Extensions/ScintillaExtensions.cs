@@ -51,7 +51,7 @@ public static class ScintillaExtensions
         // user4 = 7
         scintilla.SetKeywords(7, @"between and or union like ");
 
-        scintilla.Text = "";
+        scintilla.Text = string.Empty;
         scintilla.SetMarginWidth();
     }
 

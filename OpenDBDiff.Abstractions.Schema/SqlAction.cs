@@ -80,7 +80,7 @@ public class SqlAction(ISchemaBase item)
     {
         get
         {
-            var message = "";
+            var message = string.Empty;
             if (Action == ObjectStatus.Drop)
             {
                 message = "DROP " + GetTypeName() + " " + Name + "\r\n";

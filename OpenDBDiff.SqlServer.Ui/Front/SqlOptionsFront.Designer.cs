@@ -1090,7 +1090,7 @@ namespace OpenDBDiff.SqlServer.Ui
             // 
             // columnHeader4
             // 
-            this.columnHeader4.Text = "";
+            this.columnHeader4.Text = string.Empty;
             // 
             // btnApply
             // 

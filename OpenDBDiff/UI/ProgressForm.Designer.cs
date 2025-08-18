@@ -77,7 +77,7 @@ namespace OpenDBDiff.UI
             this.destinationProgressControl.DatabaseName = "Destination:";
             this.destinationProgressControl.Location = new System.Drawing.Point(12, 15);
             this.destinationProgressControl.Maximum = 100;
-            this.destinationProgressControl.Message = "";
+            this.destinationProgressControl.Message = string.Empty;
             this.destinationProgressControl.Name = "destinationProgressControl";
             this.destinationProgressControl.Size = new System.Drawing.Size(472, 64);
             this.destinationProgressControl.TabIndex = 34;
@@ -88,7 +88,7 @@ namespace OpenDBDiff.UI
             this.originProgressControl.DatabaseName = "Source:";
             this.originProgressControl.Location = new System.Drawing.Point(12, 92);
             this.originProgressControl.Maximum = 100;
-            this.originProgressControl.Message = "";
+            this.originProgressControl.Message = string.Empty;
             this.originProgressControl.Name = "originProgressControl";
             this.originProgressControl.Size = new System.Drawing.Size(472, 64);
             this.originProgressControl.TabIndex = 35;

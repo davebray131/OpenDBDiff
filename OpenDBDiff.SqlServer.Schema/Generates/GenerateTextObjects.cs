@@ -15,7 +15,7 @@ public class GenerateTextObjects(Generate root)
     private static string GetSQL(SqlOption options)
     {
         var filterQuery = SQLQueries.SQLQueryFactory.Get("GetTextObjectsQuery");
-        var filter = "";
+        var filter = string.Empty;
         if (options.Ignore.FilterStoredProcedure)
         {
             filter += "O.type = 'P' OR ";

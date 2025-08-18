@@ -24,7 +24,7 @@ public class GenerateFileGroups(Generate root)
             {
                 Id = (int)reader["file_id"],
                 Name = reader["name"].ToString(),
-                Owner = "",
+                Owner = string.Empty,
                 Growth = (int)reader["growth"],
                 IsPercentGrowth = (bool)reader["is_percent_growth"],
                 IsSparse = (bool)reader["is_sparse"],
@@ -53,7 +53,7 @@ public class GenerateFileGroups(Generate root)
                     {
                         Id = (int)reader["ID"],
                         Name = reader["name"].ToString(),
-                        Owner = "",
+                        Owner = string.Empty,
                         IsDefaultFileGroup = (bool)reader["is_default"],
                         IsReadOnly = (bool)reader["is_read_only"],
                         IsFileStream = reader["type"].Equals("FD")
